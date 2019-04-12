@@ -1,0 +1,46 @@
+*, *::after, *::before{
+	box-sizing: border-box;
+}
+
+.Stage{
+	width: 600px;
+	height: 480px;
+	background: #eee;
+	overflow: hidden;
+	position: relative;
+}
+
+.Scene{
+	width: 900px;
+	height: 480px;
+	background: blue;
+	position: relative;
+	transition: all .1s linear;
+}
+.Scene-Floor{
+	width: 900px;
+	height: 30px;
+	background: brown;
+	position: absolute;
+	bottom: 0;
+}
+
+
+.Puppet{
+	width: 40px;
+	height: 60px;
+	background: black;
+	position: absolute;
+	left: 40px;
+	bottom: 60px;
+	transition: all .1s linear;
+}
+
+
+.Box{
+	width: 40px;
+	height: 40px;
+	background: brown;
+	position: absolute;
+	bottom: 30px;
+}
