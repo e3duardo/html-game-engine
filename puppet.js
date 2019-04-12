@@ -39,28 +39,40 @@ class Puppet {
 	}
 
 	goAhead = ()=>{
+		this.x += speedX;
 
-		if(!this.colide(speedX, 0)){
-			this.x += speedX;
-
-			if(this.x>100){
-				scene.x -= speedX;
-			}
+		if(this.x> -scene.x+80){
+			scene.x -= speedX;
 		}
 
-		const puppetOutsideScene = this.x >= scene.width-this.width
-		if(puppetOutsideScene){
+		const isOutsideScene = this.x >= scene.width-this.width
+		if(isOutsideScene){
 			this.x = scene.width-this.width;
 		}
+
+		this.tag.classList.remove('Puppet-tras');
+		this.tag.classList.remove('Puppet-frente');
+		this.tag.classList.add('Puppet-frente');
 	}
+
 	goBack = ()=>{
-		if(!this.colide(-speedX, 0)  && (this.x - speedX)>0 && this.x > -(scene.x) ){
-			this.x -= speedX;
+		this.x -= speedX;
+
+		const isOutsideScene = this.x < -scene.x;
+		if(isOutsideScene){
+			this.x = -scene.x;
 		}
+
+		this.tag.classList.remove('Puppet-frente');
+		this.tag.classList.remove('Puppet-tras');
+		this.tag.classList.add('Puppet-tras');
 	}
+
 	jump = ()=>{
 		console.log(gravitySpeed);
-		gravitySpeed = -20;
+		if(this.colide(0, 10)){
+			gravitySpeed = -5;
+		}
 		//gravity = 0;
 		// if(this.colide(0, scale)){
 		//   this.tag.style.top = (this.tag.offsetTop - (scale*10)) + 'px';

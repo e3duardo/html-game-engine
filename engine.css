@@ -15,7 +15,7 @@
 	height: 480px;
 	background: blue;
 	position: relative;
-	transition: all .1s linear;
+	transition: all .04s linear;
 }
 .Scene-Floor{
 	height: 30px;
@@ -32,10 +32,29 @@
 	position: absolute;
 	left: 40px;
 	bottom: 60px;
-	transition: all .1s linear;
+	transition: all .04s linear;
 	z-index: 10;
+	border-top-left-radius: 40px;
+	border-top-right-radius: 40px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 }
-
+.Puppet:before {
+    background: #444;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    content: '. .';
+    border-radius: 40px;
+	 text-align: right;
+	 color: #fff;
+}
+.Puppet-frente:before {
+	text-align: right;
+}
+.Puppet-tras:before {
+	text-align: left;
+}
 
 .Box{
 	width: 40px;

@@ -1,8 +1,8 @@
 'use strict'
 
-const speedX = 30;
+const speedX = 20;
 const speedY = 0;
-const gravity = 0.30;
+const gravity = 0.10;
 let gravitySpeed = 0;
 
 const stage = new Stage();
@@ -14,7 +14,7 @@ let isPaused = false;
 
 setInterval(function(){
 	puppet.gravity();
-}, 10);
+}, 20);
 
 
 document.addEventListener("keydown", function(e){
