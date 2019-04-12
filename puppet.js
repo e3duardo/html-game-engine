@@ -1,6 +1,7 @@
 class Puppet {
 	constructor() {
 		this.tag = document.querySelector('.Puppet');
+		this.running;
 	}
 
 	get x (){ return this.tag.offsetLeft; }
@@ -50,9 +51,18 @@ class Puppet {
 			this.x = scene.width-this.width;
 		}
 
-		this.tag.classList.remove('Puppet-tras');
-		this.tag.classList.remove('Puppet-frente');
-		this.tag.classList.add('Puppet-frente');
+
+		this.tag.classList.remove('Puppet-backwards');
+		this.tag.classList.remove('Puppet-ahead');
+		this.tag.classList.add('Puppet-ahead');
+
+
+		const tag = this.tag;
+		clearTimeout(this.running)
+		tag.classList.add('Puppet-running');
+		this.running = setTimeout(function(){
+			tag.classList.remove('Puppet-running');
+		},40);
 	}
 
 	goBack = ()=>{
@@ -63,30 +73,39 @@ class Puppet {
 			this.x = -scene.x;
 		}
 
-		this.tag.classList.remove('Puppet-frente');
-		this.tag.classList.remove('Puppet-tras');
-		this.tag.classList.add('Puppet-tras');
+
+		this.tag.classList.remove('Puppet-ahead');
+		this.tag.classList.remove('Puppet-backwards');
+		this.tag.classList.add('Puppet-backwards');
+
+
+		const tag = this.tag;
+		clearTimeout(this.running)
+		tag.classList.add('Puppet-running');
+		this.running = setTimeout(function(){
+			tag.classList.remove('Puppet-running');
+		},40);
 	}
 
 	jump = ()=>{
 		const tag = this.tag;
 
 		if(this.colide(0, 10)){
-			gravitySpeed = -5;
-			tag.classList.add('Puppet-olho-fechado');
+			gravitySpeed = -12;
+			tag.classList.add('Puppet-blink');
 		}
 
 		setTimeout(function(){
-			tag.classList.remove('Puppet-olho-fechado');
-		},200);
+			tag.classList.remove('Puppet-blink');
+		},50);
 	}
 
 	dive = ()=>{
 		const tag = this.tag;
 
-		gravitySpeed = +5;
+		gravitySpeed = +20;
 
-		tag.classList.add('Puppet-olho-fechado');
+		tag.classList.add('Puppet-blink');
 
 		setTimeout(function(){
 			tag.classList.remove('Puppet-olho-fechado');

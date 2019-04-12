@@ -26,37 +26,55 @@
 
 
 .Puppet{
-	width: 40px;
-	height: 60px;
+	width: 20px;
+	height: 50px;
 	background: black;
 	position: absolute;
 	left: 40px;
 	bottom: 60px;
 	transition: all .04s linear;
 	z-index: 10;
-	border-top-left-radius: 40px;
-	border-top-right-radius: 40px;
+	border-top-left-radius: 30px;
+	border-top-right-radius: 30px;
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 }
 .Puppet:before {
     background: #444;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
+	 left:-5px;
     position: absolute;
     content: '. .';
-    border-radius: 40px;
+    border-radius: 30px;
 	 text-align: right;
 	 color: #fff;
 }
-.Puppet-frente:before {
+.Puppet-ahead:before {
 	text-align: right;
 }
-.Puppet-tras:before {
+.Puppet-backwards:before {
 	text-align: left;
 }
-.Puppet-olho-fechado:before {
+.Puppet-blink:before {
 	color: #444;
+}
+.Puppet:after {
+    content: ' ';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #444;
+    border-radius: 10px;
+    top: 30px;
+    left: 10px;
+}
+.Puppet-running:after {
+	 animation: run .4s linear 0s infinite alternate;
+}
+@keyframes run {
+	from { left: -10px; }
+	to { left: 20px ;}
 }
 
 .Box{
