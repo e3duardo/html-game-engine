@@ -69,13 +69,28 @@ class Puppet {
 	}
 
 	jump = ()=>{
-		console.log(gravitySpeed);
+		const tag = this.tag;
+
 		if(this.colide(0, 10)){
 			gravitySpeed = -5;
+			tag.classList.add('Puppet-olho-fechado');
 		}
-		//gravity = 0;
-		// if(this.colide(0, scale)){
-		//   this.tag.style.top = (this.tag.offsetTop - (scale*10)) + 'px';
-		// }
+
+		setTimeout(function(){
+			tag.classList.remove('Puppet-olho-fechado');
+		},200);
+	}
+
+	dive = ()=>{
+		const tag = this.tag;
+
+		gravitySpeed = +5;
+
+		tag.classList.add('Puppet-olho-fechado');
+
+		setTimeout(function(){
+			tag.classList.remove('Puppet-olho-fechado');
+		},200);
+
 	}
 }

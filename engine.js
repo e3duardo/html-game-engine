@@ -31,7 +31,7 @@ document.addEventListener("keydown", function(e){
       puppet.goAhead();
     break;
     case "ArrowDown":
-      //puppet.style.left += (puppet.offsetTop + scale) +'px';
+	 	puppet.dive();
     break;
   }
 }, false);

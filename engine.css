@@ -55,6 +55,9 @@
 .Puppet-tras:before {
 	text-align: left;
 }
+.Puppet-olho-fechado:before {
+	color: #444;
+}
 
 .Box{
 	width: 40px;
