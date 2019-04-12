@@ -5,10 +5,12 @@ const speedY = 0;
 const gravity = 0.30;
 let gravitySpeed = 0;
 
+const stage = new Stage();
+const scene = new Scene();
 const puppet = new Puppet();
+
 let isPaused = false;
 
-const scene = document.querySelector('.Scene');
 
 setInterval(function(){
 	puppet.gravity();
