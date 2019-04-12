@@ -39,6 +39,7 @@ class Puppet {
 	}
 
 	goAhead = ()=>{
+
 		if(!this.colide(speedX, 0)){
 			this.x += speedX;
 
@@ -46,10 +47,13 @@ class Puppet {
 				scene.x -= speedX;
 			}
 		}
+
+		const puppetOutsideScene = this.x >= scene.width-this.width
+		if(puppetOutsideScene){
+			this.x = scene.width-this.width;
+		}
 	}
 	goBack = ()=>{
-		console.log()
-
 		if(!this.colide(-speedX, 0)  && (this.x - speedX)>0 && this.x > -(scene.x) ){
 			this.x -= speedX;
 		}

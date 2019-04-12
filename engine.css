@@ -33,6 +33,7 @@
 	left: 40px;
 	bottom: 60px;
 	transition: all .1s linear;
+	z-index: 10;
 }
 
 
