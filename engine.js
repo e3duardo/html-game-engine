@@ -12,7 +12,6 @@ const puppet = new Puppet();
 let isPaused = false;
 let keys = [];
 
-
 setInterval(function(){
 	puppet.gravity();
 
@@ -30,9 +29,6 @@ setInterval(function(){
 	}
 }, 20);
 
-
-	//
-
 document.addEventListener("keydown", function(e){
 	if(keys.indexOf(e.key) == -1){
 		keys.push(e.key);
@@ -41,26 +37,3 @@ document.addEventListener("keydown", function(e){
 document.addEventListener("keyup", function(e){
 	keys.splice(keys.indexOf(e.key), 1);
 });
-
-
-
-//
-//
-// $(document.body).keydown(function (evt) {
-//   var li = pressedKeys[evt.keyCode];
-//   if (!li) {
-// 		li = log.appendChild(document.createElement('li'));
-// 		pressedKeys[evt.keyCode] = li;
-//   }
-//   $(li).text('Down: ' + evt.keyCode);
-//   $(li).removeClass('key-up');
-// });
-//
-// $(document.body).keyup(function (evt) {
-//   var li = pressedKeys[evt.keyCode];
-//   if (!li) {
-// 	  li = log.appendChild(document.createElement('li'));
-//   }
-//   $(li).text('Up: ' + evt.keyCode);
-//   $(li).addClass('key-up');
-// });

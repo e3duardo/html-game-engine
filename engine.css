@@ -22,6 +22,7 @@
 	background: brown;
 	position: absolute;
 	bottom: 0;
+	border-top: 5px solid green;
 }
 
 

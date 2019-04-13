@@ -13,8 +13,11 @@ class Puppet {
 	get width (){ return this.tag.clientWidth; }
 	get height (){ return this.tag.clientHeight; }
 
-	colide = (previewX, previewY)=>{
-		const collidables = document.querySelectorAll('.collidable');
+	colide = (previewX, previewY, topColliders)=>{
+		let collidables = document.querySelectorAll('.collidable');
+		if(topColliders){
+			collidables = [...collidables,...document.querySelectorAll('.collidable-top')];
+		}
 
 		for (var i = 0; i < collidables.length; i++) {
 			const collidable = collidables[i];
@@ -33,7 +36,7 @@ class Puppet {
 	}
 
 	gravity = ()=>{
-		if(gravitySpeed<0 || !this.colide(0, speedY+gravitySpeed)){
+		if(gravitySpeed<0 || !this.colide(0, speedY+gravitySpeed, true)){
 			gravitySpeed += gravity;
 			this.y = (this.y + (speedY+gravitySpeed));
 		}
