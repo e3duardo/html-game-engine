@@ -6,7 +6,7 @@
   "scripts": {
     "start": "parcel index.html",
     "watch": "parcel watch index.html",
-    "build": "parcel build index.html --public-url /html-game-engine/"
+    "build": "parcel build index.html --public-url /html-game-engine"
   },
   "repository": {
     "type": "git",
