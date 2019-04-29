@@ -3,37 +3,42 @@
   <head>
     <meta charset="utf-8">
     <title>Html Game Engine</title>
-	 <link rel="stylesheet" type="text/css" href="engine.css">
+	 <link rel="stylesheet" type="text/css" href="style/engine.less">
+	 <link rel="stylesheet" type="text/css" href="style/sprites.less">
+	 <link rel="stylesheet" type="text/css" href="style/puppet.less">
   </head>
   <body>
-
 	  <div class="Stage">
-
 		  <div class="Scene">
 
 			  <div class="Puppet"></div>
 
 
-			  <div class="Box collidable" style="left: 100px;"></div>
-			  <div class="Box collidable" style="left: 400px;"></div>
-			  <div class="Box collidable" style="left: 800px;"></div>
+			  <div class="Box Collidable" style="left: 100px;"></div>
+			  <div class="Box Collidable" style="left: 400px;"></div>
+			  <div class="Box Collidable" style="left: 800px;"></div>
 
-			  <div class="Box collidable" style="left: 1000px;"></div>
-			  <div class="Box collidable" style="left: 1040px;bottom:70px;"></div>
-			  <div class="Box collidable" style="left: 1080px;bottom:120px;"></div>
-			  <div class="Box collidable-top" style="left: 1350px;width: 300px;bottom: 30px;height: 60px;background: burlywood;"></div>
+			  <div class="Box Collidable" style="left: 1000px;"></div>
+			  <div class="Box Collidable" style="left: 1040px;bottom:70px;"></div>
+			  <div class="Box Collidable" style="left: 1080px;bottom:120px;"></div>
+			  <div class="Box Collidable Collidable-Top" style="left: 1350px;width: 300px;bottom: 30px;height: 60px;background: burlywood;"></div>
 
-			  <div class="Scene-Floor collidable" style="left: 0; width: 250px;"></div>
-			  <div class="Scene-Floor collidable" style="left: 320px; width:1780px;"></div>
+			  <div class="Box Collidable Grass" style="left: 0;"></div>
+			  <div class="Box Collidable Floor" style="bottom: 15px; left: 0;"></div>
+			  <div class="Box Collidable Floor" style="bottom: 0; left: 0;"></div>
+
+			  <div class="Box Collidable Grass" style="left: 68px;"></div>
+			  <div class="Box Collidable Floor" style="bottom: 15px; left: 68px;"></div>
+			  <div class="Box Collidable Floor" style="bottom: 0; left: 68px;"></div>
+
+			  <div class="Box Collidable Grass" style="left: 136px;"></div>
+			  <div class="Box Collidable Floor" style="bottom: 15px; left: 136px;"></div>
+			  <div class="Box Collidable Floor" style="bottom: 0; left: 136px;"></div>
 
 		  </div>
 
 	  </div>
 
-	  <script src="stage.js"></script>
-	  <script src="scene.js"></script>
-	  <script src="puppet.js"></script>
-	  <script src="engine.js"></script>
-
+	  <script src="index.js"></script>
   </body>
 </html>
