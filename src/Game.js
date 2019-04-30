@@ -2,11 +2,7 @@ import Puppet from './Puppet';
 
 class Game {
 	constructor(){
-		this.stageTag = document.querySelector('.Stage');
-		this.sceneTag = document.querySelector('.Scene');
-
 		this.puppet = new Puppet(this);
-
 
 		this.ticks = 0;
 
@@ -45,6 +41,18 @@ class Game {
 	    // showStartMenu()
 	}
 
+	gameOver = ()=>{
+		console.error('dead');
+		// sound_dead()
+		if (--this.puppet.lives > 0) {
+			this.puppet.respawnPlayer()
+		} else {
+		// todo: dying animation
+		// actors = []
+			//showGameOver()
+		}
+	}
+
 	play = ()=>{
 	    // hideMenus();
 	    // registerControls()
@@ -59,13 +67,6 @@ class Game {
 	    window.clearInterval(this.gameInterval);
 	    // initGame()
 	    // startGame()
-	}
-
-	get width (){
-		return this.sceneTag.offsetWidth;
-	}
-	get height (){
-		return this.sceneTag.offsetHeight;
 	}
 }
 

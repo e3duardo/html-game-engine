@@ -1,5 +1,22 @@
 import Game from "./Game";
+import Scene from './Scene';
+import Stage from './Stage';
 import Control from './Control';
+
+var size = {
+    tile:{ // size of tiles
+        source:{w:16, h:16},
+        target:{w:32, h:32}
+    },
+    tiles:{ // number of tiles
+        target:{w:1, h:1} // this is set dynamically depending on the canvas size
+    },
+    canvas:{w:1, h:1} // the canvas size is read from the actual html
+};
+Number.prototype.inRange = function (a, b) {
+    var n = +this;
+    return ( n >= a && n <= b );
+};
 
 class Puppet {
 
@@ -15,7 +32,7 @@ class Puppet {
 		this.speedX=0;
 		this.speedY=0;
 
-		this.lives=1;
+		this.lives=3;
 
 		// var speed = {
 		//   player:{
@@ -25,14 +42,14 @@ class Puppet {
 		//
 		// // run
 		// if (held.right) {
-		//   actor.speed.x += speed.player.velocity_x;
+		//   this.speedX += speed.player.velocity_x;
 		// }
 		//
 		// // jump
-		// if (held.up) { actor.speed.y -= speed.player.velocity_y; }
+		// if (held.up) { this.speedY -= speed.player.velocity_y; }
 		//
 		// // apply gravity.
-		// actor.speed.y += speed.player.gravity;
+		// this.speedY += speed.player.gravity;
 
 
 
@@ -100,116 +117,182 @@ class Puppet {
 		}
 
 
+		this.x += this.speedX;
+		this.y += this.speedY;
 
-/*
+		// block on level edge
+		if (this.x < 0) {
+			this.x = 0;
+		} else if (this.x + this.width > Scene.width) {
+			this.x = Scene.width - this.width;
+		}
+		// die on level bottom
+		// console.warn(this.y, Stage.height)
+		if (this.y > Stage.height) {
+			Game.gameOver();
+		}
+
+		// add visible items + actors to collision check
+		// todo: only add visible items
+		Scene.collisionMap.forEach((object)=>{
 
 
+			var collides = {top:false, bottom:false, left:false, right:false};
+			// we are below or above an object (use the middle of the actor, with tolerance)
+			if ((this.x + this.width / 2).inRange(object.x - 0.25, object.x + object.width + 1.25)) {
+			// if ((this.x + this.width / 2).inRange(object.x - 0.25 * size.tile.target.w, object.x + 1.25 * size.tile.target.w)) {
+				// check bounce bottom:
+				// if ((this.y + this.height).inRange(object.y, object.y + size.tile.target.h - 1) && this.y < object.y) {
 
-     actor.pos.x += actor.speed.x;
-     actor.pos.y += actor.speed.y;
+				if ((this.y + this.height).inRange(object.y, object.y + object.height - 1) && this.y < object.y) {
+					collides.bottom = true;
+				// check bounce top:
+				// } else if (this.y.inRange(object.y, object.y + size.tile.target.h)) {
+				} else if (this.y.inRange(object.y, object.y + object.height)) {
+					collides.top = true;
+				}
+			}
+			// we are right or left of an object
+			// if ((this.y + this.height / 2).inRange(object.y - 0.25 * size.tile.target.h, object.y + 1.25 * size.tile.target.h)) {
+			if ((this.y + this.height / 2).inRange(object.y - 0.25, object.y + object.height + 1.25)) {
+				// check bounce right
+				// if ((this.x + this.width).inRange(object.x, object.x + size.tile.target.w)) {
+				if ((this.x + this.width).inRange(object.x, object.x + object.width)) {
+					collides.right = true;
+				}
+				// check bounce left
+				// if (this.x.inRange(object.x, object.x + size.tile.target.w)) {
+				if (this.x.inRange(object.x, object.x + object.width)) {
+					collides.left = true;
+				}
+			}
 
-     // block on level edge
-     if (actor.pos.x < 0) {
-         actor.pos.x = 0;
-     } else if (actor.pos.x + actor.target_size.w > current_level.width) {
-         actor.pos.x = current_level.width - actor.target_size.w;
-     }
-     // die on level bottom
-     if (actor.pos.y > size.canvas.h) {
-         gameOver();
-     }
-
-     // add visible items + actors to collision check
-     // todo: only add visible items
-     collisionMap = collisionMap.concat(items);
-
-     collisionMap.forEach(function (object) {
-
-         var collides = checkCollision(actor, object);
-
-         // apply collision to player movement
-         // special actions on collisions
-         if (object.solid) {
+			if (object.solid) {
              if (collides.top) {
-                 if (object.type == 'block_coin') {
-                     replaceLevelSpriteXY(object.x, object.y, "ß");
-                     items.push({ sx:8, sy:9, x:object.x, y:(object.y - size.tile.target.h), type:'coin' });
-                 } else {
-                     actor.pos.y = object.y + size.tile.target.h;
-                     actor.speed.y = 1;
-                 }
+                 // if (object.type == 'block_coin') {
+                 //     replaceLevelSpriteXY(object.x, object.y, "ß");
+                 //     items.push({ sx:8, sy:9, x:object.x, y:(object.y - size.tile.target.h), type:'coin' });
+                 // } else {
+                     this.y = object.y + this.height;// + size.tile.target.h;
+                     this.speedY = 1;
+                 // }
              } else if (collides.bottom) {
                  // jump on enemy
-                 if (object.type == 'enemy_mushroom') {
-                     object.deadly = false
-                     object.speed = 0
-                     object.sx = 2
-                     score++;
-                     sound_jump_on_enemy()
-                 }
-                 actor.pos.y = object.y - actor.target_size.h;
-                 actor.speed.y = 0;
+                 // if (object.type == 'enemy_mushroom') {
+                 //     object.deadly = false
+                 //     object.speed = 0
+                 //     object.sx = 2
+                 //     score++;
+                 //     sound_jump_on_enemy()
+                 // }
+                 this.y = object.y - this.height;
+                 this.speedY = 0;
              } else if (collides.right) {
-                 actor.pos.x = object.x - actor.target_size.w;
-                 actor.speed.x = 0;
+                 this.x = object.x - this.width;
+                 this.speedX = 0;
              } else if (collides.left) {
-                 actor.pos.x = object.x + size.tile.target.w;
-                 actor.speed.x = 0;
+                 this.x = object.x + this.width;//+ size.tile.target.w;
+                 this.speedX = 0;
              }
+         }else if (object.platform) {
+				if (collides.bottom) {
+					if(this.speedY > 0){
+						this.y = object.y - this.height;
+						this.speedY = 0;
+					}
+				}
          }
 
-         // collide from any side
-         if (collides.top || collides.bottom || collides.right || collides.left) {
-             if (object.deadly == true) {
-                 //items.push({ sx:, sy:9, x:actor.pos.x, y:actor.pos.y, deadly:false, type:'looser' });
-                 gameOver()
-             }
-             if (object.type == 'exit') {
-                 levelWin()
-             }
-             if (object.type == 'trampoline') {
-                 actor.speed.y < 0 ? actor.speed.y = 0 : true
-                 sound_jump()
-                 actor.speed.y = -0.5 * actor.speed.y - 25
-             }
-             if (object.type == 'coin') {
-                 items.splice(items.indexOf(object), 1)
-                 score++
-                 sound_coin()
-             }
-         }
+			// const collides = this.checkCollision(object);
 
-     })
+		    // apply collision to player movement
+		    // special actions on collisions
+		    // if (object.solid) {
+		    //     if (collides.top) {
+		    //         // if (object.type == 'block_coin') {
+		    //         //     replaceLevelSpriteXY(object.x, object.y, "ß");
+		    //         //     items.push({ sx:8, sy:9, x:object.x, y:(object.y - size.tile.target.h), type:'coin' });
+		    //         // } else {
+				// 		// if
+		    //             this.y = object.y-object.height;
+		    //             this.speedY = 0;
+		    //         // }
+		    //     } else if (collides.bottom) {
+		    //         // jump on enemy
+		    //         // if (object.type == 'enemy_mushroom') {
+		    //         //     object.deadly = false
+		    //         //     object.speed = 0
+		    //         //     object.sx = 2
+		    //         //     score++;
+		    //         //     sound_jump_on_enemy()
+		    //         // }
+				// 		this.y = object.y+object.height;
+				// 		this.speedY = 0;
+		    //     } else if (collides.right) {
+		    //         this.x = object.x - this.width;
+		    //         this.speedX = 0;
+		    //     } else if (collides.left) {
+		    //         this.x = object.x + size.tile.target.w;
+		    //         this.speedX = 0;
+		    //     }
+		    // }
 
-     // move the player when the level is at it's border, else move the level
-     if (scroll_x <= 0) {
-         if (actor.pos.x > (size.canvas.w / 2)) {
-             scroll_x = 1;
-         }
-     } else if (scroll_x >= current_level.width - size.canvas.w && current_level.width > size.canvas.w) {
-         scroll_x = current_level.width - size.canvas.w;
-         if (actor.pos.x < current_level.width - (size.canvas.w / 2)) {
-             scroll_x = current_level.width - size.canvas.w - 1;
-         }
-     } else if (current_level.width > size.canvas.w) {
-         scroll_x += actor.speed.x;
-     }
+		    // collide from any side
+		    // if (collides.top || collides.bottom || collides.right || collides.left) {
+		    //     if (object.deadly == true) {
+		    //         //items.push({ sx:, sy:9, x:this.x, y:this.y, deadly:false, type:'looser' });
+		    //         gameOver()
+		    //     }
+		    //     if (object.type == 'exit') {
+		    //         levelWin()
+		    //     }
+		    //     if (object.type == 'trampoline') {
+		    //         this.speedY < 0 ? this.speedY = 0 : true
+		    //         sound_jump()
+		    //         this.speedY = -0.5 * this.speedY - 25
+		    //     }
+		    //     if (object.type == 'coin') {
+		    //         items.splice(items.indexOf(object), 1)
+		    //         score++
+		    //         sound_coin()
+		    //     }
+		    // }
+		});
 
 
 
 
-	  */
+
+
+
+		console.log('scroll', Scene.scroll_x);
+	  // move the player when the level is at it's border, else move the level
+	  if (Scene.scroll_x <= 0) {
+		  console.log('scroll <', Scene.scroll_x);
+		  if (this.x > (Stage.width / 2)) {
+			  Scene.scroll_x = 1;
+		  }
+	  } else if (Scene.scroll_x >= Scene.width - Stage.width && Scene.width > Stage.width) {
+		  console.log('scroll >');
+		  Scene.scroll_x = Scene.width - Stage.width;
+		  if (this.x < Scene.width - (Stage.width / 2)) {
+			  Scene.scroll_x = Scene.width - Stage.width - 1;
+		  }
+	  } else if (Scene.width > Stage.width) {
+		  console.log('scroll =');
+		  Scene.scroll_x += this.speedX;
+	  }
 
 	  // apply friction
 	  this.speedX *= this.friction;
 
 
-	  this.x += this.speedX;
-	  this.y += this.speedY;
-	  if(this.y > Game.height-59){
-	  	this.y = Game.height-59;
-	  	this.speedY = 0;
-	  }
+	  // this.x += this.speedX;
+	  // this.y += this.speedY;
+	  // if(this.y > Stage.height-59){
+	  // 	this.y = Stage.height-59;
+	  // 	this.speedY = 0;
+	  // }
 
 
 		// this.speedY += this.velocity_y;
@@ -217,8 +300,8 @@ class Puppet {
 		// this.x += this.speedX;
 		// this.y += this.speedY;
 		//
-		// if(this.y > Game.height-59){
-		// 	this.y = Game.height-59;
+		// if(this.y > Stage.height-59){
+		// 	this.y = Stage.height-59;
 		// 	this.speedY = 0;
 		// }
 		//
@@ -260,12 +343,63 @@ class Puppet {
 	}
 
 
+	// checkCollision = (object)=>{
+	// 	var collides = {top:false, bottom:false, left:false, right:false};
+	//
+	// 	// we are below or above an object (use the middle of the actor, with tolerance)
+	// 	if ((this.x + this.width / 2).inRange(object.x - 0.25, object.x + 1.25 + object.width)) {
+   //      // check bounce bottom:
+   //      if ((this.y + this.height).inRange(object.y, object.y + size.tile.target.h - 1) && this.y < object.y) {
+   //          collides.bottom = true;
+   //          // check bounce top:
+   //      } else if (this.y.inRange(object.y, object.y+object.height)){// object.y + size.tile.target.h)) {
+   //          collides.top = true;
+   //      }
+	// 	// we are right or left of an object
+	// 	// if ((this.y + this.height / 2).inRange(object.y - 0.25 * size.tile.target.h, object.y + 1.25 * size.tile.target.h)) {
+	// 	// 	// check bounce right
+	// 	// 	if ((this.x + this.width).inRange(object.x, object.x + size.tile.target.w)) {
+	// 	// 		collides.right = true;
+	// 	// 	}
+	// 	// 	// check bounce left
+	// 	// 	if (this.x.inRange(object.x, object.x + size.tile.target.w)) {
+	// 	// 		collides.left = true;
+	// 	// 	}
+	// 	// }
+	// }
+	// //console.log(collides);
+	// 	return collides;
+	// }
+
+
+	// todo: re-spawn player at the closest 'y' to the left
+	respawnPlayer = ()=>{
+	    // if (startpos = getLastLevelSpritePosition('y', this.x)) {
+	    //     this.x = startpos.x * size.tile.target.w
+	    //     if (this.x >= Stage.width/2) {
+	    //         Scene.scroll_x = startpos.x * size.tile.target.w - Stage.width/2
+	    //     } else {
+	    //         Scene.scroll_x = 0
+	    //     }
+	    //     this.y = (startpos.y + line_offset_y) * size.tile.target.h
+	    // } else {
+	        this.x = 2 * size.tile.target.w
+	        this.y = 5 * size.tile.target.h
+	        Scene.scroll_x = 0
+	    // }
+	    this.speedX = 0
+	    this.speedY = 0
+	}
+
 
 	get x (){ return this.tag.offsetLeft; }
 	set x (x){ this.tag.style.left = x + 'px'; }
 
 	get y (){ return this.tag.offsetTop; }
 	set y (y){ this.tag.style.top = y + 'px'; }
+
+	get width (){ return this.tag.offsetWidth; }
+	get height (){ return this.tag.offsetHeight; }
 }
 
 export {Puppet as default};
