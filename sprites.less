@@ -166,8 +166,9 @@
 	z-index: 3;
 	&.Question {
 		background-position: -207px -181px;
+		animation-timing-function: step-end;
 		animation-name: question;
-		animation-duration: 1s;
+		animation-duration: .40s;
 		animation-iteration-count: infinite;
 	}
 	@keyframes question {
@@ -333,11 +334,28 @@
 		background-position: -450px -478px;
 		width: 16px;
 		height: 16px;
+		animation-name: cherry;
+		animation-duration: .5s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+		transform-origin: top;
 	}
 	&.CherryRose {
 		background-position: -405px -479px;
 		width: 16px;
 		height: 16px;
+		animation-name: cherry;
+		animation-duration: .5s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+		transform-origin: top;
+	}
+	@keyframes cherry {
+		0%		{transform: rotate(-8deg);}
+		25%	{transform: rotate(0deg);}
+		50%	{transform: rotate(8deg);}
+		75%	{transform: rotate(0deg);}
+		100%	{transform: rotate(-8deg);}
 	}
 	&.Egg {
 		background-position: -428px -475px;

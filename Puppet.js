@@ -3,6 +3,8 @@ import Scene from './Scene';
 import Stage from './Stage';
 import Control from './Control';
 
+
+// remover >>>>>
 var size = {
     tile:{ // size of tiles
         source:{w:16, h:16},
@@ -17,6 +19,7 @@ Number.prototype.inRange = function (a, b) {
     var n = +this;
     return ( n >= a && n <= b );
 };
+// <<<<<< remover
 
 class Puppet {
 
@@ -87,17 +90,17 @@ class Puppet {
 		  //function animate_actor(actor) {
 		    if (this.speedX > 0) {
 		        // actor.sprite.y = actor.source_size.h;
-				  this.tag.style.backgroundPosition = '-209px 0';
+				  // this.tag.style.backgroundPosition = '-209px 0';
 		    } else if (this.speedX < 0) {
 		        // actor.sprite.y = actor.source_size.h * 3;
-				  this.tag.style.backgroundPosition = '-169px 0';
+				  // this.tag.style.backgroundPosition = '-169px 0';
 		    }
 			 //
 		    if (this.speedY != 0) {
 					if (this.speedX > 0) {
-						  this.tag.style.backgroundPosition = '-208px -39px';
+						  // this.tag.style.backgroundPosition = '-208px -39px';
 		  		    } else if (this.speedX < 0) {
-		  				  this.tag.style.backgroundPosition = '-168px -39px';
+		  				  // this.tag.style.backgroundPosition = '-168px -39px';
 		  		    }
 		    } else {
 		    }
@@ -393,10 +396,20 @@ class Puppet {
 
 
 	get x (){ return this.tag.offsetLeft; }
-	set x (x){ this.tag.style.left = x + 'px'; }
+	set x (x){
+		if(this.x != x){
+			console.log(this.x, x, 'alterado x');
+			this.tag.style.left = x + 'px';
+		}
+	}
 
 	get y (){ return this.tag.offsetTop; }
-	set y (y){ this.tag.style.top = y + 'px'; }
+	set y (y){
+		if(this.y != y){
+			console.log(this.y, y, 'alterado y');
+				this.tag.style.top = y + 'px';
+		}
+	}
 
 	get width (){ return this.tag.offsetWidth; }
 	get height (){ return this.tag.offsetHeight; }

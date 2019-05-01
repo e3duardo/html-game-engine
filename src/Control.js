@@ -4,23 +4,20 @@ document.addEventListener("keydown", (e)=>{
 
 class Control {
 	constructor(){
-		console.log('control - constructor');
 		this.keys = {
 			up: false,
 			right: false,
-			bottom: false,
+			down: false,
 			left: false,
 			a: false
 		};
 		document.addEventListener("keydown", (e)=>{
 			if(!e.repeat){
-				console.log(this.keys);
 				this.keys[this.translateKeyboard(e.key)] = true;
 			}
 		});
 		document.addEventListener("keyup", (e)=>{
 			if(!e.repeat){
-				console.log(this.keys);
 				this.keys[this.translateKeyboard(e.key)] = false;
 			}
 		});
@@ -28,7 +25,7 @@ class Control {
 
 	get up(){ return this.keys.up; }
 	get right(){ return this.keys.right; }
-	get bottom(){ return this.keys.bottom; }
+	get down(){ return this.keys.down; }
 	get left(){ return this.keys.left; }
 	get a(){ return this.keys.a; }
 	releaseA=()=>{ console.log(this.keys.a, '<'); this.keys.a = false;}

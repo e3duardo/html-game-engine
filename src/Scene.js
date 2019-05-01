@@ -21,14 +21,27 @@ class Scene {
 		this.x = -scroll;
 		this._scroll_x = scroll;
 	}
-	get x (){ return this.tag.offsetLeft; }
-	get y (){ return this.tag.offsetTop; }
 
 	get width (){ return this.tag.clientWidth; }
 	get height (){ return this.tag.clientHeight; }
 
-	set x (x){ this.tag.style.left = x+'px'; }
-	set y (y){ this.tag.style.top = y+'px'; }
+	get x (){ return this.tag.offsetLeft; }
+	set x (x){
+		x = parseInt(x);
+		if(x != this.x){
+			// console.log('x', x, 'velocity_x',  this.velocity_x);
+			this.tag.style.left = x + 'px';
+		}
+	}
+
+	get y (){ return this.tag.offsetTop; }
+	set y (y){
+		y = parseInt(y);
+		if(y != this.y){
+			// console.log(y);
+			this.tag.style.top = y + 'px';
+		}
+	}
 
 }
 
