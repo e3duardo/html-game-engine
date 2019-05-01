@@ -35,7 +35,7 @@ class Control {
 		if(key == "ArrowRight") return 'right';
 		if(key == "ArrowDown") return 'down';
 		if(key == "ArrowLeft") return 'left';
-		if(key == "a") return 'a';
+		if(key == "a" || key == "A" ) return 'a';
 		return '';
 	}
 }

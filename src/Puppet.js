@@ -235,7 +235,7 @@ class Puppet {
 		    if (collides.top || collides.bottom || collides.right || collides.left) {
 		        if (object.deadly == true) {
 		            //items.push({ sx:, sy:9, x:this.x, y:this.y, deadly:false, type:'looser' });
-		            Game.gameOver()
+						Game.gameOver()
 		        }
 		    //     if (object.type == 'exit') {
 		    //         levelWin()
