@@ -60,18 +60,18 @@ class Puppet {
 	update = ()=>{
 		if (this.speedY == 0) {
 			if (Control.left && this.speedY == 0) {
-				// console.log('left');
+				console.log('left');
 				this.speedX -= this.velocity_x;
 			} else if (Control.right && this.speedY == 0) {
-				// console.log('right');
+				console.log('right');
 				this.speedX += this.velocity_x;
 			}
 		} else {
 			if (Control.left) {
-				// console.log('left');
+				console.log('left');
 				this.speedX -= this.velocity_x_jump;
 			} else if (Control.right) {
-				// console.log('right2');
+				console.log('right2');
 				this.speedX += this.velocity_x_jump;
 			}
 		}
@@ -265,21 +265,21 @@ class Puppet {
 
 
 
-		// console.log('scroll', Scene.scroll_x);
+		console.log('scroll', Scene.scroll_x);
 	  // move the player when the level is at it's border, else move the level
 	  if (Scene.scroll_x <= 0) {
-		  // console.log('scroll <', Scene.scroll_x);
+		  console.log('scroll <', Scene.scroll_x);
 		  if (this.x > (Stage.width / 2)) {
 			  Scene.scroll_x = 1;
 		  }
 	  } else if (Scene.scroll_x >= Scene.width - Stage.width && Scene.width > Stage.width) {
-		  // console.log('scroll >');
+		  console.log('scroll >');
 		  Scene.scroll_x = Scene.width - Stage.width;
 		  if (this.x < Scene.width - (Stage.width / 2)) {
 			  Scene.scroll_x = Scene.width - Stage.width - 1;
 		  }
 	  } else if (Scene.width > Stage.width) {
-		  // console.log('scroll =');
+		  console.log('scroll =');
 		  Scene.scroll_x += this.speedX;
 	  }
 

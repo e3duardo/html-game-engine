@@ -1,21 +1,36 @@
+@debug: true;
+
 *, *::after, *::before{
-	box-sizing: border-box;
+	box-sizing: content-box;
 }
 
 .Stage{
 	width: 600px;
 	height: 432px;
 	background: #eee;
-	overflow: hidden;
 	position: relative;
+	border: 1px solid green;
+	// overflow: hidden;
 }
 
 .Scene{
 	background: url('fase1.png') repeat;
-	width: 1900px;
+	width: 5120px;
 	height: 432px;//432
 	position: relative;
 	transition: all .04s linear;
+}
+& when (@debug = true) {
+.Grid{
+	background: url('grid.png') repeat;
+	width: 5120px;
+	height: 432px;//432
+	top: 0;
+	left: 0;
+	position: absolute;
+	z-index: 100;
+	opacity: .5
+}
 }
 .Box{
 	width: 40px;

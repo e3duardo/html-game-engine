@@ -1,99 +1,202 @@
-*, *::after, *::before{
-	box-sizing: content-box;
-}
-.Collidable{
-	border:1px solid red;
-}
-.Box{
-	position: absolute;
-	bottom: 0;
-}
-.Floor{
-	background: url('background-objects.gif') no-repeat -214px -492px;
-	width: 68px;
-	height: 15px;
-}
-.FloorLeft{
-	background: url('background-objects.gif') no-repeat -207px -492px;
-	width: 6px;
-	height: 15px;
-}
-.FloorRight{
-	background: url('background-objects.gif') no-repeat -283px -492px;
-	width: 6px;
-	height: 15px;
-}
-.Grass{
-	background: url('background-objects.gif') no-repeat -214px -482px;
-	width: 68px;
-	height: 9px;
-}
-.GrassLeft{
-	background: url('background-objects.gif') no-repeat -207px -482px;
-	width: 6px;
-	height: 9px;
-}
-.GrassRight{
-	background: url('background-objects.gif') no-repeat -283px -482px;
-	width: 6px;
-	height: 9px;
+@debug: true;
+
+& when (@debug = true) {
+	.Collidable{
+		border:1px solid red;
+	}
 }
 
-
-.Platform{
-	// border: 2px solid red;
-	height: 39px;
-	width: 80px;
+.Sprite{
 	position: absolute;
-}
-
-.Stone{
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -469px -555px;
+	background: url('tiles.png') no-repeat;
+	z-index: 1;
 	width: 16px;
 	height: 16px;
+	//ggg
+	//g..
+	//g..
+	&.GrassLT{
+		background-position: -137px -99px;
+	}
+	//ggg
+	//...
+	//...
+	&.GrassT{
+		background-position: -154px -99px;
+	}
+	//ggg
+	//..g
+	//..g
+	&.GrassRT{
+		background-position: -171px -99px;
+	}
+	//g..
+	//g..
+	//g..
+	&.GrassL{
+		background-position: -137px -116px;
+	}
+	//..g
+	//..g
+	//..g
+	&.GrassR{
+		background-position: -171px -116px;
+	}
+	//g..
+	//g..
+	//ggg
+	&.GrassLB{
+		background-position: -137px -133px;
+	}
+	//...
+	//...
+	//ggg
+	&.GrassB{
+		background-position: -154px -133px;
+	}
+	//..g
+	//..g
+	//ggg
+	&.GrassRB{
+		background-position: -171px -133px;
+	}
+	//..g
+	//...
+	//...
+	&.GrassInR{
+		background-position: -52px -116px;
+	}
+	//g..
+	//...
+	//...
+	&.GrassInL{
+		background-position: -69px -116px;
+	}
+	//...
+	//...
+	//...
+	&.Terrain{
+		background-position: -137px -167px;
+	}
+	//ggg
+	//g..
+	//g..
+	&.GrassBLT{
+		background-position: -120px -150px;
+	}
+	//ggg
+	//...
+	//...
+	&.GrassBT{
+		background-position: -137px -150px;
+	}
+	//ggg
+	//..g
+	//..g
+	&.GrassBRT{
+		background-position: -154px -150px;
+	}
+	//g..
+	//g..
+	//g..
+	&.GrassBL{
+		background-position: -120px -167px;
+	}
+	//..g
+	//..g
+	//..g
+	&.GrassBR{
+		background-position: -154px -167px;
+	}
+	//g..
+	//g..
+	//ggg
+	&.GrassBLB{
+		background-position: -120px -184px;
+	}
+	//...
+	//...
+	//ggg
+	&.GrassBB{
+		background-position: -137px -184px;
+	}
+	//..g
+	//..g
+	//ggg
+	&.GrassBRB{
+		background-position: -154px -184px;
+	}
+	&.Bush01 {
+		background-position: -171px -166px;
+	}
+	&.Bush02 {
+		background-position: -188px -166px;
+	}
+	&.Bush03 {
+		background-position: -205px -166px;
+	}
+	&.Bush04 {
+		background-position: -222px -166px;
+	}
+	&.Bush05 {
+		background-position: -239px -166px;
+	}
+	&.Bush06 {
+		background-position: -256px -166px;
+	}
+	&.Bush07 {
+		background-position: -273px -166px;
+	}
+
+	&.TerrainBushL {
+		background-position: -86px -116px;
+	}
+	&.TerrainBush {
+		background-position: -103px -116px;
+	}
+	&.TerrainBushR {
+		background-position: -120px -116px;
+	}
+}
+.SpriteGroup{
+	position: absolute;
+	z-index: 1;
 }
 
-
-.ArbustoMaior {
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -7px -216px;
+/* ** sprites ************* */
+.BigShrub {
+	background-position: -7px -216px;
 	width: 144px;
 	height: 80px;
 }
-.Arbusto {
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -159px -239px;
+.SmallShrub {
+	background-position: -159px -239px;
 	width: 96px;
 	height: 56px;
 }
-.Moita {
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -340px -560px;
-	width: 48px;
-	height: 16px;
-}
-.Interrogation {
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -492px -555px;
+
+.Question {
+	background-position: -492px -555px;
 	width: 16px;
 	height: 16px;
 }
 .Cherry {
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -451px -479px;
-	width: 14px;
-	height: 13px;
+	background-position: -450px -478px;
+	width: 16px;
+	height: 16px;
 }
 .CherryRose {
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -405px -479px;
-	width: 14px;
-	height: 13px;
+	background-position: -405px -479px;
+	width: 16px;
+	height: 16px;
 }
 .Egg {
-	position: absolute;
-	background: url('background-objects.gif') no-repeat -429px -475px;
+	background-position: -429px -475px;
 	width: 14px;
+	height: 16px;
+}
+.Information {
+	background-position: -469px -535px;
+	width: 16px;
 	height: 16px;
 }
