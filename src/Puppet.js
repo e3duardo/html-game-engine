@@ -264,24 +264,24 @@ class Puppet {
 
 
 
-
 		// console.log('scroll', Scene.scroll_x);
 	  // move the player when the level is at it's border, else move the level
 	  if (Scene.scroll_x <= 0) {
-		  // console.log('scroll <', Scene.scroll_x);
-		  if (this.x > (Stage.width / 2)) {
-			  Scene.scroll_x = 1;
-		  }
-	  } else if (Scene.scroll_x >= Scene.width - Stage.width && Scene.width > Stage.width) {
-		  // console.log('scroll >');
-		  Scene.scroll_x = Scene.width - Stage.width;
-		  if (this.x < Scene.width - (Stage.width / 2)) {
-			  Scene.scroll_x = Scene.width - Stage.width - 1;
-		  }
-	  } else if (Scene.width > Stage.width) {
-		  // console.log('scroll =');
-		  Scene.scroll_x += this.speedX;
-	  }
+		  // console.log('aquii2');
+         if (this.x > (Stage.width / 2)) {
+             Scene.scroll_x = 1;
+         }
+     } else if (Scene.scroll_x >= Scene.width - Stage.width && Scene.width > Stage.width) {
+		  // console.log('aquii');
+         Scene.scroll_x = Scene.width - Stage.width;
+         if (this.x < Scene.width - (Stage.width / 2)) {
+             Scene.scroll_x = Scene.width - Stage.width - 1;
+         }
+     } else if (Scene.width > Stage.width) {
+			if(this.x > 200){
+				Scene.scroll_x = this.x-200;
+			}
+     }
 
 	  // apply friction
 	  this.speedX *= this.friction;

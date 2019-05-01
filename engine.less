@@ -1,4 +1,4 @@
-@debug: true;
+@debug: false;
 
 *, *::after, *::before{
 	box-sizing: content-box;
@@ -23,16 +23,16 @@
 	transition: all .04s linear;
 }
 & when (@debug = true) {
-.Grid{
-	background: url('grid.png') repeat;
-	width: 5120px;
-	height: 432px;//432
-	top: 0;
-	left: 0;
-	position: absolute;
-	z-index: 100;
-	opacity: .5
-}
+	.Grid{
+		background: url('grid.png') repeat;
+		width: 5120px;
+		height: 432px;//432
+		top: 0;
+		left: 0;
+		position: absolute;
+		z-index: 100;
+		opacity: .5
+	}
 }
 .Box{
 	width: 40px;
