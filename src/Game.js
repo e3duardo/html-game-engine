@@ -42,11 +42,15 @@ class Game {
 	}
 
 	gameOver = ()=>{
+		this.newGame();
+		//meu
 		console.error('dead');
 		// sound_dead()
 		if (--this.puppet.lives > 0) {
 			this.puppet.respawnPlayer()
+			this.play();
 		} else {
+			document.querySelector('.GameOver').style.display="flex";
 		// todo: dying animation
 		// actors = []
 			//showGameOver()

@@ -34,10 +34,7 @@ class Puppet {
 
 		this.lives=3;
 
-		this.background={
-			x: -209,
-			y: 0
-		}
+		this.animation('right');
 	}
 
 	animation = (classe)=>{
@@ -50,24 +47,24 @@ class Puppet {
 		// this.tag.style.backgroundPosition = "-209px 0";
 
 		if(!Control.right && !Control.left){
-			if (this.speedX > 0) {
-				this.animation('right');
-			}else{
+			if (this.speedX < 0) {
 				this.animation('left');
+			}else{
+				this.animation('right');
 			}
 		}
 		if (Control.up) {
-			if (this.speedX > 0) {
-				this.animation('lookup-right');
-			}else{
+			if (this.speedX < 0) {
 				this.animation('lookup-left');
+			}else{
+				this.animation('lookup-right');
 			}
 		}
 		if(Control.down) {
-			if (this.speedX > 0) {
-				this.animation('lower-right');
-			}else{
+			if (this.speedX < 0) {
 				this.animation('lower-left');
+			}else{
+				this.animation('lower-right');
 			}
 		}
 		if (this.speedY == 0) {
@@ -99,16 +96,16 @@ class Puppet {
 		}
 
 		if(this.speedY < 0){
-			if (this.speedX > 0) {
-				this.animation('jumping-right');
-			}else{
+			if (this.speedX < 0) {
 				this.animation('jumping-left');
+			}else{
+				this.animation('jumping-right');
 			}
 		}else if(this.speedY > 0){
-			if (this.speedX > 0) {
-				this.animation('falling-right');
-			}else{
+			if (this.speedX < 0) {
 				this.animation('falling-left');
+			}else{
+				this.animation('falling-right');
 			}
 		}
 
@@ -235,11 +232,11 @@ class Puppet {
 		    // }
 
 		    // collide from any side
-		    // if (collides.top || collides.bottom || collides.right || collides.left) {
-		    //     if (object.deadly == true) {
-		    //         //items.push({ sx:, sy:9, x:this.x, y:this.y, deadly:false, type:'looser' });
-		    //         gameOver()
-		    //     }
+		    if (collides.top || collides.bottom || collides.right || collides.left) {
+		        if (object.deadly == true) {
+		            //items.push({ sx:, sy:9, x:this.x, y:this.y, deadly:false, type:'looser' });
+		            Game.gameOver()
+		        }
 		    //     if (object.type == 'exit') {
 		    //         levelWin()
 		    //     }
@@ -253,7 +250,7 @@ class Puppet {
 		    //         score++
 		    //         sound_coin()
 		    //     }
-		    // }
+		    }
 		});
 
 
@@ -312,12 +309,13 @@ class Puppet {
 	    //     }
 	    //     this.y = (startpos.y + line_offset_y) * size.tile.target.h
 	    // } else {
-	        this.x = 2 * size.tile.target.w
-	        this.y = 5 * size.tile.target.h
-	        Scene.scroll_x = 0
-	    // }
-	    this.speedX = 0
-	    this.speedY = 0
+		 this.speedX = 0;
+		 this.speedY = 0;
+		 this.x = 40;
+		 this.y = 0;
+		 Scene.scroll_x = 0
+		 Scene.x = 0
+		 this.animation('right');
 	}
 
 
@@ -325,7 +323,7 @@ class Puppet {
 	set x (x){
 		x = parseFloat(x.toFixed(1));
 		if(x != this.x){
-			// console.log('x', x, 'velocity_x',  this.velocity_x);
+			console.log('x', x, 'velocity_x',  this.velocity_x);
 			this.tag.style.left = x + 'px';
 		}
 	}
