@@ -158,45 +158,200 @@
 		background-position: -120px -116px;
 	}
 }
+.Object{
+	position: absolute;
+	background: url('objects.png') no-repeat -173px -181px;
+	width: 16px;
+	height: 16px;
+	z-index: 3;
+	&.Question {
+		background-position: -207px -181px;
+		animation-name: question;
+		animation-duration: 1s;
+		animation-iteration-count: infinite;
+	}
+	@keyframes question {
+		0%   {background-position: -173px -181px;}
+		25%  {background-position: -190px -181px;}
+		50%  {background-position: -207px -181px;}
+		100% {background-position: -224px -181px;}
+	}
+	&.Cloud {
+		background-image: url('tiles2.png');
+		background-position: -112px -132px;
+	}
+	&.GreenStair {
+		background-image: url('tiles2.png');
+		background-position: -92px -132px;
+	}
+	&.Plate {
+		background-position: -173px -164px;
+	}
+	&.PlateGray {
+		background-position: -307px -213px;
+	}
+	&.BoxBrown {
+		background-position: -257px -97px;
+	}
+	&.BoxBrown {
+		background-position: -257px -97px;
+	}
+	@keyframes plate {
+		0%   {background-position: -173px -164px;}
+		25%  {background-position: -190px -164px;}
+		50%  {background-position: -207px -164px;}
+		100% {background-position: -224px -164px;}
+	}
+	&.P {
+		background-position: -444px -510px;
+	}
+	&.P-pressed {
+		background-position: -461px -510px;
+	}
+	&.Square {
+		background-position: -274px -64px;
+	}
+	&.PipeYellowLT {
+		background-position: -241px -147px;
+	}
+	&.PipeYellowRT {
+		background-position: -258px -147px;
+	}
+	&.PipeYellowL {
+		background-position: -242px -163px;
+	}
+	&.PipeYellowR {
+		background-position: -258px -163px;
+	}
+	&.PipeYellowLB {
+		background-position: -241px -231px;
+	}
+	&.PipeYellowRB {
+		background-position: -258px -231px;
+	}
+	&.PipePurpleLT {
+		background-position: -103px -136px;
+	}
+	&.PipePurpleRT {
+		background-position: -120px -136px;
+	}
+	&.PipePurpleL {
+		background-position: -104px -153px;
+	}
+	&.PipePurpleR {
+		background-position: -120px -153px;
+	}
+	&.PipePurpleLB {
+		background-position: -241px -231px;
+	}
+	&.PipePurpleRB {
+		background-position: -258px -231px;
+	}
+	&.PipeGrayLT {
+		background-position: -274px -165px;
+	}
+	&.PipeGrayRT {
+		background-position: -291px -165px;
+	}
+	&.PipeGrayL {
+		background-position: -275px -181px;
+	}
+	&.PipeGrayR {
+		background-position: -291px -181px;
+	}
+	&.PipeGrayLB {
+		background-position: -274px -249px;
+	}
+	&.PipeGrayRB {
+		background-position: -291px -249px;
+	}
+	&.PipeGreenLT {
+		background-position: -1px -179px;
+	}
+	&.PipeGreenRT {
+		background-position: -18px -179px;
+	}
+	&.PipeGreenL {
+		background-position: -2px -195px;
+	}
+	&.PipeGreenR {
+		background-position: -18px -195px;
+	}
+	&.PipeGreenLB {
+		background-position: -1px -263px;
+	}
+	&.PipeGreenRB {
+		background-position: -18px -263px;
+	}
+	&.ArrowLT {
+		// border: 1px solid yellow;
+		background-position: -186px -27px;
+	}
+	&.ArrowRT {
+		// border: 1px solid yellow;
+		background-position: -203px -27px;
+	}
+	&.ArrowLB {
+		// border: 1px solid yellow;
+		background-position: -185px -44px;
+	}
+	&.ArrowRB {
+		// border: 1px solid yellow;
+		background-position: -202px -44px;
+	}
+}
+.Plant{
+	position: absolute;
+	background: url('background-objects.gif') no-repeat -173px -181px;
+	&.BigShrub {
+		background-position: -7px -216px;
+		width: 144px;
+		height: 80px;
+	}
+	&.SmallShrub {
+		background-position: -159px -239px;
+		width: 96px;
+		height: 56px;
+	}
+	&.Cherry {
+		background-position: -450px -478px;
+		width: 16px;
+		height: 16px;
+	}
+	&.CherryRose {
+		background-position: -405px -479px;
+		width: 16px;
+		height: 16px;
+	}
+	&.Egg {
+		background-position: -428px -475px;
+		width: 16px;
+		height: 16px;
+	}
+	&.Information {
+		background-position: -469px -535px;
+		width: 16px;
+		height: 16px;
+	}
+	&.Checkpoint {
+		background-position: -544px -450px;
+		width: 48px;
+		height: 64px;
+	}
+	&.CheckpointBar {
+		background-position: -560px -520px;
+		width: 18px;
+		height: 3px;
+	}
+	&.Castor {
+		background-position: -562px -534px;
+		width: 16px;
+		height: 16px;
+	}
+}
 .SpriteGroup{
 	position: absolute;
 	z-index: 1;
 }
 
 /* ** sprites ************* */
-.BigShrub {
-	background-position: -7px -216px;
-	width: 144px;
-	height: 80px;
-}
-.SmallShrub {
-	background-position: -159px -239px;
-	width: 96px;
-	height: 56px;
-}
-
-.Question {
-	background-position: -492px -555px;
-	width: 16px;
-	height: 16px;
-}
-.Cherry {
-	background-position: -450px -478px;
-	width: 16px;
-	height: 16px;
-}
-.CherryRose {
-	background-position: -405px -479px;
-	width: 16px;
-	height: 16px;
-}
-.Egg {
-	background-position: -429px -475px;
-	width: 14px;
-	height: 16px;
-}
-.Information {
-	background-position: -469px -535px;
-	width: 16px;
-	height: 16px;
-}

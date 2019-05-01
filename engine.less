@@ -10,7 +10,9 @@
 	background: #eee;
 	position: relative;
 	border: 1px solid green;
-	// overflow: hidden;
+	& when (@debug = false) {
+		overflow: hidden;
+	}
 }
 
 .Scene{
