@@ -4,6 +4,7 @@ class Scene {
 	constructor() {
 		this.tag = document.querySelector('.Scene');
 
+		this.line_to_scroll = 128;
 		this._scroll_x = 0;
 		this.scroll_x_start = 0;
 

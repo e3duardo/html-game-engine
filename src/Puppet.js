@@ -23,11 +23,11 @@ class Puppet {
 	constructor() {
 		this.tag = document.querySelector('.Puppet');
 		this.velocity_x=1.5;
-		this.velocity_x_jump=1.5;
-		this.velocity_y=25;
-		this.gravity=2;
+		this.velocity_x_jump=1.0;
+		this.velocity_y=22;
+		this.gravity=3;
 		this.friction=0.8;
-		this.speed_limit_y=25;
+		this.speed_limit_y=10;
 
 		this.speedX=0;
 		this.speedY=0;
@@ -75,14 +75,18 @@ class Puppet {
 				this.speedX += this.velocity_x_jump;
 			}
 		}
-		if (Control.up && this.speedY == 0) {
+		if (Control.up) {
+			console.warn('look up');
+		}
+		if (Control.a && this.speedY == 0) {
 			// sound_jump()
+			Control.releaseA();
 			this.speedY -= this.velocity_y;
 		} else if (Control.down) {
 			console.warn('duck');
 			// this only causes a duck animation, nothing happens in term of speed
 		}
-		Control.up = false
+		// Control.up = false
 
 		  //function animate_actor(actor) {
 		    if (this.speedX > 0) {
@@ -128,7 +132,7 @@ class Puppet {
 		}
 		// die on level bottom
 		// console.warn(this.y, Stage.height)
-		if (this.y > Stage.height) {
+		if (this.y > Scene.height) {
 			Game.gameOver();
 		}
 
@@ -278,8 +282,8 @@ class Puppet {
              Scene.scroll_x = Scene.width - Stage.width - 1;
          }
      } else if (Scene.width > Stage.width) {
-			if(this.x > 200){
-				Scene.scroll_x = this.x-200;
+			if(this.x > Scene.line_to_scroll){
+				Scene.scroll_x = this.x-Scene.line_to_scroll;
 			}
      }
 
