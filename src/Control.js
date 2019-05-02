@@ -9,7 +9,8 @@ class Control {
 			right: false,
 			down: false,
 			left: false,
-			a: false
+			a: false,
+			shift: false
 		};
 		document.addEventListener("keydown", (e)=>{
 			if(!e.repeat){
@@ -28,6 +29,7 @@ class Control {
 	get down(){ return this.keys.down; }
 	get left(){ return this.keys.left; }
 	get a(){ return this.keys.a; }
+	get shift(){ return this.keys.shift; }
 	releaseA=()=>{ console.log(this.keys.a, '<'); this.keys.a = false;}
 
 	translateKeyboard  = (key)=>{
@@ -36,6 +38,7 @@ class Control {
 		if(key == "ArrowDown") return 'down';
 		if(key == "ArrowLeft") return 'left';
 		if(key == "a" || key == "A" ) return 'a';
+		if(key == "Shift" ) return 'shift';
 		return '';
 	}
 }

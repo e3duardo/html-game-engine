@@ -1,16 +1,27 @@
-import Collidable from './Collidable'
+import CollidableFactory from './CollidableFactory'
 
 class Scene {
 	constructor() {
 		this.tag = document.querySelector('.Scene');
 
+		this.gravity=3;
+		
 		this.line_to_scroll = 128;
 		this._scroll_x = 0;
 		this.scroll_x_start = 0;
 
 		this.collisionMap = [];
+		this.updatableMap = [];
+		this.sceneMap = [];
 		document.querySelectorAll('.Collidable').forEach((object)=>{
-				this.collisionMap.push(new Collidable(object));
+			object = CollidableFactory.from(object);
+			this.collisionMap.push(object);
+			if(object.updatable){
+				this.updatableMap.push(object);
+			}
+			if(object.solid || object.platform){
+				this.sceneMap.push(object);
+			}
 		});
 	}
 
