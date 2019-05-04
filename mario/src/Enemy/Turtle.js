@@ -1,9 +1,8 @@
-import Collidable from '../Collidable';
+import Collidable from '~/engine/Collidable';
 
 class Turtle extends Collidable{
-	constructor(tag) {
-		super(tag);
-		console.log('turtle');
+	constructor(game, tag) {
+		super(game, tag);
 
 		this.border = {
 			top: 'solid',

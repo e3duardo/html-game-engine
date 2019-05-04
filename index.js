@@ -1,3 +1,8 @@
-import Game from './src/Game';
+import SuperMarioWord from './mario/src/SuperMarioWorld';
 
-Game.play();
+//
+
+
+document.querySelector('.Stage').addEventListener('click', ()=>{
+	SuperMarioWord.play();
+});

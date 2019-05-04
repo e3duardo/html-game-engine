@@ -1,9 +1,8 @@
-document.addEventListener("keydown", (e)=>{
-}, false);
+import ControlBase from '~/engine/ControlBase';
 
-
-class Control {
-	constructor(){
+class Control extends ControlBase{
+	constructor(game){
+		super(game);
 		this.keys = {
 			up: false,
 			right: false,
@@ -12,16 +11,6 @@ class Control {
 			a: false,
 			shift: false
 		};
-		document.addEventListener("keydown", (e)=>{
-			if(!e.repeat){
-				this.keys[this.translateKeyboard(e.key)] = true;
-			}
-		});
-		document.addEventListener("keyup", (e)=>{
-			if(!e.repeat){
-				this.keys[this.translateKeyboard(e.key)] = false;
-			}
-		});
 	}
 
 	get up(){ return this.keys.up; }
@@ -30,7 +19,7 @@ class Control {
 	get left(){ return this.keys.left; }
 	get a(){ return this.keys.a; }
 	get shift(){ return this.keys.shift; }
-	releaseA=()=>{ console.log(this.keys.a, '<'); this.keys.a = false;}
+	releaseA=()=>{ this.keys.a = false;}
 
 	translateKeyboard  = (key)=>{
 		if(key == "ArrowUp") return 'up';
@@ -43,4 +32,4 @@ class Control {
 	}
 }
 
-export default new Control();
+export default Control;

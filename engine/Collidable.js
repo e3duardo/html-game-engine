@@ -1,5 +1,6 @@
 class Collidable {
-	constructor(tag) {
+	constructor(game, tag) {
+		this.game = game;
 		this.tag = tag;
 		this.solid = this.tag.classList.contains('solid');
 		this.platform = this.tag.classList.contains('platform');
@@ -37,7 +38,6 @@ class Collidable {
 		if (collides.right && this.border.horizontal=='solid' && from.speedX > 0) {
 			if(from.border && from.border.horizontal=='elastic') {
 				from.speedX *= -1;
-				console.log('teste1');
 			}else{
 				from.ax = this.x - from.width;
 				from.speedX = 0;
@@ -46,7 +46,6 @@ class Collidable {
 		if (collides.left && this.border.horizontal=='solid' && from.speedX < 0) {
 			if(from.border && from.border.horizontal=='elastic') {
 				from.speedX *= -1;
-				console.log('teste2');
 			}else{
 				from.ax = this.x + this.width;
 				from.speedX = 0;

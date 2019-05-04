@@ -1,7 +1,4 @@
-import Game from "./Game";
-import Scene from './Scene';
 import Stage from './Stage';
-import Control from './Control';
 
 var size = {
     tile:{ // size of tiles
@@ -20,7 +17,9 @@ Number.prototype.inRange = function (a, b) {
 
 class Puppet {
 
-	constructor() {
+	constructor(game) {
+		this.game = game;
+
 		this.tag = document.querySelector('.Puppet');
 		this.ax=0;
 		this.ay=0;
@@ -45,7 +44,7 @@ class Puppet {
 		this.ax = this.x;
 		this.ay = this.y;
 
-		if(Control.shift){
+		if(this.game.control.shift){
 			this.velocity_x=2;
 			this.velocity_x_jump=2.2;
 		}else{
@@ -55,21 +54,21 @@ class Puppet {
 
 		// this.tag.style.backgroundPosition = "-209px 0";
 
-		if(!Control.right && !Control.left){
+		if(!this.game.control.right && !this.game.control.left){
 			if (this.speedX < 0) {
 				this.animation('left');
 			}else{
 				this.animation('right');
 			}
 		}
-		if (Control.up) {
+		if (this.game.control.up) {
 			if (this.speedX < 0) {
 				this.animation('lookup-left');
 			}else{
 				this.animation('lookup-right');
 			}
 		}
-		if(Control.down) {
+		if(this.game.control.down) {
 			if (this.speedX < 0) {
 				this.animation('lower-left');
 			}else{
@@ -77,14 +76,14 @@ class Puppet {
 			}
 		}
 		if (this.speedY == 0) {
-			if (Control.left) {
+			if (this.game.control.left) {
 				// if(this.speedX > 0){
 				// 	console.warn('run with SMOKE left');
 				// }else{
 				// }
 				this.animation('walk-left');
 				this.speedX -= this.velocity_x;
-			} else if (Control.right) {
+			} else if (this.game.control.right) {
 				// if(this.speedX < 0){
 				// 	console.warn('run with SMOKE right');
 				// }else{
@@ -93,13 +92,13 @@ class Puppet {
 				this.speedX += this.velocity_x;
 			}
 		}else {
-			if (Control.left) {
+			if (this.game.control.left) {
 				this.speedX -= this.velocity_x_jump;
-			} else if (Control.right) {
+			} else if (this.game.control.right) {
 				this.speedX += this.velocity_x_jump;
 			}
 		}
-		if (Control.a && this.speedY == 0) {
+		if (this.game.control.a && this.speedY == 0) {
 			this.jump();
 		}
 
@@ -119,7 +118,7 @@ class Puppet {
 
 
 		// apply gravity.
-		this.speedY += Scene.gravity;
+		this.speedY += this.game.scene.gravity;
 		if (Math.abs(this.speedY) < 0.1) this.speedY = 0;
 
 		// apply speed limit when falling down
@@ -133,17 +132,17 @@ class Puppet {
 		// block on level edge
 		if (this.ax < 0) {
 			this.ax = 0;
-		} else if (this.ax + this.width > Scene.width) {
-			this.ax = Scene.width - this.width;
+		} else if (this.ax + this.width > this.game.scene.width) {
+			this.ax = this.game.scene.width - this.width;
 		}
 		// die on level bottom
-		if (this.ay > Scene.height) {
-			Game.gameOver();
+		if (this.ay > this.game.scene.height) {
+			this.game.gameOver();
 		}
 
 		// add visible items + actors to collision check
 		// todo: only add visible items
-		Scene.collisionMap.forEach((object)=>{
+		this.game.scene.collisionMap.forEach((object)=>{
 			const collides = object.collides(this);
 
 			object.collide(this, collides);
@@ -232,7 +231,6 @@ class Puppet {
 
 					//items.push({ sx:, sy:9, x:this.x, y:this.y, deadly:false, type:'looser' });
 					Game.newGame();
-					console.log('top top');
 
 					if (this.speedX < 0) {
 						this.animation('dying-left');
@@ -264,18 +262,18 @@ class Puppet {
 
 
 	  // move the player when the level is at it's border, else move the level
-	  if (Scene.scroll_x <= 0) {
+	  if (this.game.scene.scroll_x <= 0) {
          if (this.ax > (Stage.width / 2)) {
-             Scene.scroll_x = 1;
+             this.game.scene.scroll_x = 1;
          }
-     } else if (Scene.scroll_x >= Scene.width - Stage.width && Scene.width > Stage.width) {
-         Scene.scroll_x = Scene.width - Stage.width;
-         if (this.ax < Scene.width - (Stage.width / 2)) {
-             Scene.scroll_x = Scene.width - Stage.width - 1;
+     } else if (this.game.scene.scroll_x >= this.game.scene.width - Stage.width && this.game.scene.width > Stage.width) {
+         this.game.scene.scroll_x = this.game.scene.width - Stage.width;
+         if (this.ax < this.game.scene.width - (Stage.width / 2)) {
+             this.game.scene.scroll_x = this.game.scene.width - Stage.width - 1;
          }
-     } else if (Scene.width > Stage.width) {
-			if(this.ax > Scene.line_to_scroll){
-				Scene.scroll_x = this.ax-Scene.line_to_scroll;
+     } else if (this.game.scene.width > Stage.width) {
+			if(this.ax > this.game.scene.line_to_scroll){
+				this.game.scene.scroll_x = this.ax-this.game.scene.line_to_scroll;
 			}
      }
 
@@ -285,24 +283,12 @@ class Puppet {
 		this.x = this.ax;
 		this.y = this.ay;
 	}
-
-	// walk = (direction)=>{
-	// 	this.speedX += this.velocity_x;
-	// 	this.tag.classList.add('walk');
-	// 	this.tag.classList.remove('walk-back');
-	// }
-	// walkReverse = (direction)=>{
-	// 	this.speedX -= this.velocity_x;
-	// 	this.tag.classList.remove('walk');
-	// 	this.tag.classList.add('walk-back');
-	// }
 	jump = ()=>{
-		Control.releaseA();
+		this.game.control.releaseA();
 		this.speedY -= this.velocity_y;
 	}
 	die = ()=>{
-		Game.newGame();
-		console.log('top top');
+		this.game.newGame();
 
 		if (this.speedX < 0) {
 			this.animation('dying-left');
@@ -311,8 +297,8 @@ class Puppet {
 		}
 
 		setTimeout(()=>{
-			Game.gameOver();
-			Game.play();
+			this.game.gameOver();
+			this.game.play();
 		}, 1000);
 	}
 	lower = ()=>{
@@ -337,8 +323,8 @@ class Puppet {
 		 this.speedY = 0;
 		 this.x = 40;
 		 this.y = 0;
-		 Scene.scroll_x = 0
-		 Scene.x = 0
+		 this.game.scene.scroll_x = 0
+		 this.game.scene.x = 0
 		 this.animation('right');
 	}
 

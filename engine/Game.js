@@ -1,12 +1,11 @@
-import Puppet from './Puppet';
-import Scene from './Scene';
-
 class Game {
 	constructor(){
-		this.puppet = new Puppet(this);
+		this.scene;
+		this.puppet;
+		this.control;
+		this.collidableFactory;
 
 		this.ticks = 0;
-
 		this.fps = 30;
 
 		// fps measurement
@@ -16,10 +15,17 @@ class Game {
 		this.thisLoop;
 	}
 
+	inject = (scene, puppet, control, collidableFactory)=>{
+		this.scene = scene;
+		this.puppet = puppet;
+		this.control = control;
+		this.collidableFactory = collidableFactory;
+	}
+
 	gameLoop = ()=>{
 		this.puppet.update();
 
-		Scene.updatableMap.forEach((object)=>{
+		this.scene.updatableMap.forEach((object)=>{
 			object.update();
 		});
 
@@ -48,7 +54,6 @@ class Game {
 
 	gameOver = ()=>{
 		//meu
-		console.error('dead');
 		// sound_dead()
 		if (--this.puppet.lives > 0) {
 			this.puppet.respawnPlayer()
@@ -77,4 +82,4 @@ class Game {
 	}
 }
 
-export default new Game();
+export default Game;

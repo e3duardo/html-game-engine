@@ -1,10 +1,8 @@
-import Scene from '../Scene';
-import Control from '../Control';
-import Collidable from '../Collidable';
+import Collidable from '~/engine/Collidable';
 
 class TurtleShell extends Collidable{
-	constructor(tag) {
-		super(tag);
+	constructor(game, tag) {
+		super(game, tag);
 
 		this.ax=0;
 		this.ay=0;
@@ -43,7 +41,7 @@ class TurtleShell extends Collidable{
 		this.ay = this.y;
 
 		// apply gravity.
-		this.speedY += Scene.gravity;
+		this.speedY += this.game.scene.gravity;
 		if (Math.abs(this.speedY) < 0.1) this.speedY = 0;
 
 		// apply speed limit when falling down
@@ -54,7 +52,7 @@ class TurtleShell extends Collidable{
 		this.ax += this.speedX;
 		this.ay += this.speedY;
 
-		Scene.sceneMap.forEach((object)=>{
+		this.game.scene.sceneMap.forEach((object)=>{
 			const collides = object.collides(this);
 			object.collide(this, collides);
 		});

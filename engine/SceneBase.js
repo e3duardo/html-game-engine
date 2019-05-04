@@ -1,11 +1,10 @@
-import CollidableFactory from './CollidableFactory'
-
-class Scene {
-	constructor() {
+class SceneBase {
+	constructor(collidableFactory) {
+		// this.game = game;
 		this.tag = document.querySelector('.Scene');
 
 		this.gravity=3;
-		
+
 		this.line_to_scroll = 128;
 		this._scroll_x = 0;
 		this.scroll_x_start = 0;
@@ -14,7 +13,7 @@ class Scene {
 		this.updatableMap = [];
 		this.sceneMap = [];
 		document.querySelectorAll('.Collidable').forEach((object)=>{
-			object = CollidableFactory.from(object);
+			object = collidableFactory.from(object);
 			this.collisionMap.push(object);
 			if(object.updatable){
 				this.updatableMap.push(object);
@@ -40,7 +39,6 @@ class Scene {
 	set x (x){
 		x = parseInt(x);
 		if(x != this.x){
-			// console.log('x', x, 'velocity_x',  this.velocity_x);
 			this.tag.style.left = x + 'px';
 		}
 	}
@@ -49,11 +47,10 @@ class Scene {
 	set y (y){
 		y = parseInt(y);
 		if(y != this.y){
-			// console.log(y);
 			this.tag.style.top = y + 'px';
 		}
 	}
 
 }
 
-export default new Scene();
+export default SceneBase;
