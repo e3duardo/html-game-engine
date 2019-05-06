@@ -6,4 +6,4 @@ class Stage {
 	get width (){ return this.tag.clientWidth; }
 	get height (){ return this.tag.clientHeight; }
 }
-export default new Stage();
+export default Stage;

@@ -1,18 +1,24 @@
-import TurtleShell from './Enemy/TurtleShell';
-import Turtle from './Enemy/Turtle';
+import KoopaTroopaShell from './Enemy/KoopaTroopaShell';
+import KoopaTroopa from './Enemy/KoopaTroopa';
+
+import Question from './Item/Question';
+
 import CollidableFactoryBase from '~/engine/CollidableFactoryBase';
 
 class CollidableFactory extends CollidableFactoryBase{
-	constructor(game){
-		super(game);
+	constructor(){
+		super();
 	}
 
 	from(tag){
 		if(tag.classList.contains('TurtleShell')){
-			return new TurtleShell(this.game, tag);
+			return new KoopaTroopaShell(tag);
 		}
 		if(tag.classList.contains('Turtle')){
-			return new Turtle(this.game, tag);
+			return new KoopaTroopa(tag);
+		}
+		if(tag.classList.contains('Question')){
+			return new Question(tag);
 		}
 		return super.from(tag);
 	}

@@ -1,12 +1,11 @@
 import Collidable from './Collidable';
 
 class CollidableFactoryBase {
-	constructor(game){
-		this.game = game;
+	constructor(){
 	}
 
 	from(tag){
-		return new Collidable(this.game, tag);
+		return new Collidable(tag);
 	}
 }
 

@@ -1,6 +1,5 @@
 class ControlBase {
-	constructor(game){
-		this.game = game;
+	constructor(){
 		this.keys = {
 		};
 		document.addEventListener("keydown", (e)=>{

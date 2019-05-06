@@ -1,8 +1,9 @@
+import Inject from '~/engine/Inject';
 import Collidable from '~/engine/Collidable';
 
-class TurtleShell extends Collidable{
-	constructor(game, tag) {
-		super(game, tag);
+class KoopaTroopaShell extends Collidable{
+	constructor(tag) {
+		super(tag);
 
 		this.ax=0;
 		this.ay=0;
@@ -41,7 +42,7 @@ class TurtleShell extends Collidable{
 		this.ay = this.y;
 
 		// apply gravity.
-		this.speedY += this.game.scene.gravity;
+		this.speedY += Inject.scene.gravity;
 		if (Math.abs(this.speedY) < 0.1) this.speedY = 0;
 
 		// apply speed limit when falling down
@@ -52,7 +53,7 @@ class TurtleShell extends Collidable{
 		this.ax += this.speedX;
 		this.ay += this.speedY;
 
-		this.game.scene.sceneMap.forEach((object)=>{
+		Inject.scene.sceneMap.forEach((object)=>{
 			const collides = object.collides(this);
 			object.collide(this, collides);
 		});
@@ -64,4 +65,4 @@ class TurtleShell extends Collidable{
 	}
 }
 
-export {TurtleShell as default};
+export {KoopaTroopaShell as default};

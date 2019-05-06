@@ -1,6 +1,7 @@
+import Inject from './Inject';
+
 class SceneBase {
-	constructor(collidableFactory) {
-		// this.game = game;
+	constructor() {
 		this.tag = document.querySelector('.Scene');
 
 		this.gravity=3;
@@ -13,7 +14,7 @@ class SceneBase {
 		this.updatableMap = [];
 		this.sceneMap = [];
 		document.querySelectorAll('.Collidable').forEach((object)=>{
-			object = collidableFactory.from(object);
+			object = Inject.collidableFactory.from(object);
 			this.collisionMap.push(object);
 			if(object.updatable){
 				this.updatableMap.push(object);
@@ -22,6 +23,29 @@ class SceneBase {
 				this.sceneMap.push(object);
 			}
 		});
+	}
+
+	getCollisionMapVisible=()=>{
+		var visible = []
+
+		this.collisionMap.forEach(co=>{
+			if(co.x > (Math.abs(this.x) - 30) && co.x < (Math.abs(this.x)+Inject.stage.width+30))
+				visible.push(co);
+		});
+		console.log(visible);
+		console.log(Math.abs(this.x), Math.abs(this.x)+Inject.stage.width);
+
+
+
+		return visible;
+	}
+	get updatableMapVisible(){
+
+		// console.log(this.updatableMap);
+
+		// console.log(this.updatableMap);
+
+		return [];
 	}
 
 	get scroll_x(){

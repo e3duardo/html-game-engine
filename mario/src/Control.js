@@ -1,8 +1,8 @@
 import ControlBase from '~/engine/ControlBase';
 
 class Control extends ControlBase{
-	constructor(game){
-		super(game);
+	constructor(){
+		super();
 		this.keys = {
 			up: false,
 			right: false,

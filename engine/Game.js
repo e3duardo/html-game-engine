@@ -1,10 +1,7 @@
+import Inject from './Inject';
+
 class Game {
 	constructor(){
-		this.scene;
-		this.puppet;
-		this.control;
-		this.collidableFactory;
-
 		this.ticks = 0;
 		this.fps = 30;
 
@@ -15,17 +12,10 @@ class Game {
 		this.thisLoop;
 	}
 
-	inject = (scene, puppet, control, collidableFactory)=>{
-		this.scene = scene;
-		this.puppet = puppet;
-		this.control = control;
-		this.collidableFactory = collidableFactory;
-	}
-
 	gameLoop = ()=>{
-		this.puppet.update();
+		Inject.puppet.update();
 
-		this.scene.updatableMap.forEach((object)=>{
+		Inject.scene.updatableMapVisible.forEach((object)=>{
 			object.update();
 		});
 
@@ -55,8 +45,8 @@ class Game {
 	gameOver = ()=>{
 		//meu
 		// sound_dead()
-		if (--this.puppet.lives > 0) {
-			this.puppet.respawnPlayer()
+		if (--Inject.puppet.lives > 0) {
+			Inject.puppet.respawnPlayer()
 		} else {
 			document.querySelector('.GameOver').style.display="flex";
 		// todo: dying animation

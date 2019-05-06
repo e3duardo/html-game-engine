@@ -1,8 +1,9 @@
 import Collidable from '~/engine/Collidable';
 
-class Turtle extends Collidable{
-	constructor(game, tag) {
-		super(game, tag);
+//https://www.mariowiki.com/Koopa_Troopa
+class KoopaTroopa extends Collidable{
+	constructor(tag) {
+		super(tag);
 
 		this.border = {
 			top: 'solid',
@@ -25,4 +26,4 @@ class Turtle extends Collidable{
 	}
 }
 
-export {Turtle as default};
+export {KoopaTroopa as default};

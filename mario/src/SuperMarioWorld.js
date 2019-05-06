@@ -1,3 +1,5 @@
+import Inject from '~/engine/Inject';
+
 import Game from '~/engine/Game';
 
 import Mario from './Mario';
@@ -8,12 +10,13 @@ import YoshisIsland2 from './Stage/YoshisIsland2';
 class SuperMarioWord extends Game {
 	constructor(){
 		super();
-		const mario = new Mario(this);
-		const collidableFactory = new CollidableFactory(this);
-		const scene = new YoshisIsland2(collidableFactory);
-		const control = new Control(this);
 
-		this.inject(scene, mario, control, collidableFactory);
+		Inject.puppet = new Mario();
+		Inject.collidableFactory = new CollidableFactory();
+		Inject.scene = new YoshisIsland2();
+		Inject.control = new Control();
+
+		Inject.game = this;
 	}
 }
 

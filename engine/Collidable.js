@@ -1,6 +1,5 @@
 class Collidable {
-	constructor(game, tag) {
-		this.game = game;
+	constructor(tag) {
 		this.tag = tag;
 		this.solid = this.tag.classList.contains('solid');
 		this.platform = this.tag.classList.contains('platform');
