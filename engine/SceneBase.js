@@ -13,6 +13,9 @@ class SceneBase {
 		this.collisionMap = [];
 		this.updatableMap = [];
 		this.sceneMap = [];
+	}
+
+	constructCollisionMap=()=>{
 		document.querySelectorAll('.Collidable').forEach((object)=>{
 			object = Inject.collidableFactory.from(object);
 			this.collisionMap.push(object);
@@ -32,13 +35,15 @@ class SceneBase {
 			if(co.x > (Math.abs(this.x) - 30) && co.x < (Math.abs(this.x)+Inject.stage.width+30))
 				visible.push(co);
 		});
-		console.log(visible);
-		console.log(Math.abs(this.x), Math.abs(this.x)+Inject.stage.width);
-
-
-
+		// console.log(visible);
+		// console.log(Math.abs(this.x), Math.abs(this.x)+Inject.stage.width);
 		return visible;
 	}
+
+	addTag=(tag)=>{
+		this.tag.appendChild(tag);
+	}
+
 	get updatableMapVisible(){
 
 		// console.log(this.updatableMap);

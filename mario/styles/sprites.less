@@ -177,6 +177,32 @@
 		50%  {background-position: -207px -181px;}
 		100% {background-position: -224px -181px;}
 	}
+	&.Coin {
+		width: 16px;
+		height: 16px;
+		background: none;
+		&::before {
+			position: absolute;
+			content: ' ';
+			background: url('../assets/objects.png') no-repeat;
+			background-position: -219px -28px;
+			height: 16px;
+			width: 12px;
+			margin-left:2px;
+			animation-timing-function: step-end;
+			animation-name: coin;
+			animation-duration: .40s;
+			animation-iteration-count: infinite;
+		}
+	}
+	@keyframes coin {
+		0%   {background-position: -219px -28px;width: 12px;margin-left:2px;}
+		16%  {background-position: -232px -28px;width: 8px;margin-left:4px;}
+		32%  {background-position: -241px -28px;width: 6px;margin-left:5px;}
+		48% {background-position: -248px -28px;width: 8px;margin-left:4px;}
+		64%  {background-position: -232px -28px;width: 8px;margin-left:4px;}
+		80%   {background-position: -219px -28px;width: 12px;margin-left:2px;}
+	}
 	&.Cloud {
 		background-image: url('../assets/tiles2.png');
 		background-position: -112px -132px;
@@ -203,6 +229,12 @@
 	}
 	&.Plate {
 		background-position: -173px -164px;
+		animation-timing-function: step-end;
+		animation-duration: .4s;
+		animation-iteration-count: infinite;
+		&.Rotation{
+			animation-name: plate;
+		}
 	}
 	&.PlateGray {
 		background-position: -307px -213px;

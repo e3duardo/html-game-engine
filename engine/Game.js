@@ -61,6 +61,7 @@ class Game {
 	    // initializeLevel()
 	    // initializeTheme()
 	    // sound_theme()
+		 Inject.scene.constructCollisionMap();
 	    window.clearInterval(this.gameInterval);
 	    this.gameInterval = setInterval(this.gameLoop, 1000 / this.fps);
 	}

@@ -18,7 +18,8 @@ class Collidable {
 		}
 	}
 
-	collide = (from, collides)=>{
+	collide(from, collides){
+	// collide = (from, collides)=>{
 		if (collides.top && this.border.bottom=='solid') {
 			  from.ay = this.y + from.height;// + size.tile.target.h;
 			  from.speedY = 1;

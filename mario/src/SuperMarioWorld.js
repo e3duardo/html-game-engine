@@ -12,8 +12,8 @@ class SuperMarioWord extends Game {
 		super();
 
 		Inject.puppet = new Mario();
-		Inject.collidableFactory = new CollidableFactory();
 		Inject.scene = new YoshisIsland2();
+		Inject.collidableFactory = new CollidableFactory();
 		Inject.control = new Control();
 
 		Inject.game = this;
