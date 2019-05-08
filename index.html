@@ -14,6 +14,9 @@
 			<div class="Hud"></div>
 			<div class="GameOver">GameOver</div>
 			<div class="Scene">
+
+				<div class="Object Switch Collidable solid" style="bottom: 64px; left: 64px;"></div>
+
 				<div class="Puppet" style="bottom: 48px;"></div>
 
 				<div class="Plant SmallShrub" style="bottom: 48px; left: 0;"></div>
@@ -21,20 +24,16 @@
 				<div class="Plant BigShrub" style="bottom: 48px; left: 128px;"></div>
 				<div class="Plant Cherry" style="bottom: 64px;left: 176px;"></div>
 
-				<div class="Enemy TurtleShell Collidable elastic" style="bottom: 48px;left: 272px;"></div>
+				<div class="Enemy KoopaTroopaShell Collidable elastic" style="bottom: 48px;left: 272px;"></div>
 
-				<div class="Enemy TurtleShell Collidable elastic" style="bottom: 96px;left: 336px;opacity:.8"></div>
-
-				<div class="Object Question Collidable solid" style="bottom: 48px;left: 400px;"></div>
-
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 432px;"></div>
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 448px;"></div>
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 464px;"></div>
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 480px;"></div>
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 496px;"></div>
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 512px;"></div>
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 528px;"></div>
-				<div class="Enemy Turtle Collidable deadly" style="bottom: 96px;left: 544px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 432px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 448px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 464px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 480px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 496px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 512px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 528px;"></div>
+				<div class="Enemy KoopaTroopa Collidable deadly" style="bottom: 96px;left: 544px;"></div>
 
 				<div class="SpriteGroup Collidable platform" style="width: 256px; height: 48px; bottom: 48px; left: 304px;">
 					<div class="Sprite GrassBLT" style="top: 0; left: 0;"></div>
@@ -232,7 +231,7 @@
 
 				<div class="Object Plate Collidable solid" style="bottom: 160px;left: 3184px;"></div>
 				<div class="Object Plate Collidable solid static" style="bottom: 160px;left: 3200px;"></div>
-				
+
 				<div class="Object BoxBrown Collidable solid" style="bottom: 416px;left: 3200px;"></div>
 				<div class="SpriteGroup Collidable" style="width: 16px; height: 240px; bottom: 176px; left: 3200px;">
 					<div class="Object GreenStair" style="top: 0;"></div>
@@ -331,7 +330,7 @@
 				<div class="Object Plate Collidable solid" style="bottom: 160px; left: 4512px;"></div>
 				<div class="Object Plate Collidable solid" style="bottom: 160px; left: 4528px;"></div>
 				<div class="Object Plate Collidable solid" style="bottom: 144px; left: 4496px;"></div>
-				<div class="Object P Collidable solid" 	  style="bottom: 144px; left: 4512px;"></div>
+				<div class="Object Switch Collidable solid" 	  style="bottom: 144px; left: 4512px;"></div>
 				<div class="Object Plate Collidable solid" style="bottom: 144px; left: 4528px;"></div>
 				<div class="Object Plate Collidable solid" style="bottom: 128px; left: 4496px;"></div>
 				<div class="Object Plate Collidable solid" style="bottom: 128px; left: 4512px;"></div>
@@ -1974,6 +1973,8 @@
 				</div>
 			</div>
 		</div>
+
+		<audio id="backgroundSound" loop></audio>
 
 		<div style="position: absolute; left: 410px; top: 10px;">
 			Warning<br>

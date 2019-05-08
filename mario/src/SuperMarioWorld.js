@@ -1,4 +1,7 @@
 import Inject from '~/engine/Inject';
+import {boundMethod} from 'autobind-decorator'
+
+let stageSound = require('../sounds/overworldbgm.mp3');
 
 import Game from '~/engine/Game';
 
@@ -17,6 +20,18 @@ class SuperMarioWord extends Game {
 		Inject.control = new Control();
 
 		Inject.game = this;
+	}
+
+	@boundMethod
+	play(){
+		super.play();
+		Inject.audio.playBackground(stageSound);
+	}
+
+	@boundMethod
+	gameOver(){
+		super.gameOver();
+		Inject.audio.stopBackground();
 	}
 }
 

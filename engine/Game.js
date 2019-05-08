@@ -15,7 +15,10 @@ class Game {
 	gameLoop = ()=>{
 		Inject.puppet.update();
 
-		Inject.scene.updatableMapVisible.forEach((object)=>{
+		// console.log(Inject.scene.updatableMapVisible);
+		// console.warn('0',Inject.scene.updatableMap);
+		// Inject.scene.updatableMapVisible.forEach((object)=>{
+		Inject.scene.updatableMap.forEach((object)=>{
 			object.update();
 		});
 
@@ -42,7 +45,7 @@ class Game {
 	    // showStartMenu()
 	}
 
-	gameOver = ()=>{
+	gameOver(){
 		//meu
 		// sound_dead()
 		if (--Inject.puppet.lives > 0) {
@@ -55,13 +58,14 @@ class Game {
 		}
 	}
 
-	play = ()=>{
+	play(){
 	    // hideMenus();
 	    // registerControls()
 	    // initializeLevel()
 	    // initializeTheme()
 	    // sound_theme()
 		 Inject.scene.constructCollisionMap();
+		 // console.log(Inject.scene.updatableMap);
 	    window.clearInterval(this.gameInterval);
 	    this.gameInterval = setInterval(this.gameLoop, 1000 / this.fps);
 	}

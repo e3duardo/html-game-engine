@@ -1,3 +1,5 @@
+import Inject from './Inject';
+
 class Collidable {
 	constructor(tag) {
 		this.tag = tag;
@@ -16,6 +18,16 @@ class Collidable {
 			this.border.bottom=false;
 			this.border.horizontal=false;
 		}
+
+		this.ax=0;
+		this.ay=0;
+		this.speedX=0;
+		this.speedY=0;
+		this.velocity_x=1;
+		this.speed_limit_x=4;
+		this.friction=0.8;
+		this.updatable = false;
+		// console.warn('3', this)
 	}
 
 	collide(from, collides){
@@ -77,6 +89,38 @@ class Collidable {
 			}
 		}
 		return collides;
+	}
+
+	update = ()=>{
+		// console.warn('2', this)
+		if(this.updatable){
+			// console.log('koopa tick');
+			this.ax = this.x;
+			this.ay = this.y;
+
+			// apply gravity.
+			this.speedY += Inject.scene.gravity;
+			if (Math.abs(this.speedY) < 0.2) this.speedY = 0;
+
+			// apply speed limit when falling down
+			if (this.speedY > this.speed_limit_y) {
+				this.speedY = this.speed_limit_y;
+			}
+
+			this.ax += this.speedX;
+			this.ay += this.speedY;
+
+			Inject.scene.sceneMap.forEach((object)=>{
+				const collides = object.collides(this);
+				object.collide(this, collides);
+			});
+
+		  	// apply friction
+			// this.speedX *= this.friction;
+
+			this.x = this.ax;
+			this.y = this.ay;
+		}
 	}
 
 	get x (){ return this.tag.offsetLeft; }

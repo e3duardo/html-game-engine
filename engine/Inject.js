@@ -1,4 +1,5 @@
 import Stage from './Stage';
+import Audio from './Audio';
 
 class Inject {
 	constructor() {
@@ -8,6 +9,7 @@ class Inject {
 		this.puppet = null;
 		this.scene = null;
 		this.stage = new Stage();
+		this.audio = new Audio();
 	}
 }
 

@@ -1,4 +1,5 @@
 import Inject from './Inject';
+import {boundMethod} from 'autobind-decorator'
 
 var size = {
     tile:{ // size of tiles
@@ -35,10 +36,13 @@ class Puppet {
 		this.animation('right');
 	}
 
-	animation = (classe)=>{
+	@boundMethod
+	animation(classe){
 		this.tag.classList = "Puppet "+classe;
 	}
-	update = ()=>{
+
+	@boundMethod
+	update(){
 		this.ax = this.x;
 		this.ay = this.y;
 
@@ -281,11 +285,16 @@ class Puppet {
 		this.x = this.ax;
 		this.y = this.ay;
 	}
-	jump = ()=>{
+
+	@boundMethod
+	jump(){
+		console.log('puppet jump', this)
 		Inject.control.releaseA();
 		this.speedY -= this.velocity_y;
 	}
-	die = ()=>{
+
+	@boundMethod
+	die(){
 		Inject.game.newGame();
 
 		if (this.speedX < 0) {
@@ -299,7 +308,9 @@ class Puppet {
 			Inject.game.play();
 		}, 1000);
 	}
-	lower = ()=>{
+
+	@boundMethod
+	lower(){
 
 	}
 
@@ -307,7 +318,8 @@ class Puppet {
 
 
 	// todo: re-spawn player at the closest 'y' to the left
-	respawnPlayer = ()=>{
+	@boundMethod
+	respawnPlayer(){
 	    // if (startpos = getLastLevelSpritePosition('y', this.x)) {
 	    //     this.x = startpos.x * size.tile.target.w
 	    //     if (this.x >= Inject.stage.width/2) {

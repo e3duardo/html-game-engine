@@ -3,6 +3,7 @@ import KoopaTroopa from './Enemy/KoopaTroopa';
 
 import Question from './Item/Question';
 import Rotation from './Item/Rotation';
+import Switch from './Item/Switch';
 
 import CollidableFactoryBase from '~/engine/CollidableFactoryBase';
 
@@ -12,10 +13,10 @@ class CollidableFactory extends CollidableFactoryBase{
 	}
 
 	from(tag){
-		if(tag.classList.contains('TurtleShell')){
+		if(tag.classList.contains('KoopaTroopaShell')){
 			return new KoopaTroopaShell(tag);
 		}
-		if(tag.classList.contains('Turtle')){
+		if(tag.classList.contains('KoopaTroopa')){
 			return new KoopaTroopa(tag);
 		}
 		if(tag.classList.contains('Question')){
@@ -23,6 +24,9 @@ class CollidableFactory extends CollidableFactoryBase{
 		}
 		if(tag.classList.contains('Plate')){
 			return new Rotation(tag);
+		}
+		if(tag.classList.contains('Switch')){
+			return new Switch(tag);
 		}
 		return super.from(tag);
 	}
