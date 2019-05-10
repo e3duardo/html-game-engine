@@ -1,0 +1,2 @@
+.GameOver{height:240px;z-index:100;background:#000;color:#ff0;justify-content:center;align-items:center;display:none}.GameOver,.Hud{width:256px;position:absolute}.Hud{left:0;top:0;height:46px;background:url(score_static.0edd7664.png) no-repeat;background-size:256px 46px;z-index:10}.Scene{background:url(fase1.c0b92318.png) repeat;width:5120px;height:432px;position:relative;top:-192px;transition:all .04s linear}.Box{width:40px;height:40px;background:brown;position:absolute;bottom:30px}
+/*# sourceMappingURL=/html-game-engine/marioworld.b8ba11d7.css.map */
