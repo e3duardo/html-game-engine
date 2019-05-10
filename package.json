@@ -34,6 +34,8 @@
     "parcel-bundler": "^1.12.3"
   },
   "dependencies": {
+    "@webcomponents/webcomponentsjs": "^2.2.10",
+    "hybrids": "^3.0.0",
     "mario": "^1.8.0",
     "src": "^1.1.2"
   }

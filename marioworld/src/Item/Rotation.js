@@ -1,5 +1,6 @@
 import Collidable from '~/engine/Collidable';
 import Inject from '~/engine/Inject';
+import {boundMethod} from 'autobind-decorator'
 
 class Rotation extends Collidable{
 	constructor(tag) {
@@ -12,9 +13,12 @@ class Rotation extends Collidable{
 			horizontal: 'solid'
 		}
 		this.static = tag.classList.contains('static');
+
+		this.type = 'item';
 	}
 
-	rotate = ()=>{
+	@boundMethod
+	rotate(){
 		this.tag.classList.add('Rotation');
 		this.border = {
 			top: false,
@@ -22,7 +26,9 @@ class Rotation extends Collidable{
 			horizontal: false
 		}
 	}
-	stop = ()=>{
+
+	@boundMethod
+	stop(){
 		this.tag.classList.remove('Rotation');
 		this.border = {
 			top: 'solid',
@@ -31,16 +37,18 @@ class Rotation extends Collidable{
 		}
 	}
 
-	disable = ()=>{
+	@boundMethod
+	disable(){
 		this.disabled = true;
 		this.tag.style.backgroundPosition = '-257px -97px';
 		this.tag.style.animation = 'none';
 	}
 
-	collide = (from, collides)=>{
-		super.collide(from, collides);
+	@boundMethod
+	collide(from, collisions){
+		super.collide(from, collisions);
 
-		if (!this.disabled && collides.top && this.border.bottom=='solid') {
+		if (!this.disabled && collisions.top && this.border.bottom=='solid') {
 			if(this.static){
 				this.disable();
 			}else{

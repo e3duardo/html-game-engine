@@ -1,4 +1,4 @@
-import SuperMarioWord from './mario/src/SuperMarioWorld';
+import SuperMarioWord from './src/SuperMarioWorld';
 
 //
 

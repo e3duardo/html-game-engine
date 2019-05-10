@@ -19,6 +19,8 @@ class Control extends ControlBase{
 	get left(){ return this.keys.left; }
 	get a(){ return this.keys.a; }
 	get shift(){ return this.keys.shift; }
+
+	pressA=()=>{ this.keys.a = true;}
 	releaseA=()=>{ this.keys.a = false;}
 
 	translateKeyboard  = (key)=>{

@@ -145,122 +145,34 @@ class Puppet {
 		// add visible items + actors to collision check
 		// todo: only add visible items
 		Inject.scene.getCollisionMapVisible().forEach((object)=>{
-			const collides = object.collides(this);
+			const collisions = object.collides(this);
+			// console.log(collides);
 
-			object.collide(this, collides);
-
-
-			// if (object.solid) {
-            /* if (collides.top && object.border.top=='solid') {
-                 // if (object.type == 'block_coin') {
-                 //     replaceLevelSpriteXY(object.x, object.y, "ß");
-                 //     items.push({ sx:8, sy:9, x:object.x, y:(object.y - size.tile.target.h), type:'coin' });
-                 // } else {
-                     this.ay = object.y + this.height;// + size.tile.target.h;
-                     this.speedY = 1;
-                 // }
-             }
-				 if (collides.bottom && object.border.bottom=='solid') {
-                 // jump on enemy
-                 // if (object.type == 'enemy_mushroom') {
-                 //     object.deadly = false
-                 //     object.speed = 0
-                 //     object.sx = 2
-                 //     score++;
-                 //     sound_jump_on_enemy()
-                 // }
-                 this.ay = object.y - this.height;
-                 this.speedY = 0;
-             }
-				 if (collides.right && object.border.right=='solid') {
-                 this.ax = object.x - this.width;
-                 this.speedX = 0;
-             }
-				 if (collides.left && object.border.left=='solid') {
-                 this.ax = object.x + this.width;//+ size.tile.target.w;
-                 this.speedX = 0;
-             }*/
-         // }else if (object.platform) {
-			// 	if (collides.bottom) {
-			// 		if(this.speedY > 0){
-			// 			this.ay = object.y - this.height;
-			// 			this.speedY = 0;
-			// 		}
-			// 	}
-         // }
-
-			// const collides = this.checkCollision(object);
-
-		    // apply collision to player movement
-		    // special actions on collisions
-		    // if (object.solid) {
-		    //     if (collides.top) {
-		    //         // if (object.type == 'block_coin') {
-		    //         //     replaceLevelSpriteXY(object.x, object.y, "ß");
-		    //         //     items.push({ sx:8, sy:9, x:object.x, y:(object.y - size.tile.target.h), type:'coin' });
-		    //         // } else {
-				// 		// if
-		    //             this.y = object.y-object.height;
-		    //             this.speedY = 0;
-		    //         // }
-		    //     } else if (collides.bottom) {
-		    //         // jump on enemy
-		    //         // if (object.type == 'enemy_mushroom') {
-		    //         //     object.deadly = false
-		    //         //     object.speed = 0
-		    //         //     object.sx = 2
-		    //         //     score++;
-		    //         //     sound_jump_on_enemy()
-		    //         // }
-				// 		this.y = object.y+object.height;
-				// 		this.speedY = 0;
-		    //     } else if (collides.right) {
-		    //         this.x = object.x - this.width;
-		    //         this.speedX = 0;
-		    //     } else if (collides.left) {
-		    //         this.x = object.x + size.tile.target.w;
-		    //         this.speedX = 0;
-		    //     }
-		    // }
-
-		   // collide from any side
-			//if (collides.top || collides.bottom || collides.right || collides.left) {
-
-			//	object.collide(this, collides);
-
-			//	if (object.deadly == true) {
-/*
-
-					//items.push({ sx:, sy:9, x:this.x, y:this.y, deadly:false, type:'looser' });
-					Game.newGame();
-
-					if (this.speedX < 0) {
-						this.animation('dying-left');
-					}else{
-						this.animation('dying-right');
-					}
-
-					setTimeout(()=>{
-						Game.gameOver();
-						Game.play();
-					}, 1000);*/
-			//	}
-		    //     if (object.type == 'exit') {
-		    //         levelWin()
-		    //     }
-		    //     if (object.type == 'trampoline') {
-		    //         this.speedY < 0 ? this.speedY = 0 : true
-		    //         sound_jump()
-		    //         this.speedY = -0.5 * this.speedY - 25
-		    //     }
-		    //     if (object.type == 'coin') {
-		    //         items.splice(items.indexOf(object), 1)
-		    //         score++
-		    //         sound_coin()
-		    //     }
-		    //}
+			if(object.scenario){
+				if (collisions.top && object.border.bottom=='solid') {
+					this.ay = object.y + this.height;// + size.tile.target.h;
+					this.speedY = 1;
+				}
+				if (collisions.bottom &&
+						(object.border.top=='solid' ||
+							(object.border.top=='platform' && this.speedY > 0))) {
+					this.ay = object.y - this.height;
+					this.speedY = 0;
+				}
+				if (collisions.right && object.border.horizontal=='solid' && this.speedX > 0) {
+					this.ax = object.x - this.width;
+					this.speedX = 0;
+				}
+				if (collisions.left && object.border.horizontal=='solid' && this.speedX < 0) {
+					this.ax = object.x + object.width;
+					this.speedX = 0;
+				}
+			}
+			if(object.enemy || object.item){
+				// console.log(object);
+				object.collide(this, collisions);
+			}
 		});
-
 
 
 	  // move the player when the level is at it's border, else move the level

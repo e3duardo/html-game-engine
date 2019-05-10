@@ -1,0 +1,86 @@
+@debug: false;
+
+.Enemy{
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	z-index: 5;
+	&.KoopaTroopaShell {
+		background: url('../assets/koopas-shell.png') no-repeat 0 0;
+		&.animated {
+			animation: koopas-shell-moving .3s steps(4) infinite;
+		}
+	}
+	@keyframes koopas-shell-moving {
+		100%   {background-position: -64px 0;}
+	}
+
+	&.KoopaTroopa {
+		background: url('../assets/koopas.png') no-repeat 0 0;
+		height: 27px;
+
+		&.walking-r{
+			animation: koopas-walking-right .3s steps(2) infinite;
+		}
+		&.walking-l{
+			animation: koopas-walking-left .3s steps(2) infinite;
+		}
+		&.angry-beach-walking-r{
+			animation: angry-beach-koopas-walking-right .3s steps(2) infinite;
+		}
+		&.angry-beach-walking-l{
+			animation: angry-beach-koopas-walking-left .3s steps(2) infinite;
+		}
+		&.beach-walking-r{
+			animation: beach-koopas-walking-right .3s steps(2) infinite;
+		}
+		&.beach-walking-l{
+			animation: beach-koopas-walking-left .3s steps(2) infinite;
+		}
+		&.angry-falling-beach-walking-r{
+			animation: angry-falling-beach-koopas-walking-right .3s steps(2) infinite;
+		}
+		&.angry-falling-beach-walking-l{
+			animation: angry-falling-beach-koopas-walking-left .3s steps(2) infinite;
+		}
+
+		&.crushed{
+			background-position: -256px 0;
+		}
+	}
+	@keyframes koopas-walking-right {
+		0%		{background-position: 0 0;}
+		100%	{background-position: -32px 0;}
+	}
+	@keyframes koopas-walking-left {
+		0%		{background-position: -32px 0;}
+		100%	{background-position: -64px 0;}
+	}
+
+	@keyframes angry-beach-koopas-walking-right {
+		0%   {background-position: -64px 0;}
+		100%   {background-position: -96px 0;}
+	}
+	@keyframes angry-beach-koopas-walking-left {
+		0%   {background-position: -96px 0;}
+		100%   {background-position: -128px 0;}
+	}
+
+	@keyframes beach-koopas-walking-right {
+		0%   {background-position: -128px 0;}
+		100%   {background-position: -160px 0;}
+	}
+	@keyframes beach-koopas-walking-left {
+		0%   {background-position: -160px 0;}
+		100%   {background-position: -192px 0;}
+	}
+
+	@keyframes angry-falling-beach-koopas-walking-right {
+		0%   {background-position: -192px 0;}
+		100%   {background-position: -224px 0;}
+	}
+	@keyframes angry-falling-beach-koopas-walking-left {
+		0%   {background-position: -224px 0;}
+		100%   {background-position: -256px 0;}
+	}
+}

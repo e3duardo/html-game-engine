@@ -1,0 +1,52 @@
+.Group{
+	position: absolute;
+	bottom: 32px;
+}
+
+.Floor{
+	background-image: url('../assets/floor.png');
+	background-repeat: repeat;
+	position: absolute;
+}
+
+.Mato{
+	background-image: url('../assets/tileset.png');
+	background-repeat: no-repeat;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	&11{
+		background-position: -8*16px -8*16px;
+	}
+	&12{
+		background-position: -9*16px -8*16px;
+	}
+	&13{
+		background-position: -10*16px -8*16px;
+	}
+	&21{
+		background-position: -8*16px -9*16px;
+	}
+	&22{
+		background-position: -9*16px -9*16px;
+	}
+	&23{
+		background-position: -10*16px -9*16px;
+	}
+}
+.Moita{
+	background-image: url('../assets/tileset.png');
+	background-repeat: no-repeat;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	&1{
+		background-position: -11*16px -9*16px;
+	}
+	&2{
+		background-position: -12*16px -9*16px;
+	}
+	&3{
+		background-position: -13*16px -9*16px;
+	}
+}

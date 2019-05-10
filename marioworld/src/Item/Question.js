@@ -1,5 +1,6 @@
 import Collidable from '~/engine/Collidable';
 import Inject from '~/engine/Inject';
+import {boundMethod} from 'autobind-decorator'
 
 class Question extends Collidable{
 	constructor(tag) {
@@ -12,15 +13,19 @@ class Question extends Collidable{
 			horizontal: 'solid'
 		}
 		this.shouldReleaseYoshi = tag.classList.contains('releaseYoshi');
+
+		this.type = 'item';
 	}
 
-	disable = ()=>{
+	@boundMethod
+	disable(){
 		this.disabled = true;
 		this.tag.style.backgroundPosition = '-257px -97px';
 		this.tag.style.animation = 'none';
 	}
 
-	releaseCoin = ()=>{
+	@boundMethod
+	releaseCoin(){
 		const coin = document.createElement('div');
 		coin.className = 'Object Coin';
 		coin.style.left= this.x+'px';
@@ -35,7 +40,9 @@ class Question extends Collidable{
 			coin.parentNode.removeChild(coin);
 		}, 260);
 	}
-	releaseYoshi = ()=>{
+
+	@boundMethod
+	releaseYoshi(){
 		const coin = document.createElement('div');
 		coin.className = 'Plant Egg';
 		coin.style.left= this.x+'px';
@@ -59,10 +66,11 @@ class Question extends Collidable{
 		}, 15);
 	}
 
-	collide = (from, collides)=>{
-		super.collide(from, collides);
+	@boundMethod
+	collide(from, collisions){
+		super.collide(from, collisions);
 
-		if (!this.disabled && collides.top && this.border.bottom=='solid') {
+		if (!this.disabled && collisions.top && this.border.bottom=='solid') {
 			let i = 0;
 			let interval;
 			interval = setInterval(()=>{

@@ -1,24 +1,4 @@
-@debug: false;
 
-*, *::after, *::before{
-	box-sizing: content-box;
-}
-
-// body{
-// 	overflow: hidden;
-// }
-
-.Stage{
-	width: 256px;
-	height: 240px;
-	background: #eee;
-	position: relative;
-	border: 1px solid green;
-	& when (@debug = false) {
-		overflow: hidden;
-	}
-  	zoom: 150%;
-}
 .GameOver{
 	width: 256px;
 	height: 240px;
@@ -50,18 +30,7 @@
 	top:-192px;
 	transition: all .04s linear;
 }
-& when (@debug = true) {
-	.Grid{
-		background: url('../assets/grid.png') repeat;
-		width: 5120px;
-		height: 432px;//432
-		top: 0;
-		left: 0;
-		position: absolute;
-		z-index: 100;
-		opacity: .5
-	}
-}
+
 .Box{
 	width: 40px;
 	height: 40px;
