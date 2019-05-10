@@ -11,7 +11,7 @@ export const Mario = {
 		tag.style.width = '16px';
 		tag.style.height = '16px';
 		tag.style.left = tag.x*16+'px';
-		tag.style.bottom = tag.y*16+'px';
+		tag.style.top = '0px';
 		tag.style.zIndex = 2;
 
 		return html`

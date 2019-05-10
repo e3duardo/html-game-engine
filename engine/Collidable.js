@@ -74,7 +74,7 @@ class Collidable {
 		// we are below or above an object (use the middle of the actor, with tolerance)
 		if ((from.ax + from.width / 2).inRange(this.x - 0.25, this.x + this.width + 1.25)) {
 			// check bounce bottom:
-			if ((from.ay + from.height).inRange(this.y, this.y + this.height - 1) && from.ay < this.y) {
+			if ((from.ay + from.height).inRange(this.y, this.y + this.height - 1) ){//&& from.ay < this.y) {
 				collisions.bottom = true;
 			// check bounce top:
 			} else if (from.ay.inRange(this.y, this.y + this.height)) {

@@ -6,7 +6,7 @@ import {boundMethod} from 'autobind-decorator'
 import Game from '~/engine/Game';
 
 import Puppet from '~/engine/Puppet';
-import ControlBase from '~/engine/ControlBase';
+import Control from './Control';
 import CollidableFactoryBase from '~/engine/CollidableFactoryBase';
 import World1 from './Stage/World1';
 
@@ -17,7 +17,7 @@ class SuperMarioBros extends Game {
 		Inject.puppet = new Puppet();
 		Inject.scene = new World1();
 		Inject.collidableFactory = new CollidableFactoryBase();
-		Inject.control = new ControlBase();
+		Inject.control = new Control();
 
 		Inject.game = this;
 	}

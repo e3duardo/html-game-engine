@@ -14,7 +14,7 @@ export const Question = {
 		tag.style.left = tag.x*16+'px';
 		tag.style.bottom = tag.y*16+'px';
 		tag.style.zIndex = 2;
-		console.log(tag.hide);
+		// console.log(tag.hide);
 		if(tag.hide){
 			tag.style.opacity = '0.2';
 		}

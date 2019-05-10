@@ -146,16 +146,18 @@ class Puppet {
 		// todo: only add visible items
 		Inject.scene.getCollisionMapVisible().forEach((object)=>{
 			const collisions = object.collides(this);
-			// console.log(collides);
+			// console.log(collisions);
 
 			if(object.scenario){
 				if (collisions.top && object.border.bottom=='solid') {
 					this.ay = object.y + this.height;// + size.tile.target.h;
 					this.speedY = 1;
 				}
+				// console.log(collisions.bottom, 'colide', object.border.top=='solid')
 				if (collisions.bottom &&
 						(object.border.top=='solid' ||
-							(object.border.top=='platform' && this.speedY > 0))) {
+							(object.border.top=='platform' ))){//&& this.speedY > 0))) {
+								// console.log('colide')
 					this.ay = object.y - this.height;
 					this.speedY = 0;
 				}

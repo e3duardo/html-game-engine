@@ -19,7 +19,7 @@ class SceneBase {
 		this.collisionMap = [];
 		this.updatableMap = [];
 		this.sceneMap = [];
-		
+
 		document.querySelectorAll('.Collidable').forEach((object)=>{
 			object = Inject.collidableFactory.from(object);
 			this.collisionMap.push(object);
@@ -33,6 +33,8 @@ class SceneBase {
 	}
 
 	getCollisionMapVisible=()=>{
+		return this.collisionMap;
+		
 		var visible = []
 
 		this.collisionMap.forEach(co=>{
