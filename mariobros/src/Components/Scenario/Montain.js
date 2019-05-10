@@ -1,14 +1,14 @@
+import Assets from '../Assets';
+
 import '@webcomponents/webcomponentsjs/webcomponents-bundle.js';
 import { html, define } from 'hybrids';
 
-const tileset = require('../../assets/tileset.png');
 const m11 = `background-position: ${-8*16}px ${-8*16}px`;
 const m12 = `background-position: ${-9*16}px ${-8*16}px`;
 const m13 = `background-position: ${-10*16}px ${-8*16}px`;
 const m21 = `background-position: ${-8*16}px ${-9*16}px`;
 const m22 = `background-position: ${-9*16}px ${-9*16}px`;
 const m23 = `background-position: ${-10*16}px ${-9*16}px`;
-
 
 export const Montain = {
 	size: 1,
@@ -40,7 +40,7 @@ export const Montain = {
 				background: red;
 			}
 			.m{
-				background-image: url('${tileset}');
+				background-image: url('${Assets.tileset}');
 				background-repeat: no-repeat;
 				position: absolute;
 				width: 16px;

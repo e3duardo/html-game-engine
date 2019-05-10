@@ -34,7 +34,7 @@ class SceneBase {
 
 	getCollisionMapVisible=()=>{
 		return this.collisionMap;
-		
+
 		var visible = []
 
 		this.collisionMap.forEach(co=>{

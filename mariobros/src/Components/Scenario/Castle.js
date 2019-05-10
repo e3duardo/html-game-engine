@@ -1,7 +1,8 @@
+import Assets from '../Assets';
+
 import '@webcomponents/webcomponentsjs/webcomponents-bundle.js';
 import { html, define } from 'hybrids';
 
-const tileset = require('../../assets/tileset.png');
 const m11 = `background-position: ${-11*16}px ${-0*16}px`;
 const m12 = `background-position: ${-12*16}px ${-0*16}px`;
 const m13 = `background-position: ${-13*16}px ${-0*16}px`;
@@ -34,7 +35,7 @@ export const Castle = {
 				z-index: 2;
 			}
 			.m{
-				background-image: url('${tileset}');
+				background-image: url('${Assets.tileset}');
 				background-repeat: no-repeat;
 				position: absolute;
 				width: 16px;
