@@ -45,4 +45,4 @@ module.exports="/html-game-engine/jump.70cb4d35.wav";
 },{"~/engine/Inject":"6dW9","autobind-decorator":"KPDZ","../sounds/overworldbgm.mp3":"4Wz0","~/engine/Game":"deFs","./Mario":"vSuE","./Control":"5HqO","./CollidableFactory":"1BUh","./Stage/YoshisIsland2":"dcXZ"}],"zKd2":[function(require,module,exports) {
 "use strict";var e=r(require("./src/SuperMarioWorld"));function r(e){return e&&e.__esModule?e:{default:e}}e.default.play(),document.querySelector(".Stage").addEventListener("click",function(){});
 },{"./src/SuperMarioWorld":"3i6g"}]},{},["zKd2"], null)
-//# sourceMappingURL=/html-game-engine/marioworld.47b06737.js.map
+//# sourceMappingURL=/html-game-engine/marioworld.908e05a2.js.map
