@@ -1,9 +1,9 @@
-import Inject from '~/engine/Inject';
+import Inject from '~/engine/src/Inject';
 import {boundMethod} from 'autobind-decorator'
 
 let stageSound = require('../sounds/overworldbgm.mp3');
 
-import Game from '~/engine/Game';
+import Game from '~/engine/src/Game';
 
 import Mario from './Mario';
 import Control from './Control';

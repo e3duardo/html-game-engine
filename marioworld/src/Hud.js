@@ -1,4 +1,4 @@
-import ControlBase from '~/engine/ControlBase';
+import ControlBase from '~/engine/src/ControlBase';
 
 class Control extends ControlBase{
 	constructor(){

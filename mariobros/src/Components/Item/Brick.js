@@ -1,4 +1,4 @@
-import Object from '~/engine/Object';
+import Object from '~/engine/src/Object';
 import Assets from '../Assets';
 
 class Brick extends Object{

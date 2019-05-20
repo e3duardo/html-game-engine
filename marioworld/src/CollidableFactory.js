@@ -5,7 +5,7 @@ import Question from './Item/Question';
 import Rotation from './Item/Rotation';
 import Switch from './Item/Switch';
 
-import CollidableFactoryBase from '~/engine/CollidableFactoryBase';
+import CollidableFactoryBase from '~/engine/src/CollidableFactoryBase';
 
 class CollidableFactory extends CollidableFactoryBase{
 	constructor(){

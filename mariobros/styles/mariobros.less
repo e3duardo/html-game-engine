@@ -3,11 +3,47 @@
 
 
 .Scene{
-	background: #5c94fc;
+	background: #5c94fc;// url('../assets/screens.png') -3px -3px;
 	width: 3584px;
 	height: 240px;//432
 	position: relative;
-	transition: all .04s linear;
+	transition: left .033s linear;
+}
+.Hud{
+	position: absolute;
+	left: 0;
+	color: #fff;
+	z-index: 10000;
+	padding-top: 7.65px;
+	padding-left: 24.5px;
+	width: 214px;
+	letter-spacing: -.3px;
+}
+.Hud>div {
+	float: left;
+}
+.Hud>div:nth-of-type(1) {
+	width: 64px;
+}
+.Hud>div:nth-of-type(2) {
+	width: 55.5px;
+}
+.Hud>div:nth-of-type(2)>span {
+	margin-left: 6.6px;
+}
+.Hud>div:nth-of-type(3) {
+	width: 56.5px;
+}
+.Hud>div:nth-of-type(3)>span:nth-of-type(2) {
+	margin-left: 10px;
+}
+.Hud>div:nth-of-type(4) {
+	text-align: right;
+}
+.Hud *{
+	font-size: 7px!important;
+	line-height: 9.1px!important;
+	letter-spacing: -0.3px!important;
 }
 
 .GameOver{
@@ -24,4 +60,18 @@
 
 .Puppet{
 	z-index: 7
+}
+
+
+@font-face {
+	font-family: 'MarioBros';
+	src: url('../assets/SuperMarioBrosPixel.ttf');
+}
+
+*{
+	font-family: 'MarioBros', monospace;
+	letter-spacing: -1px;
+	word-spacing: 10px;
+	font-size: 10px;
+	line-height: 15px;
 }

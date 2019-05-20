@@ -1,4 +1,4 @@
-import SceneBase from '~/engine/SceneBase';
+import SceneBase from '~/engine/src/SceneBase';
 
 class World1 extends SceneBase {
 	constructor() {

@@ -1,12 +1,14 @@
-import Inject from './Inject';
+// import Inject from './Inject';
+import Tag from './Tag';
 import {boundMethod} from 'autobind-decorator'
 
 import '@webcomponents/webcomponentsjs/webcomponents-bundle.js';
 import { html, define } from 'hybrids';
 
-class Object {
+class Object extends Tag{
 
-	constructor() {
+	constructor(tag) {
+		super(tag);
 		this.ax=0;
 		this.ay=0;
 		this.velocity_x=1;
@@ -37,25 +39,6 @@ class Object {
 
 	get speedY (){ return this._speedY; }
 	set speedY (speedy){ this._speedY = parseFloat(speedy.toFixed(1)); }
-
-	get x (){ return this.tag.offsetLeft; }
-	set x (x){
-		x = parseFloat(x.toFixed(1));
-		if(x != this.x){
-			this.tag.style.left = x + 'px';
-		}
-	}
-
-	get y (){ return this.tag.offsetTop; }
-	set y (y){
-		y = parseFloat(y.toFixed(1));
-		if(y != this.y){
-			this.tag.style.top = y + 'px';
-		}
-	}
-
-	get width (){ return this.tag.offsetWidth; }
-	get height (){ return this.tag.offsetHeight; }
 }
 
 export {Object as default};

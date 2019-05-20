@@ -8,45 +8,24 @@
 	background-repeat: repeat;
 	position: absolute;
 }
-
-.Mato{
-	background-image: url('../assets/tileset.png');
+.Coin{
+	background-image: url('../assets/items.png');
+	background-position: calc(-8px * 0) calc(-8px * 6);
 	background-repeat: no-repeat;
 	position: absolute;
-	width: 16px;
-	height: 16px;
-	&11{
-		background-position: -8*16px -8*16px;
-	}
-	&12{
-		background-position: -9*16px -8*16px;
-	}
-	&13{
-		background-position: -10*16px -8*16px;
-	}
-	&21{
-		background-position: -8*16px -9*16px;
-	}
-	&22{
-		background-position: -9*16px -9*16px;
-	}
-	&23{
-		background-position: -10*16px -9*16px;
-	}
+	width: 8px;
+	height: 8px;
+	background-size: 288px 168px;
+	top: 15px;
+	left: 87px;
+	animation-timing-function: steps(1);
+	animation-name: coin;
+	animation-duration: .40s;
+	animation-iteration-count: infinite;
 }
-.Moita{
-	background-image: url('../assets/tileset.png');
-	background-repeat: no-repeat;
-	position: absolute;
-	width: 16px;
-	height: 16px;
-	&1{
-		background-position: -11*16px -9*16px;
-	}
-	&2{
-		background-position: -12*16px -9*16px;
-	}
-	&3{
-		background-position: -13*16px -9*16px;
-	}
+@keyframes coin {
+	0% { background-position: calc(-8px * 0) calc(-8px * 6); }
+	33% { background-position: calc(-8px * 1) calc(-8px * 6); }
+	66% { background-position: calc(-8px * 2) calc(-8px * 6); }
+	100% { background-position: calc(-8px * 3) calc(-8px * 6); }
 }

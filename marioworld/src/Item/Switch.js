@@ -1,6 +1,6 @@
-import Collidable from '~/engine/Collidable';
-import Inject from '~/engine/Inject';
-import {boundMethod} from 'autobind-decorator'
+import Collidable from '~/engine/src/Collidable';
+// import Inject from '~/engine/src/Inject';
+// import {boundMethod} from 'autobind-decorator'
 
 class Switch extends Collidable{
 	constructor(tag) {

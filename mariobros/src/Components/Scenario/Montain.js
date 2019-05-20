@@ -18,14 +18,15 @@ export const Montain = {
 		let width = 16;
 		let height = 16;
 		let t = 32;
+		console.log(tag, tag.size);
 		if(tag.size ==2){
-			width = 48;
-			height = 32;
-			t = 16;
+			width *= 3;
+			height *= 2;
+			t /= 2;
 		}else{
-			width = 80;
-			height = 48;
-			t = 0;
+			width *= 5;
+			height *= 3;
+			t *= 0;
 		}
 		tag.style.position = 'absolute';
 		tag.style.width = width+'px';

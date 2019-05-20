@@ -1,9 +1,11 @@
 import Inject from './Inject';
+import Object from './Object';
+
 import {boundMethod} from 'autobind-decorator'
 
-class Collidable {
+class Collidable extends Object{
 	constructor(tag) {
-		this.tag = tag;
+		super(tag);
 		this.solid = this.tag.classList.contains('solid');
 		this.platform = this.tag.classList.contains('platform');
 
@@ -18,13 +20,13 @@ class Collidable {
 			this.border.horizontal=false;
 		}
 
-		this.ax=0;
-		this.ay=0;
-		this.speedX=0;
-		this.speedY=0;
-		this.velocity_x=1;
-		this.speed_limit_x=4;
-		this.friction=0.8;
+		// this.ax=0;
+		// this.ay=0;
+		// this.speedX=0;
+		// this.speedY=0;
+		// this.velocity_x=1;
+		// this.speed_limit_x=4;
+		// this.friction=0.8;
 
 		this.type = 'scenario';
 		this.updatable = false;
@@ -131,25 +133,6 @@ class Collidable {
 	get scenario (){ return this.type == 'scenario'; }
 	get enemy (){ return this.type == 'enemy'; }
 	get item (){ return this.type == 'item'; }
-
-	get x (){ return this.tag.offsetLeft; }
-	set x (x){
-		x = parseFloat(x.toFixed(1));
-		if(x != this.x){
-			this.tag.style.left = x + 'px';
-		}
-	}
-
-	get y (){ return this.tag.offsetTop; }
-	set y (y){
-		y = parseFloat(y.toFixed(1));
-		if(y != this.y){
-			this.tag.style.top = y + 'px';
-		}
-	}
-
-	get width (){ return this.tag.offsetWidth; }
-	get height (){ return this.tag.offsetHeight; }
 }
 
 export {Collidable as default};

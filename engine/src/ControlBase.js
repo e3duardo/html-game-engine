@@ -1,7 +1,10 @@
+import {boundMethod} from 'autobind-decorator'
+
 class ControlBase {
 	constructor(){
 		this.keys = {
 		};
+		
 		document.addEventListener("keydown", (e)=>{
 			if(!e.repeat){
 				this.keys[this.translateKeyboard(e.key)] = true;
@@ -14,7 +17,8 @@ class ControlBase {
 		});
 	}
 
-	translateKeyboard  = (key)=>{
+	@boundMethod
+	translateKeyboard(key){
 		return '';
 	}
 }

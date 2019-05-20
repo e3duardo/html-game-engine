@@ -1,8 +1,11 @@
 import Inject from './Inject';
+import Tag from './Tag';
 
-class SceneBase {
+import {boundMethod} from 'autobind-decorator'
+
+class SceneBase extends Tag{
 	constructor() {
-		this.tag = document.querySelector('.Scene');
+		super(document.querySelector('.Scene'))
 
 		this.gravity=3;
 
@@ -15,7 +18,8 @@ class SceneBase {
 		this.sceneMap = [];
 	}
 
-	constructCollisionMap=()=>{
+	@boundMethod
+	constructCollisionMap(){
 		this.collisionMap = [];
 		this.updatableMap = [];
 		this.sceneMap = [];
@@ -32,9 +36,10 @@ class SceneBase {
 		});
 	}
 
-	getCollisionMapVisible=()=>{
+	@boundMethod
+	getCollisionMapVisible(){
 		return this.collisionMap;
-
+		/*
 		var visible = []
 
 		this.collisionMap.forEach(co=>{
@@ -43,10 +48,11 @@ class SceneBase {
 		});
 		// console.log(visible);
 		// console.log(Math.abs(this.x), Math.abs(this.x)+Inject.stage.width);
-		return visible;
+		return visible;*/
 	}
 
-	addTag=(tag)=>{
+	@boundMethod
+	addTag(tag){
 		this.tag.appendChild(tag);
 	}
 
@@ -65,25 +71,6 @@ class SceneBase {
 	set scroll_x(scroll){
 		this.x = -scroll;
 		this._scroll_x = scroll;
-	}
-
-	get width (){ return this.tag.clientWidth; }
-	get height (){ return this.tag.clientHeight; }
-
-	get x (){ return this.tag.offsetLeft; }
-	set x (x){
-		x = parseInt(x);
-		if(x != this.x){
-			this.tag.style.left = x + 'px';
-		}
-	}
-
-	get y (){ return this.tag.offsetTop; }
-	set y (y){
-		y = parseInt(y);
-		if(y != this.y){
-			this.tag.style.top = y + 'px';
-		}
 	}
 
 }

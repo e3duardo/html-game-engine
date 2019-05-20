@@ -8,8 +8,25 @@
 	<body>
 		<div class="Stage">
 			<div class="Grid"></div>
-			<div class="Hud"></div>
-			<div class="GameOver">GameOver</div>
+			<div class="Hud">
+				<div>
+					<span class="hud-actor">mario</span><br>
+					<span class="hud-score">000000</span>
+				</div>
+				<div>
+					<br><span class="hud-coin">.00<span>
+				</div>
+				<div>
+					<span>world</span><br>
+					<span class="hud-stage">1-1</span>
+				</div>
+				<div>
+					<span>time</span><br>
+					<span class="hud-time">000</span>
+				</div>
+				<div class="Coin"></div>
+			</div>
+			<div class="GameOver">gameover</div>
 			<div class="Scene">
 				<!-- <div class="Puppet" style="bottom: 64px; left: 64px;"></div> -->
 				<player-mario x="2" class="Puppet"></player-mario>
@@ -219,14 +236,18 @@
 		<audio id="backgroundSound" loop></audio>
 
 		<div style="position: absolute; left: 410px; top: 10px;">
-			Warning<br>
-			Before you begin:<br>
-			- Just work with a keyboard (by now)<br>
+			<h4>warning<h4><br>
+			before you begin<br>
+			- just work with a keyboard - by now<br><br><br>
+			- i made this font that you are reading from the original<br>
+			- all components are using webcomponents-hybrid<br>
+			- i used only html, less, javascript, hybrid, babel and parcel<br><br>
 			<!-- - Use "arrows keys" to move<br>
 			- Use "a key" to jump<br>
 			- Use "shift key" to run<br><br> -->
 
-			I still developing. Sorry for not making you have fun yet :)
+			i still developing<br>
+			sorry for not making you have fun yet
 		</div>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.0.17/webcomponents-lite.js"></script>
 		<script src="index.js"></script>

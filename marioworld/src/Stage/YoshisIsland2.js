@@ -1,4 +1,4 @@
-import SceneBase from '~/engine/SceneBase';
+import SceneBase from '~/engine/src/SceneBase';
 
 class YoshisIsland2 extends SceneBase {
 	constructor() {

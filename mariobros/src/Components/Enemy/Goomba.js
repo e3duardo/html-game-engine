@@ -1,4 +1,4 @@
-import Object from '~/engine/Object';
+import Object from '~/engine/src/Object';
 import Assets from '../Assets';
 
 class Goomba extends Object{
@@ -33,6 +33,13 @@ class Goomba extends Object{
 						height: 16px;
 						top: 0;
 						left: 0;
+						animation-timing-function: steps(2);
+						animation-name: animation;
+						animation-duration: .40s;
+						animation-iteration-count: infinite;
+					}
+					@keyframes animation {
+						100% { background-position: -${(bgx+2)*16}px -${bgy*16}px; }
 					}
 				</style>
 				<div class="m"></div>

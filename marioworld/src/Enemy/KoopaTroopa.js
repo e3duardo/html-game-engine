@@ -1,5 +1,5 @@
-import Inject from '~/engine/Inject';
-import Collidable from '~/engine/Collidable';
+import Inject from '~/engine/src/Inject';
+import Collidable from '~/engine/src/Collidable';
 import {boundMethod} from 'autobind-decorator'
 
 //https://www.mariowiki.com/Koopa_Troopa

@@ -1,4 +1,4 @@
-import Object from '~/engine/Object';
+import Object from '~/engine/src/Object';
 import Assets from '../Assets';
 
 class Mario extends Object{
@@ -21,12 +21,14 @@ class Mario extends Object{
 				tag.style.left = tag.x*16+'px';
 				tag.style.top = '0px';
 				tag.style.zIndex = 2;
+				tag.style.transition = 'left .033s linear, top .033s linear';
 
 				return Object.html`
 		  		<style>
 					.m{
 						background-image: url('${Assets.mario}');
-						background-position: -80px -34px;
+						background-position: -${bgx*16}px -${bgy*16}px;
+						/* background-position: -80px -34px; */
 						background-repeat: no-repeat;
 						position: absolute;
 						width: 16px;

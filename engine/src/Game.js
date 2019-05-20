@@ -1,4 +1,5 @@
 import Inject from './Inject';
+import {boundMethod} from 'autobind-decorator'
 
 class Game {
 	constructor(){
@@ -12,7 +13,8 @@ class Game {
 		this.thisLoop;
 	}
 
-	gameLoop = ()=>{
+	@boundMethod
+	gameLoop(){
 		Inject.puppet.update();
 
 		// console.log(Inject.scene.updatableMapVisible);
@@ -24,7 +26,7 @@ class Game {
 
 		this.ticks++;
 		let thisFrameTime = (this.thisLoop = new Date) - this.lastLoop;
-		this.frameTime += (this.thisFrameTime - this.frameTime) / this.filterStrength;
+		this.frameTime += (thisFrameTime - this.frameTime) / this.filterStrength;
 		this.lastLoop = this.thisLoop;
 
 		// console.log('fps: '+thisFrameTime);
@@ -36,7 +38,8 @@ class Game {
 		// drawControls();
 	}
 
-	newGame = ()=>{
+	@boundMethod
+	newGame(){
 	    window.clearInterval(this.gameInterval);
 	    // hideMenus()
 	    // hideControls()
@@ -45,6 +48,7 @@ class Game {
 	    // showStartMenu()
 	}
 
+	@boundMethod
 	gameOver(){
 		//meu
 		// sound_dead()
@@ -58,7 +62,9 @@ class Game {
 		}
 	}
 
+	@boundMethod
 	play(){
+		console.log('mandei dar play')
 	    // hideMenus();
 	    // registerControls()
 	    // initializeLevel()
@@ -70,7 +76,8 @@ class Game {
 	    this.gameInterval = setInterval(this.gameLoop, 1000 / this.fps);
 	}
 
-	restart = ()=>{
+	@boundMethod
+	restart(){
 	    window.clearInterval(this.gameInterval);
 	    // initGame()
 	    // startGame()

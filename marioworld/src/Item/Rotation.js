@@ -1,5 +1,5 @@
-import Collidable from '~/engine/Collidable';
-import Inject from '~/engine/Inject';
+import Collidable from '~/engine/src/Collidable';
+// import Inject from '~/engine/src/Inject';
 import {boundMethod} from 'autobind-decorator'
 
 class Rotation extends Collidable{

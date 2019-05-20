@@ -1,5 +1,5 @@
-import Inject from '~/engine/Inject';
-import Puppet from '~/engine/Puppet';
+import Inject from '~/engine/src/Inject';
+import Puppet from '~/engine/src/Puppet';
 import {boundMethod} from 'autobind-decorator'
 
 let jumpSound = require('../sounds/jump.wav');
