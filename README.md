@@ -1,4 +1,4 @@
-# Html Game Engine
+# Gamification Web Framework
 
 I'm trying to implement a game engine I've never seen before. Using div and css for sprites and js for commands.
 
