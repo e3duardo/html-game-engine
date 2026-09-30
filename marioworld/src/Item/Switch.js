@@ -1,8 +1,7 @@
 import Collidable from '~/engine/src/Collidable';
 // import Inject from '~/engine/src/Inject';
-// import {boundMethod} from 'autobind-decorator'
 
-class Switch extends Collidable{
+class Switch extends Collidable {
 	constructor(tag) {
 		super(tag);
 		this.updatable = true;
@@ -10,4 +9,4 @@ class Switch extends Collidable{
 	}
 }
 
-export {Switch as default};
+export { Switch as default };

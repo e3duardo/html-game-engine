@@ -1,9 +1,8 @@
 import Inject from '~/engine/src/Inject';
 import Collidable from '~/engine/src/Collidable';
-import {boundMethod} from 'autobind-decorator'
 
 //https://www.mariowiki.com/Koopa_Troopa
-class KoopaTroopa extends Collidable{
+class KoopaTroopa extends Collidable {
 	constructor(tag) {
 		super(tag);
 
@@ -11,19 +10,18 @@ class KoopaTroopa extends Collidable{
 			top: 'solid',
 			right: 'deadly',
 			bottom: 'deadly',
-			left: 'deadly'
-		}
+			left: 'deadly',
+		};
 
-		this.ax=0;
-		this.ay=0;
+		this.ax = 0;
+		this.ay = 0;
 		// this.speedX=1;
-		this.speedY=0;
+		this.speedY = 0;
 		// this.velocity_x=1;
 		// this.speed_limit_y=2;
 		// this.friction=0.8;
 		this.updatable = true;
 		this.type = 'enemy';
-
 
 		// .walking-r
 		// .walking-l
@@ -36,20 +34,19 @@ class KoopaTroopa extends Collidable{
 		// .crushed
 	}
 
-	@boundMethod
-	collide(from, collisions){
+	collide = (from, collisions) => {
 		// TODO: implementar algoritmo de elasticidade
-		console.log(collisions.bottom, collisions.top)
-		if(collisions.bottom){
+		console.log(collisions.bottom, collisions.top);
+		if (collisions.bottom) {
 			Inject.control.pressA();
 
-			setTimeout(()=>{
-				this.tag.parentNode.removeChild(this.tag)
-			},100)
-		}else if(collisions.right || collisions.left){
+			setTimeout(() => {
+				this.tag.parentNode.removeChild(this.tag);
+			}, 100);
+		} else if (collisions.right || collisions.left) {
 			from.die();
 		}
-	}
+	};
 
 	// @boundMethod
 	// update(){
@@ -81,4 +78,4 @@ class KoopaTroopa extends Collidable{
 	// }
 }
 
-export {KoopaTroopa as default};
+export { KoopaTroopa as default };

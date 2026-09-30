@@ -1,8 +1,7 @@
 import Collidable from '~/engine/src/Collidable';
 import Inject from '~/engine/src/Inject';
-import {boundMethod} from 'autobind-decorator'
 
-class Question extends Collidable{
+class Question extends Collidable {
 	constructor(tag) {
 		super(tag);
 
@@ -10,91 +9,87 @@ class Question extends Collidable{
 		this.border = {
 			top: 'solid',
 			bottom: 'solid',
-			horizontal: 'solid'
-		}
+			horizontal: 'solid',
+		};
 		this.shouldReleaseYoshi = tag.classList.contains('releaseYoshi');
 
 		this.type = 'item';
 	}
 
-	@boundMethod
-	disable(){
+	disable = () => {
 		this.disabled = true;
 		this.tag.style.backgroundPosition = '-257px -97px';
 		this.tag.style.animation = 'none';
-	}
+	};
 
-	@boundMethod
-	releaseCoin(){
+	releaseCoin = () => {
 		const coin = document.createElement('div');
 		coin.className = 'Object Coin';
-		coin.style.left= this.x+'px';
-		coin.style.top= (this.y-16)+'px';
+		coin.style.left = this.x + 'px';
+		coin.style.top = this.y - 16 + 'px';
 		Inject.scene.addTag(coin);
 
 		for (var i = 0; i < 8; i++) {
-			coin.style.top += (coin.style.offsetTop+1)+'px';
+			coin.style.top += coin.style.offsetTop + 1 + 'px';
 		}
-		setTimeout(()=>{
-			coin.style.opacity=0;
+		setTimeout(() => {
+			coin.style.opacity = 0;
 			coin.parentNode.removeChild(coin);
 		}, 260);
-	}
+	};
 
-	@boundMethod
-	releaseYoshi(){
+	releaseYoshi = () => {
 		const coin = document.createElement('div');
 		coin.className = 'Plant Egg';
-		coin.style.left= this.x+'px';
-		coin.style.top= (this.y-16)+'px';
+		coin.style.left = this.x + 'px';
+		coin.style.top = this.y - 16 + 'px';
 		Inject.scene.addTag(coin);
 
 		let i = 0;
 		let interval;
-		interval = setInterval(()=>{
+		interval = setInterval(() => {
 			console.log(coin.offsetTop);
 			i++;
-			if(i<2){
-				coin.style.top = (coin.offsetTop-1)+'px';
+			if (i < 2) {
+				coin.style.top = coin.offsetTop - 1 + 'px';
 			}
-			if(i>8){
-				coin.style.top = (coin.offsetTop+1)+'px';
+			if (i > 8) {
+				coin.style.top = coin.offsetTop + 1 + 'px';
 			}
-			if(i>20){
+			if (i > 20) {
 				clearInterval(interval);
 			}
 		}, 15);
-	}
+	};
 
-	@boundMethod
-	collide(from, collisions){
+	collide = (from, collisions) => {
 		super.collide(from, collisions);
 
-		if (!this.disabled && collisions.top && this.border.bottom=='solid') {
+		if (!this.disabled && collisions.top && this.border.bottom == 'solid') {
 			let i = 0;
 			let interval;
-			interval = setInterval(()=>{
+			interval = setInterval(() => {
 				i++;
-				if(i<10){
+				if (i < 10) {
 					this.y -= 1;
 				}
-				if(i==10){
-					if(this.shouldReleaseYoshi){
+				if (i == 10) {
+					if (this.shouldReleaseYoshi) {
 						this.releaseYoshi();
-					}else{
+					} else {
 						this.releaseCoin();
 					}
 				}
-				if(i>10){
+				if (i > 10) {
 					this.y += 1;
 				}
-				if(i>=20){
+				if (i >= 20) {
 					clearInterval(interval);
 					this.disable();
 				}
 			}, 5);
 		}
-	}
+	};
 }
 
-export {Question as default};
+export { Question as default };

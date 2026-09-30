@@ -1,7 +1,5 @@
 import Inject from '~/engine/src/Inject';
-import {boundMethod} from 'autobind-decorator'
-
-let stageSound = require('../sounds/overworldbgm.mp3');
+import stageSound from '../sounds/overworldbgm.mp3';
 
 import Game from '~/engine/src/Game';
 
@@ -11,10 +9,10 @@ import CollidableFactory from './CollidableFactory';
 import YoshisIsland2 from './Stage/YoshisIsland2';
 
 class SuperMarioWord extends Game {
-	constructor(){
+	constructor() {
 		super();
 
-		Inject.puppet = new Mario();
+		Inject.puppet = new Mario(document.querySelector('.Puppet'));
 		Inject.scene = new YoshisIsland2();
 		Inject.collidableFactory = new CollidableFactory();
 		Inject.control = new Control();
@@ -22,14 +20,12 @@ class SuperMarioWord extends Game {
 		Inject.game = this;
 	}
 
-	@boundMethod
-	play(){
+	play() {
 		super.play();
 		Inject.audio.playBackground(stageSound);
 	}
 
-	@boundMethod
-	gameOver(){
+	gameOver() {
 		super.gameOver();
 		Inject.audio.stopBackground();
 	}

@@ -7,29 +7,29 @@ import Switch from './Item/Switch';
 
 import CollidableFactoryBase from '~/engine/src/CollidableFactoryBase';
 
-class CollidableFactory extends CollidableFactoryBase{
-	constructor(){
+class CollidableFactory extends CollidableFactoryBase {
+	constructor() {
 		super();
 	}
 
-	from(tag){
-		if(tag.classList.contains('KoopaTroopaShell')){
+	from(tag) {
+		if (tag.classList.contains('KoopaTroopaShell')) {
 			return new KoopaTroopaShell(tag);
 		}
-		if(tag.classList.contains('KoopaTroopa')){
+		if (tag.classList.contains('KoopaTroopa')) {
 			return new KoopaTroopa(tag);
 		}
-		if(tag.classList.contains('Question')){
+		if (tag.classList.contains('Question')) {
 			return new Question(tag);
 		}
-		if(tag.classList.contains('Plate')){
+		if (tag.classList.contains('Plate')) {
 			return new Rotation(tag);
 		}
-		if(tag.classList.contains('Switch')){
+		if (tag.classList.contains('Switch')) {
 			return new Switch(tag);
 		}
 		return super.from(tag);
 	}
 }
 
-export {CollidableFactory as default};
+export { CollidableFactory as default };

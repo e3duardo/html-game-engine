@@ -1,23 +1,17 @@
 import Inject from '~/engine/src/Inject';
 import Puppet from '~/engine/src/Puppet';
-import {boundMethod} from 'autobind-decorator'
+import jumpSound from '../sounds/jump.wav';
 
-let jumpSound = require('../sounds/jump.wav');
-
-class Mario extends Puppet{
-	constructor(){
-		super();
+class Mario extends Puppet {
+	constructor(tag) {
+		super(tag);
 	}
 
-	@boundMethod
-	jump(){
+	jump() {
 		super.jump();
 		Inject.audio.play(jumpSound);
 		console.log('mario, jump!');
 	}
-
-
-
 }
 
 export default Mario;

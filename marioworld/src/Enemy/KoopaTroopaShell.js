@@ -1,14 +1,13 @@
 import Inject from '~/engine/src/Inject';
 import Collidable from '~/engine/src/Collidable';
-import {boundMethod} from 'autobind-decorator'
 
-class KoopaTroopaShell extends Collidable{
+class KoopaTroopaShell extends Collidable {
 	constructor(tag) {
 		super(tag);
 
-		this.ax=0;
-		this.ay=0;
-		this.velocity_x=5;
+		this.ax = 0;
+		this.ay = 0;
+		this.velocity_x = 5;
 
 		this.updatable = true;
 		this.affectedByGravity = false;
@@ -16,35 +15,29 @@ class KoopaTroopaShell extends Collidable{
 		this.type = 'enemy';
 	}
 
-	@boundMethod
-	animation(classe){
+	animation = (classe) => {
 		this.tag.classList.add(classe);
-	}
+	};
 
-	@boundMethod
-	collide(from, collisions){
+	collide = (from, collisions) => {
 		// TODO: implementar algoritmo de elasticidade
-		if(collisions.bottom){
+		if (collisions.bottom) {
 			Inject.control.pressA();
 
-			setTimeout(()=>{
-				this.tag.parentNode.removeChild(this.tag)
-			},100)
+			setTimeout(() => {
+				this.tag.parentNode.removeChild(this.tag);
+			}, 100);
 		}
 
-		if(collisions.right || collisions.left){
-
+		if (collisions.right || collisions.left) {
 			this.animation('animated');
 
-			if(from.speedX > 0.2)
-				this.speedX = this.velocity_x;
-			else if(from.speedX < -0.2)
-				this.speedX = -this.velocity_x;
-			else
-				from.die();
-				//console.error('dead');
+			if (from.speedX > 0.2) this.speedX = this.velocity_x;
+			else if (from.speedX < -0.2) this.speedX = -this.velocity_x;
+			else from.die();
+			//console.error('dead');
 		}
-	}
+	};
 
 	// @boundMethod
 	// update(){
@@ -75,4 +68,4 @@ class KoopaTroopaShell extends Collidable{
 	// }
 }
 
-export {KoopaTroopaShell as default};
+export { KoopaTroopaShell as default };

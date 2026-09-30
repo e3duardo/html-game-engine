@@ -1,8 +1,7 @@
 import Collidable from '~/engine/src/Collidable';
 // import Inject from '~/engine/src/Inject';
-import {boundMethod} from 'autobind-decorator'
 
-class Rotation extends Collidable{
+class Rotation extends Collidable {
 	constructor(tag) {
 		super(tag);
 
@@ -10,55 +9,51 @@ class Rotation extends Collidable{
 		this.border = {
 			top: 'solid',
 			bottom: 'solid',
-			horizontal: 'solid'
-		}
+			horizontal: 'solid',
+		};
 		this.static = tag.classList.contains('static');
 
 		this.type = 'item';
 	}
 
-	@boundMethod
-	rotate(){
+	rotate = () => {
 		this.tag.classList.add('Rotation');
 		this.border = {
 			top: false,
 			bottom: false,
-			horizontal: false
-		}
-	}
+			horizontal: false,
+		};
+	};
 
-	@boundMethod
-	stop(){
+	stop = () => {
 		this.tag.classList.remove('Rotation');
 		this.border = {
 			top: 'solid',
 			bottom: 'solid',
-			horizontal: 'solid'
-		}
-	}
+			horizontal: 'solid',
+		};
+	};
 
-	@boundMethod
-	disable(){
+	disable = () => {
 		this.disabled = true;
 		this.tag.style.backgroundPosition = '-257px -97px';
 		this.tag.style.animation = 'none';
-	}
+	};
 
-	@boundMethod
-	collide(from, collisions){
+	collide = (from, collisions) => {
 		super.collide(from, collisions);
 
-		if (!this.disabled && collisions.top && this.border.bottom=='solid') {
-			if(this.static){
+		if (!this.disabled && collisions.top && this.border.bottom == 'solid') {
+			if (this.static) {
 				this.disable();
-			}else{
+			} else {
 				this.rotate();
-				setTimeout(()=>{
+				setTimeout(() => {
 					this.stop();
-				},5000);
+				}, 5000);
 			}
 		}
-	}
+	};
 }
 
-export {Rotation as default};
+export { Rotation as default };
