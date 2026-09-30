@@ -4,4 +4,4 @@ class HudBase {
 	}
 }
 
-export {HudBase as default};
+export { HudBase as default };

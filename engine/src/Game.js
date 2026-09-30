@@ -1,87 +1,63 @@
 import Inject from './Inject';
-import {boundMethod} from 'autobind-decorator'
+import fixedStepRaf from './fixedStepRaf';
 
 class Game {
-	constructor(){
+	constructor() {
 		this.ticks = 0;
-		this.fps = 30;
+		this.fps = 60;
+		// ms per physics tick - every per-tick constant in Puppet.js/Collidable.js
+		// etc. assumes this fixed duration, see fixedStepRaf.js
+		this.tickInterval = 1000 / this.fps;
 
 		// fps measurement
 		this.filterStrength = 20;
 		this.frameTime = 0;
-		this.lastLoop = new Date
+		this.lastLoop = new Date();
 		this.thisLoop;
+
+		this._cancelLoop = null;
 	}
 
-	@boundMethod
-	gameLoop(){
+	gameLoop = () => {
 		Inject.puppet.update();
 
-		// console.log(Inject.scene.updatableMapVisible);
-		// console.warn('0',Inject.scene.updatableMap);
-		// Inject.scene.updatableMapVisible.forEach((object)=>{
-		Inject.scene.updatableMap.forEach((object)=>{
+		Inject.scene.updatableMap.forEach((object) => {
 			object.update();
 		});
 
 		this.ticks++;
-		let thisFrameTime = (this.thisLoop = new Date) - this.lastLoop;
+		let thisFrameTime = (this.thisLoop = new Date()) - this.lastLoop;
 		this.frameTime += (thisFrameTime - this.frameTime) / this.filterStrength;
 		this.lastLoop = this.thisLoop;
+	};
 
-		// console.log('fps: '+thisFrameTime);
-		// drawLevel();
-		// updateCharacters();
-		// updateElements();
-		// drawElements();
-		// drawActors();
-		// drawControls();
-	}
+	newGame = () => {
+		if (this._cancelLoop) {
+			this._cancelLoop();
+			this._cancelLoop = null;
+		}
+	};
 
-	@boundMethod
-	newGame(){
-	    window.clearInterval(this.gameInterval);
-	    // hideMenus()
-	    // hideControls()
-	    // // draw initial level for menu background
-	    // load_level()
-	    // showStartMenu()
-	}
-
-	@boundMethod
-	gameOver(){
-		//meu
-		// sound_dead()
+	gameOver() {
 		if (--Inject.puppet.lives > 0) {
-			Inject.puppet.respawnPlayer()
+			Inject.puppet.respawnPlayer();
 		} else {
-			document.querySelector('.GameOver').style.display="flex";
-		// todo: dying animation
-		// actors = []
-			//showGameOver()
+			document.querySelector('.GameOver').style.display = 'flex';
 		}
 	}
 
-	@boundMethod
-	play(){
-		console.log('mandei dar play')
-	    // hideMenus();
-	    // registerControls()
-	    // initializeLevel()
-	    // initializeTheme()
-	    // sound_theme()
-		 Inject.scene.constructCollisionMap();
-		 // console.log(Inject.scene.updatableMap);
-	    window.clearInterval(this.gameInterval);
-	    this.gameInterval = setInterval(this.gameLoop, 1000 / this.fps);
+	play() {
+		Inject.scene.constructCollisionMap();
+		if (this._cancelLoop) this._cancelLoop();
+		this._cancelLoop = fixedStepRaf(this.gameLoop, this.tickInterval);
 	}
 
-	@boundMethod
-	restart(){
-	    window.clearInterval(this.gameInterval);
-	    // initGame()
-	    // startGame()
-	}
+	restart = () => {
+		if (this._cancelLoop) {
+			this._cancelLoop();
+			this._cancelLoop = null;
+		}
+	};
 }
 
 export default Game;
