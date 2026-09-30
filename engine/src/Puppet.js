@@ -8,8 +8,8 @@ Number.prototype.inRange = function (a, b) {
 };
 
 class Puppet {
-	constructor() {
-		this.tag = document.querySelector('.Puppet');
+	constructor(tag) {
+		this.tag = tag;
 		// one-time read of the tag's starting position to seed the logical
 		// position - after this, physics never reads position back from
 		// the DOM again, see the x/y getters below

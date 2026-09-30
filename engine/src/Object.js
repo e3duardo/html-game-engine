@@ -51,10 +51,6 @@ class Object extends Tag {
 		}, '');
 	}
 
-	animation = (classe) => {
-		this.tag.classList = 'Puppet ' + classe;
-	};
-
 	get speedX() {
 		return this._speedX;
 	}

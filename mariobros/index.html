@@ -1,261 +1,128 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Html Game Engine</title>
-		<link rel="stylesheet" type="text/css" href="styles/mariobros.less">
+		<link rel="stylesheet" type="text/css" href="styles/mariobros.less" />
 	</head>
 	<body>
+		<debug-bar></debug-bar>
 		<div class="Stage">
 			<div class="Grid"></div>
 			<div class="Hud">
 				<div>
-					<span class="hud-actor">mario</span><br>
+					<span class="hud-actor">mario</span><br />
 					<span class="hud-score">000000</span>
 				</div>
+				<div><br /><span class="hud-coin">.00</span></div>
 				<div>
-					<br><span class="hud-coin">.00<span>
-				</div>
-				<div>
-					<span>world</span><br>
+					<span>world</span><br />
 					<span class="hud-stage">1-1</span>
 				</div>
 				<div>
-					<span>time</span><br>
+					<span>time</span><br />
 					<span class="hud-time">000</span>
 				</div>
 				<div class="Coin"></div>
 			</div>
 			<div class="GameOver">gameover</div>
+			<div class="LevelClear">
+				<div class="LevelClear-title">COURSE CLEAR!</div>
+				<div class="LevelClear-score">SCORE <span class="LevelClear-score-value">000000</span></div>
+			</div>
+			<div class="WorldIntro">
+				<div class="WorldIntro-title">WORLD <span class="WorldIntro-stage">1-1</span></div>
+				<div class="WorldIntro-lives">
+					<span class="WorldIntro-icon"></span>
+					<span>x <span class="WorldIntro-lives-count">3</span></span>
+				</div>
+			</div>
 			<div class="Scene">
-				<!-- <div class="Puppet" style="bottom: 64px; left: 64px;"></div> -->
-				<player-mario x="2" class="Puppet"></player-mario>
-
-				<!-- enemies -->
-				<enemy-goomba x="22"></enemy-goomba>
-				<enemy-goomba x="40"></enemy-goomba>
-				<enemy-goomba x="51"></enemy-goomba>
-				<enemy-goomba x="52.5"></enemy-goomba>
-				<enemy-goomba x="80" y="10"></enemy-goomba>
-				<enemy-goomba x="82" y="10"></enemy-goomba>
-				<enemy-goomba x="97"></enemy-goomba>
-				<enemy-goomba x="98.6"></enemy-goomba>
-				<enemy-goomba x="114"></enemy-goomba>
-				<enemy-goomba x="115.6"></enemy-goomba>
-				<enemy-goomba x="124"></enemy-goomba>
-				<enemy-goomba x="125.6"></enemy-goomba>
-
-				<enemy-goomba x="128"></enemy-goomba>
-				<enemy-goomba x="129.6"></enemy-goomba>
-
-				<enemy-goomba x="174"></enemy-goomba>
-				<enemy-goomba x="175.6"></enemy-goomba>
-
-				<enemy-koopa-tropa x="107"></enemy-koopa-tropa>
-				<!-- end enemies -->
-
-				<!-- interable -->
-				<item-question x="16" y="5"></item-question>
-
-				<item-brick x="20" y="5"></item-brick>
-				<item-question x="21" y="5"></item-question>
-				<item-brick x="22" y="5"></item-brick>
-				<item-question x="22" y="10"></item-question>
-				<item-question x="23" y="5"></item-question>
-				<item-brick x="24" y="5"></item-brick>
-
-				<item-question x="64" y="6" hide="true"></item-question>
-
-				<item-brick x="77" y="5"></item-brick>
-				<item-question x="78" y="5"></item-question>
-				<item-brick x="79" y="5"></item-brick>
-				<item-brick x="80" y="9"></item-brick>
-				<item-brick x="81" y="9"></item-brick>
-				<item-brick x="82" y="9"></item-brick>
-				<item-brick x="83" y="9"></item-brick>
-				<item-brick x="84" y="9"></item-brick>
-				<item-brick x="85" y="9"></item-brick>
-				<item-brick x="86" y="9"></item-brick>
-				<item-brick x="87" y="9"></item-brick>
-
-				<item-brick x="91" y="9"></item-brick>
-				<item-brick x="92" y="9"></item-brick>
-				<item-brick x="93" y="9"></item-brick>
-				<item-brick x="94" y="5"></item-brick>
-				<item-question x="94" y="9"></item-question>
-
-				<item-brick x="100" y="5"></item-brick>
-				<item-brick x="101" y="5"></item-brick>
-
-				<item-question x="106" y="5"></item-question>
-
-				<item-question x="109" y="9"></item-question>
-				<item-question x="109" y="5"></item-question>
-
-				<item-question x="112" y="5"></item-question>
-
-				<item-brick x="118" y="5"></item-brick>
-
-				<item-brick x="121" y="9"></item-brick>
-				<item-brick x="122" y="9"></item-brick>
-				<item-brick x="123" y="9"></item-brick>
-
-				<item-brick x="128" y="9"></item-brick>
-				<item-question x="129" y="9"></item-question>
-				<item-brick x="129" y="5"></item-brick>
-				<item-question x="130" y="9"></item-question>
-				<item-brick x="130" y="5"></item-brick>
-				<item-brick x="131" y="9"></item-brick>
-
-				<item-brick x="168" y="5"></item-brick>
-				<item-brick x="169" y="5"></item-brick>
-				<item-question x="170" y="5"></item-question>
-				<item-brick x="171" y="5"></item-brick>
-				<!-- end interable -->
-
-				<!-- pipes -->
-				<item-pipe size="2" x="28"></item-pipe>
-				<item-pipe size="3" x="38"></item-pipe>
-				<item-pipe size="4" x="46"></item-pipe>
-				<item-pipe size="4" x="57"></item-pipe>
-				<item-pipe size="2" x="163"></item-pipe>
-				<item-pipe size="2" x="179"></item-pipe>
-				<!-- end pipes -->
-
-				<!-- ----------->
-				<!-- scenario -->
-				<!-- ----------->
-
-				<!-- air -->
-				<air-cloud size="3"  x="8" y="10"></air-cloud>
-				<air-cloud size="3"  x="19" y="12"></air-cloud>
-				<air-cloud size="5"  x="27" y="10"></air-cloud>
-				<air-cloud size="4"  x="36" y="12"></air-cloud>
-				<air-cloud size="3"  x="56" y="10"></air-cloud>
-				<air-cloud size="3"  x="67" y="12"></air-cloud>
-				<air-cloud size="5"  x="75" y="10"></air-cloud>
-				<air-cloud size="4"  x="84" y="12"></air-cloud>
-				<air-cloud size="3"  x="104" y="10"></air-cloud>
-				<air-cloud size="3"  x="115" y="12"></air-cloud>
-				<air-cloud size="5"  x="123" y="10"></air-cloud>
-				<air-cloud size="4"  x="132" y="12"></air-cloud>
-				<air-cloud size="3"  x="152" y="10"></air-cloud>
-				<air-cloud size="3"  x="163" y="12"></air-cloud>
-				<air-cloud size="5"  x="171" y="10"></air-cloud>
-				<air-cloud size="4"  x="180" y="12"></air-cloud>
-				<air-cloud size="3"  x="200" y="10"></air-cloud>
-				<air-cloud size="3"  x="211" y="12"></air-cloud>
-				<air-cloud size="5"  x="219" y="10"></air-cloud>
-				<!-- end-air -->
-
-				<item-flag x="197.5" y="11"></item-flag>
-				<item-pole x="198"></item-pole>
-				<building-castle x="202"></building-castle>
-
-				<!-- blocks -->
-				<item-block size="1" x="134"></item-block>
-				<item-block size="2" x="135"></item-block>
-				<item-block size="3" x="136"></item-block>
-				<item-block size="4" x="137"></item-block>
-
-				<item-block size="4" x="140"></item-block>
-				<item-block size="3" x="141"></item-block>
-				<item-block size="2" x="142"></item-block>
-				<item-block size="1" x="143"></item-block>
-
-				<item-block size="1" x="148"></item-block>
-				<item-block size="2" x="149"></item-block>
-				<item-block size="3" x="150"></item-block>
-				<item-block size="4" x="151"></item-block>
-				<item-block size="4" x="152"></item-block>
-
-				<item-block size="4" x="155"></item-block>
-				<item-block size="3" x="156"></item-block>
-				<item-block size="2" x="157"></item-block>
-				<item-block size="1" x="158"></item-block>
-
-				<item-block size="1" x="181"></item-block>
-				<item-block size="2" x="182"></item-block>
-				<item-block size="3" x="183"></item-block>
-				<item-block size="4" x="184"></item-block>
-				<item-block size="5" x="185"></item-block>
-				<item-block size="6" x="186"></item-block>
-				<item-block size="7" x="187"></item-block>
-				<item-block size="8" x="188"></item-block>
-				<item-block size="8" x="189"></item-block>
-
-				<item-block size="1" x="198"></item-block>
-				<!-- end blocks -->
-
-				<!-- vegetation -->
-				<vegetation-mountain size="3" x="0"></vegetation-mountain>
-				<vegetation-stuff size="5" x="11"></vegetation-stuff>
-				<vegetation-mountain size="2" x="16"></vegetation-mountain>
-				<vegetation-stuff size="3" x="23"></vegetation-stuff>
-				<!-- pipe -->
-				<vegetation-stuff size="4" x="41"></vegetation-stuff>
-				<!-- pipe -->
-				<!-- pipe -->
-				<vegetation-mountain size="3" x="48"></vegetation-mountain>
-				<!-- pipe -->
-				<vegetation-stuff size="5" x="59"></vegetation-stuff>
-				<vegetation-mountain size="2" x="64"></vegetation-mountain>
-				<!-- floor break -->
-				<vegetation-stuff size="3" x="71"></vegetation-stuff>
-				<!-- floor break -->
-				<vegetation-stuff size="4" x="89"></vegetation-stuff>
-				<vegetation-mountain size="3" x="96"></vegetation-mountain>
-				<vegetation-stuff size="5" x="107"></vegetation-stuff>
-				<vegetation-mountain size="2" x="112"></vegetation-mountain>
-				<vegetation-stuff size="3" x="119"></vegetation-stuff>
-				<vegetation-stuff size="4" x="137"></vegetation-stuff>
-				<vegetation-mountain size="3" x="144"></vegetation-mountain>
-				<!-- floor break -->
-				<vegetation-stuff size="2" x="158"></vegetation-stuff>
-				<vegetation-mountain size="2" x="160"></vegetation-mountain>
-				<!-- pipe -->
-				<vegetation-stuff size="3" x="167"></vegetation-stuff>
-				<!-- pipe -->
-				<vegetation-mountain size="3" x="192"></vegetation-mountain>
-				<vegetation-stuff size="2" x="206"></vegetation-stuff>
-				<vegetation-mountain size="2" x="208"></vegetation-mountain>
-				<vegetation-stuff size="3" x="215"></vegetation-stuff>
-				<!-- end vegetation -->
-
-				<!-- floor -->
-				<!-- <div  style="width: 1248px; height: 32px; bottom: 0; left: 0; position: absolute;"> -->
-				<div class="Floor Collidable solid" style="width: 1104px; height: 32px; bottom: 0;"></div>
-				<div class="Floor Collidable solid" style="width: 240px; height: 32px; bottom: 0; left: 1136px;"></div>
-				<div class="Floor Collidable solid" style="width: 1024px; height: 32px; bottom: 0; left: 1424px;"></div>
-				<div class="Floor Collidable solid" style="width: 1104px; height: 32px; bottom: 0; left: 2480px;"></div>
-				<!-- </div> -->
-				<!-- end floor -->
 			</div>
 		</div>
 
-		<audio id="backgroundSound" loop></audio>
+		<event-panel></event-panel>
 
-		<div style="position: absolute; left: 410px; top: 10px;">
-			<h4>warning<h4><br>
-			before you begin<br>
-			- just work with a keyboard - by now<br><br><br>
-			- i made this font that you are reading from the original<br>
-			- all components are using webcomponents-hybrid<br>
-			- i used only html, less, javascript, hybrid, babel and parcel<br><br>
-			<!-- - Use "arrows keys" to move<br>
-			- Use "a key" to jump<br>
-			- Use "shift key" to run<br><br> -->
+		<div class="InfoBox">
+			<div class="InfoBox-text">
+				<h4>warning</h4>
+				<br />
+				before you begin<br />
+				- just work with a keyboard - by now<br /><br /><br />
+				- i made this font that you are reading from the original<br />
+				- all components are using native web components<br />
+				- i used only html, less, javascript, web components and vite<br /><br />
+				<!-- - Use "arrows keys" to move<br>
+				- Use "f key" to jump<br>
+				- Use "d key" to run<br><br> -->
 
-			i still developing<br>
-			sorry for not making you have fun yet
+				i still developing<br />
+				sorry for not making you have fun yet
+			</div>
+
+			<touch-controls></touch-controls>
 		</div>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.0.17/webcomponents-lite.js"></script>
-		<script src="index.js"></script>
+
+		<style>
+			.InfoBox {
+				position: absolute;
+				left: 410px;
+				top: 10px;
+			}
+			@media (max-width: 600px) {
+				/* the game canvas (.Stage) was left-flush against the
+				   browser's own default 8px body margin, so it had no room
+				   left for a matching margin on the right - center it
+				   explicitly instead of relying on leftover space */
+				html,
+				body {
+					margin: 0;
+					/* the whole page is black on mobile now, not just the
+					   game canvas - only the touch buttons and the game
+					   screen itself keep any color (see below) */
+					background: #000;
+					/* <debug-bar>/<event-panel> are fixed at 380px wide
+					   (a desktop-only debug tool), wider than most phones -
+					   left unconstrained, that forces the mobile browser to
+					   render the whole page against a wider virtual
+					   viewport than the actual screen so that box isn't
+					   clipped, which also drags every position:fixed
+					   element (the touch controls included) along with it -
+					   they'd render "fixed" relative to that wider virtual
+					   canvas, not the physically visible screen, so the
+					   right edge (the JUMP button) would sit past what's
+					   actually on screen until scrolled. Capping those two
+					   boxes' width below (see DebugBar.js) AND hard-blocking
+					   horizontal scroll here removes any reason for the
+					   browser to widen the viewport in the first place. */
+					overflow-x: hidden;
+				}
+				.Stage {
+					margin: 0 auto;
+				}
+				/* the dev-notes text (the stuff that used to fill the white
+				   space under the game on mobile) is desktop-only now - the
+				   controls that used to live inside this same box (see the
+				   markup above) still need to render, so only the text
+				   wrapper is hidden, not .InfoBox itself */
+				.InfoBox-text {
+					display: none;
+				}
+				.InfoBox {
+					position: static;
+					margin: 0;
+				}
+			}
+		</style>
+		<script type="module" src="index.js"></script>
 
 		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-139009939-3"></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
+			function gtag() {
+				dataLayer.push(arguments);
+			}
 			gtag('js', new Date());
 
 			gtag('config', 'UA-139009939-3');

@@ -1,13 +1,52 @@
-@import "~/engine/styles/engine.less";
+@import "../../engine/styles/engine.less";
 @import "_scenario.less";
 
 
 .Scene{
 	background: #5c94fc;// url('../assets/screens.png') -3px -3px;
-	width: 3584px;
+	// original level is 3584px (224 tiles); the next 256px (16 tiles) is a
+	// walled-off bonus room, and the 256px (16 tiles) after that is the
+	// warp-zone screen it leads to - both reachable only via warp pipes
+	// (see index.html/Pipe.js), with a solid item-block wall at the start
+	// of each keeping them from being reachable by just walking off the
+	// end of the normal level
+	width: 4096px;
 	height: 240px;//432
 	position: relative;
+	// position:relative alone (z-index left at its default `auto`) does
+	// NOT make this its own stacking context - any descendant with a
+	// negative z-index (the underground backdrops, see each scene's own
+	// usage) then escapes past .Scene's own background entirely instead
+	// of just sitting behind .Scene's other (game) content, since without
+	// this, .Scene's own box competes at the SAME "auto" layer as that
+	// negative-z child, both flattened into whichever outer element
+	// really does establish a stacking context. Any explicit number pins
+	// that scope back to .Scene itself.
+	z-index: 0;
 	transition: left .033s linear;
+}
+// recolors the shared brown/pink tileset sprites to the cyan underground
+// palette (hue-rotate(162deg) is a calibrated match against the actual
+// tileset.png colors - see the bonus room / warp-zone screen in index.html,
+// the only two sections wrapped in this class). item-pipe/item-coin are
+// deliberately left out of the selector - both stay their normal green/
+// orange in the reference screenshot, only the bricks/blocks/floor change.
+// just the filter, no position/background/size of its own - it only
+// exists to scope the descendant selector below, and its children (item-
+// block/item-brick/mario/etc, all position:absolute already) don't need
+// their ancestor sized or positioned at all for a plain CSS filter to
+// apply. The black backdrop is a SEPARATE, dedicated div per usage (see
+// each usage site) with its own explicit left/width and a negative
+// z-index - giving *this* wrapper a background+position instead put the
+// backdrop and the actual game content (its own children!) into the same
+// stacking box, so a z-index meant only for the backdrop also dragged
+// every brick/mario/etc inside it backward - and before that, no
+// position/width at all made it default to 100% of .Scene's full width
+// (the whole level), painting #000 across everything.
+.UndergroundPalette {
+	item-block, item-brick, .Floor {
+		filter: hue-rotate(162deg);
+	}
 }
 .Hud{
 	position: absolute;
@@ -40,6 +79,21 @@
 .Hud>div:nth-of-type(4) {
 	text-align: right;
 }
+.Coin {
+	position: absolute;
+	top: 15px;
+	left: 88.5px;
+	width: 8px;
+	height: 8px;
+	// one static frame of the same coin sprite item-coin.js animates through
+	// (tileset.png, tile at col 24 row 1) - scaled down at an exact half
+	// (8px of its native 16px) so the crop lands on whole pixels instead of
+	// bleeding into the neighboring tile's colors like a fractional scale did
+	background-image: url('../assets/tileset.png');
+	background-size: 264px 224px;
+	background-position: -192px -8px;
+	image-rendering: pixelated;
+}
 .Hud *{
 	font-size: 7px!important;
 	line-height: 9.1px!important;
@@ -58,7 +112,103 @@
 	display: none;
 }
 
-.Puppet{
+// shown on entering the stage and again after every death (see
+// Hud.showIntro/hideIntro + SuperMarioBros.play) - sits below .Hud's z-index
+// (10000) on purpose, so the score/coin/world/time row stays visible on top
+// of this black background, same as the original NES title card.
+.WorldIntro{
+	width: 256px;
+	height: 240px;
+	position: absolute;
+	z-index: 100;
+	background: #000;
+	color: #fff;
+	display: none;
+	flex-direction: column;
+	align-items: center;
+	padding-top: 90px;
+}
+.WorldIntro-title{
+	margin-bottom: 30px;
+}
+.WorldIntro-lives{
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+// shown once Mario walks into the castle at the end of the flagpole
+// sequence (see Puppet.winLevel) - same shape as .GameOver/.WorldIntro,
+// the game just stays stopped after this (no next stage exists to load)
+.LevelClear{
+	width: 256px;
+	height: 240px;
+	position: absolute;
+	z-index: 100;
+	background: #000;
+	color: #fff;
+	display: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 20px;
+}
+
+.WorldIntro-icon{
+	width: 11px;
+	height: 16px;
+	// same standing-right crop player-mario itself uses (see Mario.js) -
+	// duplicated here rather than shared since this element isn't a
+	// player-mario tag, same approach .Coin already uses for the HUD coin icon
+	background-image: url('../assets/mario.png');
+	background-position: -83px -34px;
+	background-repeat: no-repeat;
+	image-rendering: pixelated;
+}
+
+// floating score/coin text (see Hud.showScorePopup) - fades and rises above
+// whatever awarded the points, same spot the original game pops it from.
+// Font-size/line-height/letter-spacing match .Hud's digits (mariobros.less
+// ".Hud *") so the popup reads at the same scale as the on-screen score,
+// same as the original NES game; the 8px total rise (not 16) matches the
+// original's real travel distance too - it barely drifts before vanishing.
+.ScorePopup{
+	position: absolute;
+	z-index: 20;
+	color: #fff;
+	font-size: 5px;
+	line-height: 6.5px;
+	letter-spacing: -0.3px;
+	pointer-events: none;
+	animation: score-popup-float .7s ease-out forwards;
+}
+@keyframes score-popup-float{
+	0% { transform: translateY(0); opacity: 1; }
+	85% { transform: translateY(-8px); opacity: 1; }
+	100% { transform: translateY(-8px); opacity: 0; }
+}
+
+// the coin that visually pops out of a bumped '?' block (see Question.js
+// popCoin()) - cosmetic only, unrelated to the collectible item-coin dotted
+// around the level; reuses that same tileset crop (frame 0 of coin-spin)
+.BlockCoinPop{
+	position: absolute;
+	z-index: 20;
+	width: 16px;
+	height: 16px;
+	background-image: url('../assets/tileset.png');
+	background-position: -384px -16px;
+	background-repeat: no-repeat;
+	image-rendering: pixelated;
+	pointer-events: none;
+	animation: block-coin-pop .5s ease-out forwards;
+}
+@keyframes block-coin-pop{
+	0% { transform: translateY(0); opacity: 1; }
+	40% { transform: translateY(-20px); opacity: 1; }
+	100% { transform: translateY(-20px); opacity: 0; }
+}
+
+player-mario{
 	z-index: 7
 }
 

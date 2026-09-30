@@ -8,24 +8,3 @@
 	background-repeat: repeat;
 	position: absolute;
 }
-.Coin{
-	background-image: url('../assets/items.png');
-	background-position: calc(-8px * 0) calc(-8px * 6);
-	background-repeat: no-repeat;
-	position: absolute;
-	width: 8px;
-	height: 8px;
-	background-size: 288px 168px;
-	top: 15px;
-	left: 87px;
-	animation-timing-function: steps(1);
-	animation-name: coin;
-	animation-duration: .40s;
-	animation-iteration-count: infinite;
-}
-@keyframes coin {
-	0% { background-position: calc(-8px * 0) calc(-8px * 6); }
-	33% { background-position: calc(-8px * 1) calc(-8px * 6); }
-	66% { background-position: calc(-8px * 2) calc(-8px * 6); }
-	100% { background-position: calc(-8px * 3) calc(-8px * 6); }
-}

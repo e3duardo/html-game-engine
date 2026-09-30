@@ -1,36 +1,27 @@
 import ControlBase from '~/engine/src/ControlBase';
 
-class Control extends ControlBase{
-	constructor(){
-		super();
-		this.keys = {
-			up: false,
-			right: false,
-			down: false,
-			left: false,
-			a: false,
-			shift: false
-		};
-	}
+// NES-style layout: 4 directions + jump ('f') + run ('d', double-duties as
+// throw-fireball, see Puppet.js) + start ('Enter', the title screen) - only
+// the directional+jump pair is the genuinely universal minimum (see
+// ControlBase); run/start are this game's own extras. Which physical keys
+// mean what is entirely this file's call - marioworld's own Control.js maps
+// a different, SNES-style layout to the same semantic buttons, and that's
+// expected, not duplication.
+const KEY_MAP = {
+	ArrowUp: 'up',
+	ArrowRight: 'right',
+	ArrowDown: 'down',
+	ArrowLeft: 'left',
+	f: 'a',
+	F: 'a',
+	d: 'shift',
+	D: 'shift',
+	Enter: 'start',
+};
 
-	get up(){ return this.keys.up; }
-	get right(){ return this.keys.right; }
-	get down(){ return this.keys.down; }
-	get left(){ return this.keys.left; }
-	get a(){ return this.keys.a; }
-	get shift(){ return this.keys.shift; }
-
-	pressA=()=>{ this.keys.a = true;}
-	releaseA=()=>{ this.keys.a = false;}
-
-	translateKeyboard  = (key)=>{
-		if(key == "ArrowUp") return 'up';
-		if(key == "ArrowRight") return 'right';
-		if(key == "ArrowDown") return 'down';
-		if(key == "ArrowLeft") return 'left';
-		if(key == "a" || key == "A" ) return 'a';
-		if(key == "Shift" ) return 'shift';
-		return '';
+class Control extends ControlBase {
+	constructor() {
+		super(KEY_MAP);
 	}
 }
 

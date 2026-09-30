@@ -1,0 +1,394 @@
+<player-mario x="2" y="12"></player-mario>
+
+<!-- enemies -->
+<enemy-goomba x="22"></enemy-goomba>
+<enemy-goomba x="40"></enemy-goomba>
+<enemy-goomba x="51"></enemy-goomba>
+<enemy-goomba x="52.5"></enemy-goomba>
+<enemy-goomba x="80" y="10"></enemy-goomba>
+<enemy-goomba x="82" y="10"></enemy-goomba>
+<enemy-goomba x="97"></enemy-goomba>
+<enemy-goomba x="98.6"></enemy-goomba>
+<enemy-goomba x="114"></enemy-goomba>
+<enemy-goomba x="115.6"></enemy-goomba>
+<enemy-goomba x="124"></enemy-goomba>
+<enemy-goomba x="125.6"></enemy-goomba>
+
+<enemy-goomba x="128"></enemy-goomba>
+<enemy-goomba x="129.6"></enemy-goomba>
+
+<enemy-goomba x="174"></enemy-goomba>
+<enemy-goomba x="175.6"></enemy-goomba>
+
+<enemy-koopa-tropa x="107"></enemy-koopa-tropa>
+<!-- end enemies -->
+
+<!-- interable -->
+<item-question x="16" y="5"></item-question>
+
+<item-brick x="20" y="5"></item-brick>
+<item-question x="21" y="5" mushroom="true"></item-question>
+<item-brick x="22" y="5"></item-brick>
+<item-question x="22" y="10"></item-question>
+<item-question x="23" y="5"></item-question>
+<item-brick x="24" y="5"></item-brick>
+
+<item-question x="64" y="6" hide="true" life="true"></item-question>
+
+<item-brick x="77" y="5"></item-brick>
+<item-question x="78" y="5" powerup="true"></item-question>
+<item-brick x="79" y="5"></item-brick>
+<item-brick x="80" y="9"></item-brick>
+<item-brick x="81" y="9"></item-brick>
+<item-brick x="82" y="9"></item-brick>
+<item-brick x="83" y="9"></item-brick>
+<item-brick x="84" y="9"></item-brick>
+<item-brick x="85" y="9"></item-brick>
+<item-brick x="86" y="9"></item-brick>
+<item-brick x="87" y="9"></item-brick>
+
+<item-brick x="91" y="9"></item-brick>
+<item-brick x="92" y="9"></item-brick>
+<item-brick x="93" y="9"></item-brick>
+<!-- disguised as a plain brick - hit it fast, repeatedly,
+		for several coins before it goes flat for good (see
+		Brick.js's `coin` attribute) -->
+<item-brick x="94" y="5" coin="true"></item-brick>
+<item-question x="94" y="9"></item-question>
+
+<item-brick x="100" y="5"></item-brick>
+<!-- the right of this "small platform of two blocks" is
+		secretly a star, not a plain brick (see Brick.js's
+		`star` attribute) -->
+<item-brick x="101" y="5" star="true"></item-brick>
+
+<item-question x="106" y="5"></item-question>
+
+<!-- the top block of this 4-question "pyramid" is the
+		power-up (mushroom/fire flower depending on size) -->
+<item-question x="109" y="9" powerup="true"></item-question>
+<item-question x="109" y="5"></item-question>
+
+<item-question x="112" y="5"></item-question>
+
+<item-brick x="118" y="5"></item-brick>
+
+<item-brick x="121" y="9"></item-brick>
+<item-brick x="122" y="9"></item-brick>
+<item-brick x="123" y="9"></item-brick>
+
+<item-brick x="128" y="9"></item-brick>
+<item-question x="129" y="9"></item-question>
+<item-brick x="129" y="5"></item-brick>
+<item-question x="130" y="9"></item-question>
+<item-brick x="130" y="5"></item-brick>
+<item-brick x="131" y="9"></item-brick>
+
+<item-brick x="168" y="5"></item-brick>
+<item-brick x="169" y="5"></item-brick>
+<item-question x="170" y="5"></item-question>
+<item-brick x="171" y="5"></item-brick>
+<!-- end interable -->
+
+<!-- coins - rough placement in open-air gaps, not the exact
+		original layout, just enough to exercise the mechanic -->
+<item-coin x="95" y="10"></item-coin>
+<item-coin x="96" y="10"></item-coin>
+<item-coin x="97" y="10"></item-coin>
+
+<item-coin x="148" y="8"></item-coin>
+<item-coin x="149" y="8"></item-coin>
+<item-coin x="150" y="8"></item-coin>
+<!-- end coins -->
+
+<!-- pipes -->
+<item-pipe size="2" x="28"></item-pipe>
+<item-pipe size="3" x="38"></item-pipe>
+<item-pipe size="4" x="46"></item-pipe>
+<!-- goes straight to the warp-zone screen now, not through
+		the coin-heaven bonus room first (that room is still
+		here, just unreachable for now - not being used). -->
+<item-pipe size="4" x="57" warp-id="entrance-28" warp-to="warpzone-entrance"></item-pipe>
+<!-- landing spot for the bonus room's own exit pipe (see
+		warp-id="warpzone-exit" below) - this is the level's
+		second-to-last pipe: entering the bonus room early (via
+		the pipe at x=57) and leaving it drops mario back in
+		here, skipping the middle section of the level as an
+		actual shortcut -->
+<item-pipe size="2" x="163" warp-id="pipe-163"></item-pipe>
+<item-pipe size="2" x="179"></item-pipe>
+<!-- end pipes -->
+
+<!-- ----------->
+<!-- scenario -->
+<!-- ----------->
+
+<!-- air -->
+<air-cloud size="3" x="8" y="10"></air-cloud>
+<air-cloud size="3" x="19" y="12"></air-cloud>
+<air-cloud size="5" x="27" y="10"></air-cloud>
+<air-cloud size="4" x="36" y="12"></air-cloud>
+<air-cloud size="3" x="56" y="10"></air-cloud>
+<air-cloud size="3" x="67" y="12"></air-cloud>
+<air-cloud size="5" x="75" y="10"></air-cloud>
+<air-cloud size="4" x="84" y="12"></air-cloud>
+<air-cloud size="3" x="104" y="10"></air-cloud>
+<air-cloud size="3" x="115" y="12"></air-cloud>
+<air-cloud size="5" x="123" y="10"></air-cloud>
+<air-cloud size="4" x="132" y="12"></air-cloud>
+<air-cloud size="3" x="152" y="10"></air-cloud>
+<air-cloud size="3" x="163" y="12"></air-cloud>
+<air-cloud size="5" x="171" y="10"></air-cloud>
+<air-cloud size="4" x="180" y="12"></air-cloud>
+<air-cloud size="3" x="200" y="10"></air-cloud>
+<air-cloud size="3" x="211" y="12"></air-cloud>
+<air-cloud size="5" x="219" y="10"></air-cloud>
+<!-- end-air -->
+
+<item-flag x="197.5" y="11"></item-flag>
+<item-pole x="198"></item-pole>
+<building-castle x="202"></building-castle>
+
+<!-- blocks -->
+<item-block size="1" x="134"></item-block>
+<item-block size="2" x="135"></item-block>
+<item-block size="3" x="136"></item-block>
+<item-block size="4" x="137"></item-block>
+
+<item-block size="4" x="140"></item-block>
+<item-block size="3" x="141"></item-block>
+<item-block size="2" x="142"></item-block>
+<item-block size="1" x="143"></item-block>
+
+<item-block size="1" x="148"></item-block>
+<item-block size="2" x="149"></item-block>
+<item-block size="3" x="150"></item-block>
+<item-block size="4" x="151"></item-block>
+<item-block size="4" x="152"></item-block>
+
+<item-block size="4" x="155"></item-block>
+<item-block size="3" x="156"></item-block>
+<item-block size="2" x="157"></item-block>
+<item-block size="1" x="158"></item-block>
+
+<item-block size="1" x="181"></item-block>
+<item-block size="2" x="182"></item-block>
+<item-block size="3" x="183"></item-block>
+<item-block size="4" x="184"></item-block>
+<item-block size="5" x="185"></item-block>
+<item-block size="6" x="186"></item-block>
+<item-block size="7" x="187"></item-block>
+<item-block size="8" x="188"></item-block>
+<item-block size="8" x="189"></item-block>
+
+<item-block size="1" x="198"></item-block>
+<!-- end blocks -->
+
+<!-- vegetation -->
+<vegetation-mountain size="3" x="0"></vegetation-mountain>
+<vegetation-stuff size="5" x="11"></vegetation-stuff>
+<vegetation-mountain size="2" x="16"></vegetation-mountain>
+<vegetation-stuff size="3" x="23"></vegetation-stuff>
+<!-- pipe -->
+<vegetation-stuff size="4" x="41"></vegetation-stuff>
+<!-- pipe -->
+<!-- pipe -->
+<vegetation-mountain size="3" x="48"></vegetation-mountain>
+<!-- pipe -->
+<vegetation-stuff size="5" x="59"></vegetation-stuff>
+<vegetation-mountain size="2" x="64"></vegetation-mountain>
+<!-- floor break -->
+<vegetation-stuff size="3" x="71"></vegetation-stuff>
+<!-- floor break -->
+<vegetation-stuff size="4" x="89"></vegetation-stuff>
+<vegetation-mountain size="3" x="96"></vegetation-mountain>
+<vegetation-stuff size="5" x="107"></vegetation-stuff>
+<vegetation-mountain size="2" x="112"></vegetation-mountain>
+<vegetation-stuff size="3" x="119"></vegetation-stuff>
+<vegetation-stuff size="4" x="137"></vegetation-stuff>
+<vegetation-mountain size="3" x="144"></vegetation-mountain>
+<!-- floor break -->
+<vegetation-stuff size="2" x="158"></vegetation-stuff>
+<vegetation-mountain size="2" x="160"></vegetation-mountain>
+<!-- pipe -->
+<vegetation-stuff size="3" x="167"></vegetation-stuff>
+<!-- pipe -->
+<vegetation-mountain size="3" x="192"></vegetation-mountain>
+<vegetation-stuff size="2" x="206"></vegetation-stuff>
+<vegetation-mountain size="2" x="208"></vegetation-mountain>
+<vegetation-stuff size="3" x="215"></vegetation-stuff>
+<!-- end vegetation -->
+
+<!-- floor -->
+<!-- <div  style="width: 1248px; height: 32px; bottom: 0; left: 0; position: absolute;"> -->
+<scene-floor x="0" width="69"></scene-floor>
+<scene-floor x="71" width="15"></scene-floor>
+<scene-floor x="89" width="64"></scene-floor>
+<scene-floor x="155" width="69"></scene-floor>
+<!-- </div> -->
+<!-- end floor -->
+
+<!-- bonus room - not part of the walkable level, only reachable
+		by pressing down on the marked pipe at x=28. the wall below
+		seals it off from the normal floor so nobody just walks in. -->
+<scene-floor x="224" width="16"></scene-floor>
+<item-block size="13" x="224"></item-block>
+
+<item-brick x="225" y="9" line="false"></item-brick>
+<item-brick x="226" y="9" line="false"></item-brick>
+<item-brick x="227" y="9" line="false"></item-brick>
+<item-brick x="228" y="9" line="false"></item-brick>
+<item-brick x="229" y="9" line="false"></item-brick>
+<item-brick x="230" y="9" line="false"></item-brick>
+<item-brick x="231" y="9" line="false"></item-brick>
+<item-brick x="232" y="9" line="false"></item-brick>
+<item-brick x="233" y="9" line="false"></item-brick>
+<item-brick x="234" y="9" line="false"></item-brick>
+<item-brick x="235" y="9" line="false"></item-brick>
+<item-brick x="236" y="9" line="false"></item-brick>
+<item-brick x="237" y="9" line="false"></item-brick>
+<item-brick x="238" y="9" line="false"></item-brick>
+<item-brick x="239" y="9" line="false"></item-brick>
+
+<item-coin x="228" y="4"></item-coin>
+<item-coin x="230" y="4"></item-coin>
+<item-coin x="232" y="4"></item-coin>
+<item-coin x="234" y="4"></item-coin>
+
+<!-- this room's own exit no longer leads straight back to the
+		main level - it hands off to the warp-zone screen below,
+		which is the one that actually leads back out -->
+<item-pipe size="2" x="237" warp-id="bonus-exit" warp-to="warpzone-entrance"></item-pipe>
+<!-- end bonus room -->
+
+<!-- warp-zone screen - reached only by exiting the bonus room
+		above (there's no way to walk here from the main level).
+		same walled-off treatment as the bonus room, just its own
+		16-tile-wide stretch further out past it (x=240-255), so
+		the two rooms don't overlap. black backdrop + the cyan
+		.UndergroundPalette recolor (see mariobros.less) match
+		the reference screenshot's underground look - a plain,
+		position:static wrapper doesn't touch the absolutely-
+		positioned children's own coordinates (they still
+		resolve against .Scene). -->
+<div style="position: absolute; left: 3840px; width: 256px; height: 240px; bottom: 0; background: #000; z-index: -1"></div>
+<div class="UndergroundPalette">
+	<scene-floor x="240" width="16"></scene-floor>
+	<!-- the sealing wall is brick too (line="false", same as
+			everything else in this room) - not the riveted
+			item-block panel used for the main-path staircases. -->
+	<item-brick x="240" y="2" line="false"></item-brick>
+	<item-brick x="240" y="3" line="false"></item-brick>
+	<item-brick x="240" y="4" line="false"></item-brick>
+	<item-brick x="240" y="5" line="false"></item-brick>
+	<item-brick x="240" y="6" line="false"></item-brick>
+	<item-brick x="240" y="7" line="false"></item-brick>
+	<item-brick x="240" y="8" line="false"></item-brick>
+	<item-brick x="240" y="9" line="false"></item-brick>
+	<item-brick x="240" y="10" line="false"></item-brick>
+	<item-brick x="240" y="11" line="false"></item-brick>
+	<item-brick x="240" y="12" line="false"></item-brick>
+
+	<!-- every coordinate below was measured pixel-by-pixel off
+			the reference screenshot (32px/tile at its 2x scale,
+			wall's left edge = tile 0, floor's top edge = tile 2) -
+			not eyeballed. top row and platform share the exact
+			same 7-tile span (244-250); only the top coin row is
+			narrower (5-tile, centered one column in from each
+			side). every brick here is line="false" - the reference
+			screenshot's bonus/warp-zone bricks never have the
+			lighter mortar-line variant, unlike the main path. -->
+	<item-brick x="244" y="12" line="false"></item-brick>
+	<item-brick x="245" y="12" line="false"></item-brick>
+	<item-brick x="246" y="12" line="false"></item-brick>
+	<item-brick x="247" y="12" line="false"></item-brick>
+	<item-brick x="248" y="12" line="false"></item-brick>
+	<item-brick x="249" y="12" line="false"></item-brick>
+	<item-brick x="250" y="12" line="false"></item-brick>
+
+	<!-- coin pyramid platform - measured 3 tiles tall, not 2.
+			brick texture (like the top row), not the solid/rivet
+			item-block tile - item-brick has no stacking `size` of
+			its own, so each column is 3 separate tags. -->
+	<item-brick x="244" y="2" line="false"></item-brick>
+	<item-brick x="244" y="3" line="false"></item-brick>
+	<item-brick x="244" y="4" line="false"></item-brick>
+	<item-brick x="245" y="2" line="false"></item-brick>
+	<item-brick x="245" y="3" line="false"></item-brick>
+	<item-brick x="245" y="4" line="false"></item-brick>
+	<item-brick x="246" y="2" line="false"></item-brick>
+	<item-brick x="246" y="3" line="false"></item-brick>
+	<item-brick x="246" y="4" line="false"></item-brick>
+	<item-brick x="247" y="2" line="false"></item-brick>
+	<item-brick x="247" y="3" line="false"></item-brick>
+	<item-brick x="247" y="4" line="false"></item-brick>
+	<item-brick x="248" y="2" line="false"></item-brick>
+	<item-brick x="248" y="3" line="false"></item-brick>
+	<item-brick x="248" y="4" line="false"></item-brick>
+	<item-brick x="249" y="2" line="false"></item-brick>
+	<item-brick x="249" y="3" line="false"></item-brick>
+	<item-brick x="249" y="4" line="false"></item-brick>
+	<item-brick x="250" y="2" line="false"></item-brick>
+	<item-brick x="250" y="3" line="false"></item-brick>
+	<item-brick x="250" y="4" line="false"></item-brick>
+
+	<item-coin x="244" y="5"></item-coin>
+	<item-coin x="245" y="5"></item-coin>
+	<item-coin x="246" y="5"></item-coin>
+	<item-coin x="247" y="5"></item-coin>
+	<item-coin x="248" y="5"></item-coin>
+	<item-coin x="249" y="5"></item-coin>
+	<item-coin x="250" y="5"></item-coin>
+
+	<item-coin x="244" y="7"></item-coin>
+	<item-coin x="245" y="7"></item-coin>
+	<item-coin x="246" y="7"></item-coin>
+	<item-coin x="247" y="7"></item-coin>
+	<item-coin x="248" y="7"></item-coin>
+	<item-coin x="249" y="7"></item-coin>
+	<item-coin x="250" y="7"></item-coin>
+
+	<item-coin x="245" y="9"></item-coin>
+	<item-coin x="246" y="9"></item-coin>
+	<item-coin x="247" y="9"></item-coin>
+	<item-coin x="248" y="9"></item-coin>
+	<item-coin x="249" y="9"></item-coin>
+
+	<!-- mario drops in through a pipe at tile 1 (x=241, right
+			after the wall at tile 0), but it stays off-screen,
+			above the top of the room - the visible layout here is
+			already settled, this isn't meant to add anything to
+			what's on screen. decorative="true" (not solid/
+			enterable) since it's not something mario ever sees or
+			interacts with directly. -->
+	<item-pipe orientation="down" size="2" x="241" y="256" decorative="true"></item-pipe>
+	<!-- the actual warp landing spot, right at that hidden
+			pipe's own mouth, so mario appears exactly where it
+			opens (still off-screen) and gravity carries him down
+			into view - see the `warpId` read added to
+			Collidable.js for why a plain invisible/non-solid
+			marker (not the pipe itself) is what SceneBase.warp()
+			actually targets. -->
+	<!-- lock-scroll-x=240 (tile units, same as everything else -
+			see SceneBase.warp()) pins the camera to this room's own
+			left edge (the wall) on entry, instead of centering on
+			wherever mario happens to land - the room is exactly one
+			screen wide, so there's nothing to scroll to anyway. -->
+	<game-portal x="241" y="16" warp-id="warpzone-entrance" lock-scroll-x="240"></game-portal>
+	<!-- the reference's pipe mouth is a genuinely horizontal
+			piece (tileset.png cols 2/3/4 @ rows 8/9 - see Pipe.js's
+			h1/h2/h3/h1b/h2b/h3b), not the vertical cap - 3 tiles
+			long, 2 tall, sitting on the floor, with a thin 1-tile
+			smokestack riser rising off its rightmost column,
+			matching the reference pixel-for-pixel (room tiles
+			253-255, riser at 255). this IS the warp trigger now -
+			solid (no decorative="true"), so mario has to jump onto
+			its top like any other pipe instead of just walking
+			through it, and pressing down anywhere on that top
+			works (not a separate hidden 1-tile stub underneath,
+			which was too easy to miss entirely and left the mouth
+			itself walk-through-able). -->
+	<item-pipe orientation="left" size="3" x="253" warp-id="warpzone-exit" warp-to="pipe-163"></item-pipe>
+	<item-pipe size="9" width="1" x="255" y="4" cap="false"></item-pipe>
+	<!-- end warp-zone screen -->
+</div>
