@@ -4,11 +4,6 @@ import Object from './Object';
 class Collidable extends Object {
 	constructor(tag) {
 		super(tag);
-		// how this collides, same "attribute, not CSS class" convention as
-		// `type` below - a class is for styling, not game logic
-		const kind = tag.getAttribute('kind');
-		this.solid = kind === 'solid';
-		this.platform = kind === 'platform';
 		// where this tag actually lived in the markup - a reset() that
 		// needs to reattach a removed tag (an enemy/item that gets removed
 		// from the DOM and later restored to how it started) must restore
@@ -22,16 +17,11 @@ class Collidable extends Object {
 		// everything, not just objects near them.
 		this.originalParent = tag.parentNode;
 
-		this.border = {
-			top: 'solid',
-			bottom: 'solid',
-			horizontal: 'solid',
-		};
-		if (this.platform) {
-			this.border.top = 'platform';
-			this.border.bottom = false;
-			this.border.horizontal = false;
-		}
+		// how this collides, same "attribute, not CSS class" convention as
+		// `type` below - a class is for styling, not game logic. A plain div
+		// says kind="solid"/"platform" in markup; a subclass that always has
+		// one kind just calls setKind() itself instead
+		this.setKind(tag.getAttribute('kind'));
 
 		// defaults to 'scenario' - right for most Collidables (floors,
 		// blocks, pipes...), but 'scenario' IS solid-by-default in
@@ -45,6 +35,21 @@ class Collidable extends Object {
 		this.updatable = false;
 		this.affectedByGravity = false;
 		this.collideWithTheScene = false;
+	}
+
+	setKind(kind) {
+		this.solid = kind === 'solid';
+		this.platform = kind === 'platform';
+		this.border = {
+			top: 'solid',
+			bottom: 'solid',
+			horizontal: 'solid',
+		};
+		if (this.platform) {
+			this.border.top = 'platform';
+			this.border.bottom = false;
+			this.border.horizontal = false;
+		}
 	}
 
 	// default no-op - a subclass overrides this to react to whatever

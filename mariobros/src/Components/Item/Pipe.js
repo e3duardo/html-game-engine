@@ -14,6 +14,8 @@ import pipeSound from '../../../sounds/pipepowerdown.wav';
 // collide() below) - a sideways pipe answers to walking into its mouth,
 // not standing on top of it.
 class Pipe extends Portal {
+	static tagName = 'item-pipe';
+
 	constructor(tag) {
 		super(tag);
 		this.warpTo = tag.getAttribute('warp-to');
@@ -43,7 +45,7 @@ class Pipe extends Portal {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-pipe';
+		const { tagName } = this;
 		// const bgx = 35;
 		// const bgy = 2;
 		const m11 = `background-position: ${-0 * 16}px ${-8 * 16}px`;

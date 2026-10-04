@@ -6,6 +6,8 @@ import kickkillSound from '../../../sounds/kickkill.wav';
 import stompSound from '../../../sounds/stompswim.wav';
 
 class Goomba extends Enemy {
+	static tagName = 'enemy-goomba';
+
 	constructor(tag) {
 		super(tag);
 
@@ -110,7 +112,7 @@ class Goomba extends Enemy {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'enemy-goomba';
+		const { tagName } = this;
 		const bgx = 0;
 		// row 1 (y=16) is the normal overworld brown recolor; row 3 (y=48)
 		// is the same 3 frames (walk/walk2/squished) redrawn in the cyan

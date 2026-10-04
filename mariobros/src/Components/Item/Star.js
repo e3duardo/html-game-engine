@@ -3,6 +3,8 @@ import WalkingItem from '~/engine/src/WalkingItem';
 import Assets from '../Assets';
 
 class Star extends WalkingItem {
+	static tagName = 'item-star';
+
 	constructor(tag) {
 		super(tag);
 		// the real star never settles - it keeps hopping for as long as it
@@ -21,7 +23,7 @@ class Star extends WalkingItem {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-star';
+		const { tagName } = this;
 		const bgy = 48;
 
 		Collidable.setupWebComponent(tagName, {

@@ -8,6 +8,8 @@ import coinSound from '../../../sounds/coin.wav';
 // is 'item' (not the default 'scenario'), so Puppet's solid-block collision
 // resolution skips it entirely and mario just walks straight through it.
 class Coin extends Collidable {
+	static tagName = 'item-coin';
+
 	constructor(tag) {
 		super(tag);
 		this.type = 'item';
@@ -33,7 +35,7 @@ class Coin extends Collidable {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-coin';
+		const { tagName } = this;
 		// same tileset section already used by the question block (bgy=0) -
 		// this coin spin animation sits right below it, same 3 columns
 		const bgx = 24;

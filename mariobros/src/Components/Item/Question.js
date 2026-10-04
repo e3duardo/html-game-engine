@@ -5,13 +5,20 @@ import coinSound from '../../../sounds/coin.wav';
 import itemSound from '../../../sounds/item.wav';
 
 class Question extends Collidable {
+	static tagName = 'item-question';
+
 	static bgx = 24;
 	static bgy = 0;
 
 	constructor(tag) {
 		super(tag);
 
-		this.disabled = false;
+		// `disabled` markup attribute (see setupWebComponent's defaults):
+		// starts the block already spent - render() draws it as the plain
+		// "used" block, and reset() puts it back to that, not to a live '?'
+		const disabledAttr = tag.getAttribute('disabled');
+		this.disabledDefault = disabledAttr !== null && disabledAttr !== 'false';
+		this.disabled = this.disabledDefault;
 		this.bumping = false;
 		// only set on the specific block(s) authored with these attributes in
 		// the level markup - most question blocks stay coins/empty.
@@ -66,11 +73,15 @@ class Question extends Collidable {
 	};
 
 	reset = () => {
-		this.disabled = false;
 		this.bumping = false;
 		this.hasMushroom = this.hasMushroomDefault;
 		this.hasPowerUp = this.hasPowerUpDefault;
 		this.hasLife = this.hasLifeDefault;
+		if (this.disabledDefault) {
+			this.disable();
+			return;
+		}
+		this.disabled = false;
 		const m = this.tag.querySelector('.m');
 		if (m) {
 			// undo disable()'s inline overrides so the stylesheet's own
@@ -129,13 +140,14 @@ class Question extends Collidable {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-question';
+		const { tagName } = this;
 		const { bgx, bgy } = Question;
 
 		Collidable.setupWebComponent(tagName, {
 			x: 0,
 			y: 5,
 			hide: false,
+			disabled: false,
 			render: (tag) => {
 				tag.classList += 'Collidable';
 				tag.setAttribute('kind', 'solid');
@@ -173,7 +185,7 @@ class Question extends Collidable {
 						100% { background-position: -${bgx * 16}px -${bgy * 16}px; }
 					}
 				</style>
-				<div class="m"></div>
+				<div class="m" style="${tag.disabled ? `animation: none; background-position: -${(bgx + 3) * 16}px -${bgy * 16}px;` : ''}"></div>
 		  `;
 			},
 		});

@@ -6,6 +6,8 @@ import oneUpSound from '../../../sounds/1up.wav';
 import powerupSound from '../../../sounds/powerup.wav';
 
 class Mushroom extends WalkingItem {
+	static tagName = 'item-mushroom';
+
 	constructor(tag) {
 		super(tag);
 		// same shape and movement as the regular mushroom, just a green
@@ -31,7 +33,7 @@ class Mushroom extends WalkingItem {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-mushroom';
+		const { tagName } = this;
 
 		Collidable.setupWebComponent(tagName, {
 			x: 0,

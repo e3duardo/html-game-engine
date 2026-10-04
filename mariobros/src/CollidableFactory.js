@@ -1,7 +1,8 @@
 // import Mario from './Components/Actor/Mario';
 
 import Goomba from './Components/Enemy/Goomba';
-import KoopaTropa from './Components/Enemy/KoopaTropa';
+import KoopaTroopa from './Components/Enemy/KoopaTroopa';
+import ParaTroopa from './Components/Enemy/ParaTroopa';
 import Brick from './Components/Item/Brick';
 import Coin from './Components/Item/Coin';
 import Elevator from './Components/Scenario/Elevator';
@@ -13,8 +14,19 @@ import PiranhaPlant from './Components/Enemy/PiranhaPlant';
 import Question from './Components/Item/Question';
 import Star from './Components/Item/Star';
 import Pole from './Components/Scenario/Pole';
+import Lava from './Components/Scenario/Lava';
+import Block from './Components/Scenario/Block';
+import Bridge from './Components/Scenario/Bridge';
+import Floor from './Components/Scenario/Floor';
+import FloatingPlatform from './Components/Scenario/FloatingPlatform';
 
 import CollidableFactoryBase from '~/engine/src/CollidableFactoryBase';
+
+// every class that needs its own behaviour on top of a plain Collidable,
+// keyed by its own static tagName - add a new one here and nothing else
+const collidables = new Map(
+	[Question, Brick, Goomba, KoopaTroopa, ParaTroopa, PiranhaPlant, Mushroom, Coin, Flower, Fireball, Pipe, Pole, Elevator, Star, Lava, Block, Bridge, Floor, FloatingPlatform].map((Component) => [Component.tagName, Component])
+);
 
 class CollidableFactory extends CollidableFactoryBase {
 	constructor() {
@@ -24,46 +36,8 @@ class CollidableFactory extends CollidableFactoryBase {
 	from(tag) {
 		// tagName is always uppercase for custom elements (DOM spec) -
 		// compare against the lowercased form, not the literal tag name
-		const tagName = tag.tagName.toLowerCase();
-		if (tagName == 'item-question') {
-			return new Question(tag);
-		}
-		if (tagName == 'item-brick') {
-			return new Brick(tag);
-		}
-		if (tagName == 'enemy-goomba') {
-			return new Goomba(tag);
-		}
-		if (tagName == 'enemy-koopa-tropa') {
-			return new KoopaTropa(tag);
-		}
-		if (tagName == 'enemy-piranha-plant') {
-			return new PiranhaPlant(tag);
-		}
-		if (tagName == 'item-mushroom') {
-			return new Mushroom(tag);
-		}
-		if (tagName == 'item-coin') {
-			return new Coin(tag);
-		}
-		if (tagName == 'item-flower') {
-			return new Flower(tag);
-		}
-		if (tagName == 'item-fireball') {
-			return new Fireball(tag);
-		}
-		if (tagName == 'item-pipe') {
-			return new Pipe(tag);
-		}
-		if (tagName == 'item-pole') {
-			return new Pole(tag);
-		}
-		if (tagName == 'scenario-elevator') {
-			return new Elevator(tag);
-		}
-		if (tagName == 'item-star') {
-			return new Star(tag);
-		}
+		const Component = collidables.get(tag.tagName.toLowerCase());
+		if (Component) return new Component(tag);
 		return super.from(tag);
 	}
 }

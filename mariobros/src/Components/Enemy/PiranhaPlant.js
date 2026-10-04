@@ -15,7 +15,7 @@ const RISE_DISTANCE = 24;
 const RISE_SPEED = 0.5;
 const SAFE_DISTANCE = 33;
 const PAUSE_TICKS = 64;
-// mouth-chomp animation - same 2-frame toggle cadence Goomba/KoopaTropa use
+// mouth-chomp animation - same 2-frame toggle cadence Goomba/KoopaTroopa use
 // for their own walk cycle, just always running (even while paused at full
 // extension) rather than only while moving, matching the real sprite's
 // continuous open/close while it's out
@@ -37,6 +37,8 @@ const CHOMP_FRAME_TICKS = 16;
 // keeps it retracted (distance ~0, well under SAFE_DISTANCE) instead of it
 // already being risen from an arbitrary earlier phase.
 class PiranhaPlant extends Enemy {
+	static tagName = 'enemy-piranha-plant';
+
 	constructor(tag) {
 		super(tag);
 		this.dead = false;
@@ -146,7 +148,7 @@ class PiranhaPlant extends Enemy {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'enemy-piranha-plant';
+		const { tagName } = this;
 		const bgx = 12;
 
 		Collidable.setupWebComponent(tagName, {

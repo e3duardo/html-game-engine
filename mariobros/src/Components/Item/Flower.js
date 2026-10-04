@@ -8,6 +8,8 @@ import powerupSound from '../../../sounds/powerup.wav';
 // the default 'scenario'), so Puppet's solid-block collision resolution
 // skips it entirely and mario just walks through it to collect it.
 class Flower extends Collidable {
+	static tagName = 'item-flower';
+
 	constructor(tag) {
 		super(tag);
 		this.type = 'item';
@@ -27,7 +29,7 @@ class Flower extends Collidable {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-flower';
+		const { tagName } = this;
 		// items.png row y=32: the 4 per-world recolors of the same flower
 		// shape (x=0/16/32/48) - the original flicks the fire flower
 		// through several palettes instead of showing it static; cycling

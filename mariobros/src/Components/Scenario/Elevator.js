@@ -1,4 +1,5 @@
 import Collidable from '~/engine/src/Collidable';
+import Assets from '../Assets';
 
 // a platform that rises/falls on a fixed vertical track. Unlike the
 // horizontal version, this one needs no manual
@@ -8,8 +9,14 @@ import Collidable from '~/engine/src/Collidable';
 // it up/down for free as long as `platform` (one-way solid, not `solid`)
 // lets him land on top in the first place.
 class Elevator extends Collidable {
+
+	static tagName = 'scenario-elevator';
+	static bgx = 3;
+	static bgy = 1;
+
 	constructor(tag) {
 		super(tag);
+		this.setKind('platform');
 		this.type = 'scenario';
 		// Collidable defaults this to false - needed here to move every tick
 		this.updatable = true;
@@ -57,7 +64,7 @@ class Elevator extends Collidable {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'scenario-elevator';
+		const {tagName, bgx, bgy} = this;
 
 		Collidable.setupWebComponent(tagName, {
 			x: 0,
@@ -67,18 +74,16 @@ class Elevator extends Collidable {
 			// wider than the original 2-tile guess, not literally full
 			// screen width; easy to tweak here once real sprites are in
 			width: 4,
-			height: 1,
 			travel: 5,
 			speed: 0.5,
 			direction: 1,
 			render: (tag) => {
 				tag.classList += 'Collidable';
-				tag.setAttribute('kind', 'platform');
 				tag.style.position = 'absolute';
 				tag.style.left = tag.x * 16 + 'px';
 				tag.style.bottom = tag.y * 16 + 'px';
 				tag.style.width = tag.width * 16 + 'px';
-				tag.style.height = tag.height * 16 + 'px';
+				tag.style.height = 16 + 'px';
 				tag.style.zIndex = 2;
 
 				// plain original look (no ripped tile) - a flat plank
@@ -86,15 +91,25 @@ class Elevator extends Collidable {
 				// Eduardo's swapping in real sprites later
 				return Collidable.html`
 					<style>
-						scenario-elevator .m {
+						${tagName} .g{
+							position: relative;
+						}
+						${tagName} .m{
+							background-image: url('${Assets.tileset}');
+							background-position: -${bgx * 16}px -${bgy * 16}px;
+							background-repeat: no-repeat;
 							position: absolute;
-							inset: 0;
-							background: #a56b3f;
-							border-top: 2px solid #c98f5c;
-							box-shadow: inset 0 -3px 0 #6e4626;
+							width: 16px;
+							height: 16px;
+							top: 0;
+							left: 0;
 						}
 					</style>
-					<div class="m"></div>
+					<div class="g">
+						${Array.from(Array(tag.width)).map((_, col) => {
+							return Collidable.html`<div class="m" style="left: ${col * 16}px;"></div>`;
+						})}
+					</div>
 				`;
 			},
 		});

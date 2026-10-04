@@ -3,6 +3,8 @@ import WalkingItem from '~/engine/src/WalkingItem';
 import Inject from '~/engine/src/Inject';
 
 class Fireball extends WalkingItem {
+	static tagName = 'item-fireball';
+
 	constructor(tag) {
 		super(tag);
 		// 4px/frame - a continuous per-tick velocity, not a one-time
@@ -74,7 +76,7 @@ class Fireball extends WalkingItem {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-fireball';
+		const { tagName } = this;
 
 		Collidable.setupWebComponent(tagName, {
 			x: 0,

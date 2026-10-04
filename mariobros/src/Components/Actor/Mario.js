@@ -2,12 +2,14 @@ import Object from '~/engine/src/Object';
 import Assets from '../Assets';
 
 class Mario extends Object {
+	static tagName = 'player-mario';
+
 	constructor() {
 		super();
 	}
 
 	static setupWebComponent() {
-		const tagName = 'player-mario';
+		const { tagName } = this;
 
 		Object.setupWebComponent(tagName, {
 			x: 0,

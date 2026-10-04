@@ -2,12 +2,14 @@ import Object from '~/engine/src/Object';
 import Assets from '../Assets';
 
 class Flag extends Object {
+	static tagName = 'item-flag';
+
 	constructor() {
 		super();
 	}
 
 	static setupWebComponent() {
-		const tagName = 'item-flag';
+		const { tagName } = this;
 		const bgx = 35;
 		const bgy = 2;
 

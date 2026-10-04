@@ -23,7 +23,7 @@ import pipePowerDownSound from '../sounds/pipepowerdown.wav';
 // between - escalate 100, 200, 400, 500, 800, 1000, and every kill from
 // the 6th one on also grants an extra life. Only a direct stomp counts - a
 // kick, a fireball, or a sliding shell hitting another enemy award their
-// own flat score instead (see Goomba.js/KoopaTropa.js). See
+// own flat score instead (see Goomba.js/KoopaTroopa.js). See
 // awardStompScore() below.
 const COMBO_SCORE = [100, 200, 400, 500, 800, 1000];
 
@@ -69,7 +69,7 @@ class MarioPuppet extends Puppet {
 		this.powerUp = null;
 		// star power-up (see activateStarPower) - unlike `invincible` below
 		// (a brief no-op grace window after shrinking), this makes touching
-		// an enemy actively kill it, checked first in Goomba/KoopaTropa
+		// an enemy actively kill it, checked first in Goomba/KoopaTroopa
 		this.starPower = false;
 		this._starPowerTimeout = null;
 		this.invincible = false;

@@ -1,19 +1,22 @@
-import Object from '~/engine/src/Object';
+import Collidable from '~/engine/src/Collidable';
 import Assets from '../Assets';
 
-class FloatingPlatform extends Object {
-	constructor() {
-		super();
+class FloatingPlatform extends Collidable {
+	static tagName = 'floating-platform';
+
+	constructor(tag) {
+		super(tag);
+		this.setKind('platform');
 	}
 
 	static setupWebComponent() {
-		const tagName = 'floating-platform';
+		const { tagName } = this;
 		const bgxl = 5;
 		const bgxm = 6;
 		const bgxr = 7;
 		const bgy = 8;
 
-		Object.setupWebComponent(tagName, {
+		Collidable.setupWebComponent(tagName, {
 			size: 2,
 			x: 0,
 			y: 0,
@@ -28,7 +31,6 @@ class FloatingPlatform extends Object {
 				// kind="platform"), so mario can jump up through it from
 				// below and only lands once he's coming from above
 				tag.classList += 'Collidable';
-				tag.setAttribute('kind', 'platform');
 				tag.style.position = 'absolute';
 				tag.style.width = width + 'px';
 				tag.style.height = height + 'px';
@@ -38,7 +40,7 @@ class FloatingPlatform extends Object {
 
 				const n = Array.from(Array(tag.size - 2));
 
-				return Object.html`
+				return Collidable.html`
 				<style>
 					floating-platform .g{
 						position: relative;
@@ -65,7 +67,7 @@ class FloatingPlatform extends Object {
 				<div class="g">
 					<div class="l"></div>
 					${n.map(
-						(a, i) => Object.html`
+						(a, i) => Collidable.html`
 						<div class="m" style="left: ${(i + 1) * 16}px;"></div>
 					`
 					)}

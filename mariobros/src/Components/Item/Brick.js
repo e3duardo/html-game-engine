@@ -7,6 +7,8 @@ import coinSound from '../../../sounds/coin.wav';
 import itemSound from '../../../sounds/item.wav';
 
 class Brick extends Collidable {
+	static tagName = 'item-brick';
+
 	constructor(tag) {
 		super(tag);
 
@@ -134,7 +136,7 @@ class Brick extends Collidable {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-brick';
+		const { tagName } = this;
 		const bgy = 0;
 
 		Collidable.setupWebComponent(tagName, {

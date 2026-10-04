@@ -14,6 +14,9 @@ import CollidableFactory from './CollidableFactory';
 import World1 from './Stage/World1';
 import World2 from './Stage/World2';
 import World3 from './Stage/World3';
+import World4 from './Stage/World4';
+import TimeUp from './Stage/TimeUp';
+import GameOver from './Stage/GameOver';
 
 import Mario from './Components/Actor/Mario';
 
@@ -21,7 +24,8 @@ import DebugBar from './Components/UI/DebugBar';
 import TouchControls from './Components/UI/TouchControls';
 
 import Goomba from './Components/Enemy/Goomba';
-import KoopaTropa from './Components/Enemy/KoopaTropa';
+import KoopaTroopa from './Components/Enemy/KoopaTroopa';
+import ParaTroopa from './Components/Enemy/ParaTroopa';
 import PiranhaPlant from './Components/Enemy/PiranhaPlant';
 
 import Brick from './Components/Item/Brick';
@@ -52,9 +56,11 @@ import './Components/Scenario/Castle';
 // applied) anywhere they're used in a level's markup
 import './Components/Scenario/Montain';
 import './Components/Scenario/Stuff';
-import './Components/Scenario/Floor';
+import Floor from './Components/Scenario/Floor';
+import Lava from './Components/Scenario/Lava';
 import Elevator from './Components/Scenario/Elevator';
 import Pole from './Components/Scenario/Pole';
+import Bridge from './Components/Scenario/Bridge';
 import Portal from '~/engine/src/Portal';
 
 class SuperMarioBros extends Game {
@@ -67,7 +73,8 @@ class SuperMarioBros extends Game {
 		TouchControls.setupWebComponent();
 
 		Goomba.setupWebComponent();
-		KoopaTropa.setupWebComponent();
+		KoopaTroopa.setupWebComponent();
+		ParaTroopa.setupWebComponent();
 		PiranhaPlant.setupWebComponent();
 
 		Brick.setupWebComponent();
@@ -80,7 +87,10 @@ class SuperMarioBros extends Game {
 		Question.setupWebComponent();
 		Star.setupWebComponent();
 		Pole.setupWebComponent();
+		Floor.setupWebComponent();
 		Elevator.setupWebComponent();
+		Lava.setupWebComponent();
+		Bridge.setupWebComponent();
 
 		Block.setupWebComponent();
 		FloatingPlatform.setupWebComponent();
@@ -171,6 +181,15 @@ class SuperMarioBros extends Game {
 		);
 		Inject.router.register('1-3', `${import.meta.env.BASE_URL}scenes/1-3.html`, (name) =>
 			this._bootScene(World3, name)
+		);
+		Inject.router.register('1-4', `${import.meta.env.BASE_URL}scenes/1-4.html`, (name) =>
+			this._bootScene(World4, name)
+		);
+		Inject.router.register('time-up', `${import.meta.env.BASE_URL}scenes/time-up.html`, (name) =>
+			this._bootScene(TimeUp, name)
+		);
+		Inject.router.register('game-over', `${import.meta.env.BASE_URL}scenes/game-over.html`, (name) =>
+			this._bootScene(GameOver, name)
 		);
 		Inject.router.start();
 	}

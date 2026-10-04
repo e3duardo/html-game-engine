@@ -2,12 +2,14 @@ import Object from '~/engine/src/Object';
 import Assets from '../Assets';
 
 class Trunk extends Object {
+	static tagName = 'platform-trunk';
+
 	constructor() {
 		super();
 	}
 
 	static setupWebComponent() {
-		const tagName = 'platform-trunk';
+		const { tagName } = this;
 		const bgx = 5;
 		const bgy = 1;
 

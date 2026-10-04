@@ -12,6 +12,8 @@ const m12 = `background-position: ${-16 * 16}px ${-9 * 16}px`;
 // solid-block physics ignores it - Mario passes/lands on it exactly like a
 // coin or a mushroom, no separate "grab" collision needed.
 class Pole extends Collidable {
+	static tagName = 'item-pole';
+
 	constructor(tag) {
 		super(tag);
 		this.type = 'item';
@@ -27,7 +29,7 @@ class Pole extends Collidable {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'item-pole';
+		const { tagName } = this;
 
 		Collidable.setupWebComponent(tagName, {
 			size: 10,

@@ -1,17 +1,20 @@
-import Object from '~/engine/src/Object';
+import Collidable from '~/engine/src/Collidable';
 import Assets from '../Assets';
 
-class Block extends Object {
-	constructor() {
-		super();
+class Block extends Collidable {
+	static tagName = 'item-block';
+
+	constructor(tag) {
+		super(tag);
+		this.setKind('solid');
 	}
 
 	static setupWebComponent() {
-		const tagName = 'item-block';
+		const { tagName } = this;
 		const bgx = 0;
 		const bgy = 1;
 
-		Object.setupWebComponent(tagName, {
+		Collidable.setupWebComponent(tagName, {
 			size: 1,
 			x: 0,
 			y: 2,
@@ -19,7 +22,6 @@ class Block extends Object {
 				let width = 16;
 				let height = 16 * tag.size;
 				tag.classList += 'Collidable';
-				tag.setAttribute('kind', 'solid');
 				tag.style.position = 'absolute';
 				tag.style.width = width + 'px';
 				tag.style.height = height + 'px';
@@ -27,7 +29,7 @@ class Block extends Object {
 				tag.style.bottom = tag.y * 16 + 'px';
 				tag.style.zIndex = 2;
 
-				return Object.html`
+				return Collidable.html`
 		  		<style>
 					item-block .g{
 						position: relative;
@@ -46,7 +48,7 @@ class Block extends Object {
 				<div class="g">
 					<div class="m"></div>
 					${Array.from(Array(tag.size - 1)).map(
-						(a, i) => Object.html`
+						(a, i) => Collidable.html`
 						<div class="m" style="top: ${(i + 1) * 16}px;"></div>
 					`
 					)}

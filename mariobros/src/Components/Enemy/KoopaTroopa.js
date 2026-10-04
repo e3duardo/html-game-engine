@@ -9,7 +9,12 @@ import stompSound from '../../../sounds/stompswim.wav';
 // 'walking' (default) -> stomped from above -> 'shell' (stationary) ->
 // kicked from the side -> 'shell-sliding' (fast, defeats anything it hits)
 // -> stomped again -> back to 'shell'.
-class KoopaTropa extends Enemy {
+class KoopaTroopa extends Enemy {
+
+	static tagName = 'enemy-koopa-troopa';
+	static bgx = 6;
+	static shellBgx = 10;
+
 	constructor(tag) {
 		super(tag);
 
@@ -168,7 +173,8 @@ class KoopaTropa extends Enemy {
 	};
 
 	static setupWebComponent() {
-		const tagName = 'enemy-koopa-tropa';
+		const { tagName, bgx, shellBgx } = this;
+
 		// enemies.png, confirmed pixel by pixel: x=96/112 (bgx/bgx+1) is the
 		// walking pose (legs+shell, 24px tall, y offset 8px into the sheet)
 		// and its 2nd stride frame. The shell-only pose (no legs) is NOT
@@ -183,7 +189,7 @@ class KoopaTropa extends Enemy {
 		//
 		// the palette is picked by CSS attribute selector ([red="true"] /
 		// [underground="true"]) rather than a JS-computed y-offset baked
-		// into a plain `enemy-koopa-tropa .m` selector - every instance's
+		// into a plain `enemy-koopa-troopa .m` selector - every instance's
 		// own <style> block is plain light-DOM markup (not scoped to a
 		// shadow root), so it applies globally to every koopa on the page,
 		// not just itself. With a JS-computed offset, whichever koopa
@@ -196,9 +202,6 @@ class KoopaTropa extends Enemy {
 		// after `underground` so it wins if both were somehow set - same
 		// "only one row per koopa" priority as before, just resolved by
 		// source order at equal specificity instead of by last-write-wins.
-		const bgx = 6;
-		const shellBgx = 10;
-
 		Collidable.setupWebComponent(tagName, {
 			x: 0,
 			y: 2,
@@ -216,7 +219,7 @@ class KoopaTropa extends Enemy {
 
 				return Collidable.html`
 					<style>
-						enemy-koopa-tropa .m{
+						${tagName} .m{
 							background-image: url('${Assets.enemies}');
 							background-position: -${bgx * 16}px -8px;
 							background-repeat: no-repeat;
@@ -226,48 +229,48 @@ class KoopaTropa extends Enemy {
 							top: 0;
 							left: 0;
 						}
-						enemy-koopa-tropa.frame-1 .m{
+						${tagName}.frame-1 .m{
 							background-position: -${(bgx + 1) * 16}px -8px;
 						}
-						enemy-koopa-tropa[underground="true"] .m{
+						${tagName}[underground="true"] .m{
 							background-position: -${bgx * 16}px -${8 + 32}px;
 						}
-						enemy-koopa-tropa[underground="true"].frame-1 .m{
+						${tagName}[underground="true"].frame-1 .m{
 							background-position: -${(bgx + 1) * 16}px -${8 + 32}px;
 						}
-						enemy-koopa-tropa[red="true"] .m{
+						${tagName}[red="true"] .m{
 							background-position: -${bgx * 16}px -${8 + 64}px;
 						}
-						enemy-koopa-tropa[red="true"].frame-1 .m{
+						${tagName}[red="true"].frame-1 .m{
 							background-position: -${(bgx + 1) * 16}px -${8 + 64}px;
 						}
 
 						/* base art faces left - mirror for a rightward-walking
 						   koopa (see update()'s 'right' class toggle). Shells
 						   are symmetric and explicitly reset this below. */
-						enemy-koopa-tropa.right .m{
+						${tagName}.right .m{
 							transform: scaleX(-1);
 						}
 
-						enemy-koopa-tropa.shell .m{
+						${tagName}.shell .m{
 							top: 8px;
 							height: 16px;
 							background-position: -${shellBgx * 16}px -16px;
 							transform: none;
 						}
-						enemy-koopa-tropa.shell.frame-1 .m{
+						${tagName}.shell.frame-1 .m{
 							background-position: -${(shellBgx + 1) * 16}px -16px;
 						}
-						enemy-koopa-tropa[underground="true"].shell .m{
+						${tagName}[underground="true"].shell .m{
 							background-position: -${shellBgx * 16}px -${16 + 32}px;
 						}
-						enemy-koopa-tropa[underground="true"].shell.frame-1 .m{
+						${tagName}[underground="true"].shell.frame-1 .m{
 							background-position: -${(shellBgx + 1) * 16}px -${16 + 32}px;
 						}
-						enemy-koopa-tropa[red="true"].shell .m{
+						${tagName}[red="true"].shell .m{
 							background-position: -${shellBgx * 16}px -${16 + 64}px;
 						}
-						enemy-koopa-tropa[red="true"].shell.frame-1 .m{
+						${tagName}[red="true"].shell.frame-1 .m{
 							background-position: -${(shellBgx + 1) * 16}px -${16 + 64}px;
 						}
 					</style>
@@ -278,4 +281,4 @@ class KoopaTropa extends Enemy {
 	}
 }
 
-export default KoopaTropa;
+export default KoopaTroopa;

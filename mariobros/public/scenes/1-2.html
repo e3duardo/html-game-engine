@@ -1,5 +1,5 @@
 <!-- <div
-style="position: absolute; left: 0; bottom: 0; width: 4096px; height: 240px; opacity: 0.5; background-image: url('1-2-reference.webp'); background-repeat: no-repeat; pointer-events: none; z-index: 1000"
+style="position: absolute; left: 256px; bottom: -240px; width: 3072px; height: 720px; opacity: 0.5; background-image: url('SMB_World_1-2_NES_level_map.webp'); background-repeat: no-repeat; pointer-events: none; z-index: 1000"
 ></div> -->
 
 <!-- Pipe and castle - INIT -->
@@ -26,9 +26,9 @@ style="position: absolute; left: 0; bottom: 0; width: 4096px; height: 240px; opa
      <enemy-goomba x="32" underground="true"></enemy-goomba>
      <enemy-goomba x="33" y="3" underground="true"></enemy-goomba>
      <enemy-goomba x="45" underground="true"></enemy-goomba>
-     <enemy-koopa-tropa x="60" underground="true"></enemy-koopa-tropa>
-     <enemy-koopa-tropa x="61.5" underground="true"></enemy-koopa-tropa>
-     <enemy-koopa-tropa x="75" underground="true"></enemy-koopa-tropa>
+     <enemy-koopa-troopa x="60" underground="true"></enemy-koopa-troopa>
+     <enemy-koopa-troopa x="61.5" underground="true"></enemy-koopa-troopa>
+     <enemy-koopa-troopa x="75" underground="true"></enemy-koopa-troopa>
      <enemy-goomba x="78" underground="true"></enemy-goomba>
      <enemy-goomba x="80" underground="true"></enemy-goomba>
      <enemy-goomba x="89" y="10" underground="true"></enemy-goomba>
@@ -40,7 +40,7 @@ style="position: absolute; left: 0; bottom: 0; width: 4096px; height: 240px; opa
      <enemy-goomba x="129" underground="true"></enemy-goomba>
      <enemy-goomba x="151" y="6" underground="true"></enemy-goomba>
      <enemy-goomba x="152.5" y="6" underground="true"></enemy-goomba>
-     <enemy-koopa-tropa x="162" red="true"></enemy-koopa-tropa>
+     <enemy-koopa-troopa x="162" red="true"></enemy-koopa-troopa>
 
      <item-brick x="16" y="2" line="false"></item-brick>
      <item-brick x="16" y="3" line="false"></item-brick>
@@ -615,12 +615,12 @@ style="position: absolute; left: 0; bottom: 0; width: 4096px; height: 240px; opa
      <item-brick x="152" y="12" line="false"></item-brick>
      <item-brick x="153" y="12" line="false"></item-brick>
 
-     <scene-floor x="16" width="80"></scene-floor>
-     <scene-floor x="99" width="37"></scene-floor>
-     <scene-floor x="138" width="2"></scene-floor>
-     <scene-floor x="142" width="12"></scene-floor>
-     <scene-floor x="161" width="8"></scene-floor>
-     <scene-floor x="176" width="32"></scene-floor>
+     <scene-floor x="16" width="80" tileset="underground"></scene-floor>
+     <scene-floor x="99" width="37" tileset="underground"></scene-floor>
+     <scene-floor x="138" width="2" tileset="underground"></scene-floor>
+     <scene-floor x="142" width="12" tileset="underground"></scene-floor>
+     <scene-floor x="161" width="8" tileset="underground"></scene-floor>
+     <scene-floor x="176" width="32" tileset="underground"></scene-floor>
 
      <!-- 2 vertical lifts (não é ponte horizontal - sobe/desce no lugar),
           um em cada buraco de 7 tiles. y=3 é a ponta baixa do trajeto
@@ -635,8 +635,11 @@ style="position: absolute; left: 0; bottom: 0; width: 4096px; height: 240px; opa
           lifts (em vez dos dois com o mesmo default) para que, em
           qualquer instante, pelo menos um dos dois esteja disponível
           perto do meio do buraco para o jogador atravessar. -->
-     <scenario-elevator x="154" y="3" travel="5" direction="1"></scenario-elevator>
-     <scenario-elevator x="169" y="3" travel="5" direction="-1"></scenario-elevator>
+     <scenario-elevator x="155.7" width="3" y="7" travel="5" direction="1"></scenario-elevator>
+     <scenario-elevator x="155.7" width="3" y="1" travel="5" direction="1"></scenario-elevator>
+
+     <scenario-elevator x="170.7" width="3" y="4.5" travel="5" direction="-1"></scenario-elevator>
+     <scenario-elevator x="170.7" width="3" y="-3.5" travel="5" direction="-1"></scenario-elevator>
 
      <!-- end playable scene 1-2 -->
 </div>
