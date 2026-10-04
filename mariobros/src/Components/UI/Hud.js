@@ -1,12 +1,95 @@
+import Object from '~/engine/src/Object';
 import HudBase from '~/engine/src/HudBase';
 import Inject from '~/engine/src/Inject';
+import Assets from '../Assets';
+import WorldIntro from '../Screen/WorldIntro';
+import LevelClear from '../Screen/LevelClear';
 
-import beepSound from '../sounds/beep.wav';
-import oneUpSound from '../sounds/1up.wav';
+import beepSound from '../../../sounds/beep.wav';
+import oneUpSound from '../../../sounds/1up.wav';
 
 class Hud extends HudBase {
+	static tagName = 'game-hud';
+
+	static setupWebComponent() {
+		Object.setupWebComponent(this.tagName, {
+			render: () => Object.html`
+				<style>
+					${this.tagName} {
+						display: block;
+						position: absolute;
+						left: 0;
+						color: #fff;
+						z-index: 10000;
+						padding-top: 7.65px;
+						padding-left: 24.5px;
+						width: 214px;
+						letter-spacing: -0.3px;
+					}
+					${this.tagName} > div {
+						float: left;
+					}
+					${this.tagName} > div:nth-of-type(1) {
+						width: 64px;
+					}
+					${this.tagName} > div:nth-of-type(2) {
+						width: 55.5px;
+					}
+					${this.tagName} > div:nth-of-type(2) > span {
+						margin-left: 6.6px;
+					}
+					${this.tagName} > div:nth-of-type(3) {
+						width: 56.5px;
+					}
+					${this.tagName} > div:nth-of-type(3) > span:nth-of-type(2) {
+						margin-left: 10px;
+					}
+					${this.tagName} > div:nth-of-type(4) {
+						text-align: right;
+					}
+					${this.tagName} .Coin {
+						position: absolute;
+						top: 15px;
+						left: 88.5px;
+						width: 8px;
+						height: 8px;
+						/* one static frame of the same coin sprite item-coin animates
+						   through (tileset.png, tile at col 24 row 1) - scaled down at
+						   an exact half (8px of its native 16px) so the crop lands on
+						   whole pixels instead of bleeding into the neighboring tile's
+						   colors like a fractional scale did */
+						background-image: url('${Assets.tileset}');
+						background-size: 264px 224px;
+						background-position: -192px -8px;
+						image-rendering: pixelated;
+					}
+					${this.tagName} * {
+						font-size: 7px !important;
+						line-height: 9.1px !important;
+						letter-spacing: -0.3px !important;
+					}
+				</style>
+				<div>
+					<span class="hud-actor">mario</span><br />
+					<span class="hud-score">000000</span>
+				</div>
+				<div><br /><span class="hud-coin">.00</span></div>
+				<div>
+					<span>world</span><br />
+					<span class="hud-stage">1-1</span>
+				</div>
+				<div>
+					<span>time</span><br />
+					<span class="hud-time">000</span>
+				</div>
+				<div class="Coin"></div>
+			`,
+		});
+	}
+
 	constructor() {
 		super();
+		this.tag = document.querySelector(Hud.tagName);
 		// score/coin/time are kept as plain fields, not read back from the
 		// DOM (that anti-pattern is what corrupted mario's own position
 		// physics earlier this session, see Puppet.js) - here it would just
@@ -16,23 +99,20 @@ class Hud extends HudBase {
 		this._coin = 0;
 		this._time = 0;
 		this.introShowing = false;
+		// frozen for good once the game is over (see SuperMarioBros.gameOver)
+		this.clockStopped = false;
 	}
 
-	// the "WORLD 1-1" title card - shown once entering the stage and again
-	// after every death (see SuperMarioBros.play()), sitting on top of a
-	// black screen until it's dismissed. `introShowing` is checked elsewhere
-	// (the time countdown) so the clock doesn't run while it's up.
+	// `introShowing` is checked elsewhere (the time countdown) so the clock
+	// doesn't run while the "WORLD 1-1" card is up.
 	showIntro = (lives) => {
 		this.introShowing = true;
-		document.querySelector('.WorldIntro-stage').innerHTML =
-			document.querySelector('.hud-stage').innerHTML;
-		document.querySelector('.WorldIntro-lives-count').innerHTML = lives;
-		document.querySelector('.WorldIntro').style.display = 'flex';
+		WorldIntro.show(this.tag.querySelector('.hud-stage').textContent, lives);
 	};
 
 	hideIntro = () => {
 		this.introShowing = false;
-		document.querySelector('.WorldIntro').style.display = 'none';
+		WorldIntro.hide();
 	};
 
 	// showLevelClear() below never dismisses itself - undoing it is only
@@ -40,7 +120,7 @@ class Hud extends HudBase {
 	// SuperMarioBros._bootScene, called right as a Router-driven level
 	// transition starts)
 	hideLevelClear = () => {
-		document.querySelector('.LevelClear').style.display = 'none';
+		LevelClear.hide();
 	};
 
 	// the floating "100"/"200" text that pops up and fades wherever a score
@@ -61,13 +141,10 @@ class Hud extends HudBase {
 
 	// the "COURSE CLEAR!" screen shown once Mario reaches the castle (see
 	// Puppet.winLevel) - stays up (it's never dismissed here) until the next
-	// scene actually boots and explicitly hides it, see hideLevelClear below
+	// scene actually boots and explicitly hides it, see hideLevelClear above
 	showLevelClear = () => {
-		document.querySelector('.LevelClear-score-value').innerHTML =
-			document.querySelector('.hud-score').innerHTML;
-		document.querySelector('.LevelClear').style.display = 'flex';
+		LevelClear.show(this.tag.querySelector('.hud-score').textContent);
 	};
-
 	// the original converts whatever time is left into score right before
 	// the level-clear screen, visibly counting the clock down to 0 (beeping
 	// on every tick) rather than just silently adding a lump sum - 50 points
@@ -93,7 +170,7 @@ class Hud extends HudBase {
 	};
 
 	set actor(v) {
-		document.querySelector('.hud-actor').innerHTML = v;
+		this.tag.querySelector('.hud-actor').innerHTML = v;
 	}
 
 	get score() {
@@ -105,7 +182,7 @@ class Hud extends HudBase {
 		const pad = '000000';
 		const string = pad.substring(0, pad.length - s.length) + s;
 
-		document.querySelector('.hud-score').innerHTML = string;
+		this.tag.querySelector('.hud-score').innerHTML = string;
 	}
 	// convenience used by whatever awards points (stomping an enemy,
 	// collecting a coin, etc.) instead of every call site reading+writing
@@ -122,7 +199,7 @@ class Hud extends HudBase {
 		const s = ('' + v).substring(0, 2);
 		const pad = '00';
 		const string = pad.substring(0, pad.length - s.length) + s;
-		document.querySelector('.hud-coin').innerHTML = '.' + string;
+		this.tag.querySelector('.hud-coin').innerHTML = '.' + string;
 	}
 	// a coin is always worth the same 200 points in the original game, so
 	// bundle that here rather than have every collector award both separately
@@ -146,7 +223,7 @@ class Hud extends HudBase {
 	set stage(v) {
 		this._stage = v;
 		const s = ('' + v).substring(0, 2);
-		document.querySelector('.hud-stage').innerHTML = s[0] + '-' + s[1];
+		this.tag.querySelector('.hud-stage').innerHTML = s[0] + '-' + s[1];
 	}
 
 	get time() {
@@ -157,7 +234,7 @@ class Hud extends HudBase {
 		const s = ('' + v).substring(0, 3);
 		const pad = '000';
 		const string = pad.substring(0, pad.length - s.length) + s;
-		document.querySelector('.hud-time').innerHTML = string;
+		this.tag.querySelector('.hud-time').innerHTML = string;
 	}
 }
 

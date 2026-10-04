@@ -92,7 +92,7 @@ class WalkingItem extends Collidable {
 				this.speedY = this.bounceOnLand ? this.bounceImpulse : 0;
 			}
 			if (collisions.top && object.border.bottom == 'solid') {
-				this.ay = object.y + this.height;
+				this.ay = object.y + object.height;
 				this.speedY = 1;
 			}
 			if (collisions.right && object.border.horizontal == 'solid' && this.speedX > 0) {

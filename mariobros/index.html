@@ -10,34 +10,10 @@
 		<debug-bar></debug-bar>
 		<div class="Stage">
 			<div class="Grid"></div>
-			<div class="Hud">
-				<div>
-					<span class="hud-actor">mario</span><br />
-					<span class="hud-score">000000</span>
-				</div>
-				<div><br /><span class="hud-coin">.00</span></div>
-				<div>
-					<span>world</span><br />
-					<span class="hud-stage">1-1</span>
-				</div>
-				<div>
-					<span>time</span><br />
-					<span class="hud-time">000</span>
-				</div>
-				<div class="Coin"></div>
-			</div>
-			<div class="GameOver">gameover</div>
-			<div class="LevelClear">
-				<div class="LevelClear-title">COURSE CLEAR!</div>
-				<div class="LevelClear-score">SCORE <span class="LevelClear-score-value">000000</span></div>
-			</div>
-			<div class="WorldIntro">
-				<div class="WorldIntro-title">WORLD <span class="WorldIntro-stage">1-1</span></div>
-				<div class="WorldIntro-lives">
-					<span class="WorldIntro-icon"></span>
-					<span>x <span class="WorldIntro-lives-count">3</span></span>
-				</div>
-			</div>
+			<game-hud></game-hud>
+			<game-over></game-over>
+			<level-clear></level-clear>
+			<world-intro></world-intro>
 			<div class="Scene">
 			</div>
 		</div>

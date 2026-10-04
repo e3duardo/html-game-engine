@@ -4,7 +4,7 @@ import gameOverTheme from '../sounds/gameovertheme.mp3';
 
 import Game from '~/engine/src/Game';
 
-import Hud from './Hud';
+import Hud from './Components/UI/Hud';
 
 // mariobros' own subclass (see Puppet.js) - not the bare engine one, so the
 // death/fireball SFX it hangs off die()/throwFireball() actually fire
@@ -22,11 +22,16 @@ import Mario from './Components/Actor/Mario';
 
 import DebugBar from './Components/UI/DebugBar';
 import TouchControls from './Components/UI/TouchControls';
+import GameOverScreen from './Components/Screen/GameOver';
+import LevelClear from './Components/Screen/LevelClear';
+import WorldIntro from './Components/Screen/WorldIntro';
 
 import Goomba from './Components/Enemy/Goomba';
 import KoopaTroopa from './Components/Enemy/KoopaTroopa';
 import ParaTroopa from './Components/Enemy/ParaTroopa';
 import PiranhaPlant from './Components/Enemy/PiranhaPlant';
+import FireBar from './Components/Enemy/FireBar';
+import KoopaFire from './Components/Enemy/KoopaFire';
 
 import Brick from './Components/Item/Brick';
 import Coin from './Components/Item/Coin';
@@ -71,11 +76,17 @@ class SuperMarioBros extends Game {
 
 		DebugBar.setupWebComponent();
 		TouchControls.setupWebComponent();
+		Hud.setupWebComponent();
+		GameOverScreen.setupWebComponent();
+		LevelClear.setupWebComponent();
+		WorldIntro.setupWebComponent();
 
 		Goomba.setupWebComponent();
 		KoopaTroopa.setupWebComponent();
 		ParaTroopa.setupWebComponent();
 		PiranhaPlant.setupWebComponent();
+		FireBar.setupWebComponent();
+		KoopaFire.setupWebComponent();
 
 		Brick.setupWebComponent();
 		Coin.setupWebComponent();
@@ -136,6 +147,7 @@ class SuperMarioBros extends Game {
 				!Inject.puppet ||
 				Inject.hud.time <= 0 ||
 				Inject.hud.introShowing ||
+				Inject.hud.clockStopped ||
 				Inject.puppet.winning
 			)
 				return;
@@ -283,6 +295,8 @@ class SuperMarioBros extends Game {
 	gameOver() {
 		super.gameOver();
 		if (Inject.puppet.lives <= 0) {
+			// the clock keeps ticking behind the game over screen otherwise
+			Inject.hud.clockStopped = true;
 			Inject.audio.stopBackground();
 			// play(), not playBackground() - the original's game-over jingle
 			// plays once and stops, it doesn't loop like the level themes

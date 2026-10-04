@@ -305,7 +305,7 @@ class Puppet {
 
 			if (object.scenario) {
 				if (collisions.top && object.border.bottom == 'solid') {
-					this.ay = object.y + this.height;
+					this.ay = object.y + object.height;
 					this.speedY = 1;
 				}
 				if (
