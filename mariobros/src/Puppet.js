@@ -79,11 +79,20 @@ class MarioPuppet extends Puppet {
 		// (non-repeat) keydown/keyup, so the rising edge of the same 'shift'
 		// key already mapped to running is reused here instead of adding a
 		// dedicated fire button.
-		Inject.events.subscribe((event) => {
+		// kept so destroy() can drop it - a Router scene swap builds a new
+		// Puppet per scene, and a listener left behind by the old one would
+		// keep throwing fireballs (and playing the sound) from its own
+		// stale powerUp forever
+		this._unsubscribeFire = Inject.events.subscribe((event) => {
 			if (event.type == 'key' && event.data.key == 'shift' && event.data.pressed) {
 				this.throwFireball();
 			}
 		});
+	}
+
+	destroy() {
+		if (this._unsubscribeFire) this._unsubscribeFire();
+		this._unsubscribeFire = null;
 	}
 
 	// `big` is the size/ability shared by every power-up beyond small
@@ -241,6 +250,17 @@ class MarioPuppet extends Puppet {
 	// by grow/becomeFire/shrink).
 	static SIZE_CHANGE_FREEZE_MS = (59 * 1000) / 60.0988;
 
+	// grow/becomeFire/shrink run from inside an object's collide(), i.e.
+	// mid-update(), which ends with `this.y = this.ay` - a bare `this.y -= 16`
+	// is overwritten by that stale ay and mario ends up 16px inside whatever
+	// he's standing on (solid floors push him back out, a 16px-tall
+	// platform doesn't, so he fell straight through it). Moving ay too
+	// keeps the adjustment.
+	_shiftY(dy) {
+		this.y += dy;
+		if (this.ay !== undefined) this.ay += dy;
+	}
+
 	_freezeForSizeChange() {
 		this.scripted = true;
 		setTimeout(() => {
@@ -251,7 +271,7 @@ class MarioPuppet extends Puppet {
 	grow() {
 		if (this.big) return;
 		this.powerUp = 'super';
-		this.y -= 16;
+		this._shiftY(-16);
 		this.tag.style.height = '32px';
 		this._freezeForSizeChange();
 	}
@@ -264,7 +284,7 @@ class MarioPuppet extends Puppet {
 	becomeFire() {
 		if (this.powerUp === 'fire') return;
 		if (!this.big) {
-			this.y -= 16;
+			this._shiftY(-16);
 			this.tag.style.height = '32px';
 		}
 		this.powerUp = 'fire';
@@ -274,7 +294,7 @@ class MarioPuppet extends Puppet {
 	shrink() {
 		if (!this.big) return;
 		this.powerUp = null;
-		this.y += 16;
+		this._shiftY(16);
 		this.tag.style.height = '16px';
 		// grace window: without it, the same enemy still overlapping mario
 		// on the very next tick (collide() fires every tick while touching,

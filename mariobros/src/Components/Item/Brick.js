@@ -25,6 +25,15 @@ class Brick extends Collidable {
 		this.isStarBrick = tag.hasAttribute('star');
 		this.spent = false;
 		this._coinTimer = null;
+
+		// a broken brick's tag goes away, but the object itself stays in the
+		// scene's collision map until reset() - without this it kept acting
+		// as an invisible solid (ceiling/wall) wherever it used to be
+		// (Collidable.collides is an instance field, so wrap it rather than
+		// calling super)
+		const collides = this.collides;
+		this.collides = (from) =>
+			this.dead ? { top: false, bottom: false, left: false, right: false } : collides(from);
 	}
 
 	reset = () => {

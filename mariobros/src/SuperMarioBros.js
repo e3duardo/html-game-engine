@@ -218,6 +218,7 @@ class SuperMarioBros extends Game {
 	_bootScene(SceneClass, routeName) {
 		const carry = Inject.puppet ? Inject.puppet.captureState() : null;
 		Inject.hud.hideLevelClear();
+		if (Inject.puppet) Inject.puppet.destroy();
 		Inject.scene = new SceneClass();
 		Inject.puppet = new Puppet(document.querySelector('player-mario'));
 		if (carry) Inject.puppet.restoreState(carry);

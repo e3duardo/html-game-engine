@@ -6,7 +6,13 @@ class FloatingPlatform extends Collidable {
 
 	constructor(tag) {
 		super(tag);
-		this.setKind('platform');
+		// SMBDIS: the mushroom ledge's metatiles ($19/$1a/$1b) fall in the
+		// solid range (>= $10 for metatiles $00-$3f, see SolidMTileUpperExt /
+		// CheckForSolidMTiles) - same as ground and bricks, so the player
+		// bumps his head from below and is stopped from the sides. Only the
+		// stem underneath ($4f/$50, below that group's $61 threshold) is
+		// background, see platform-trunk.
+		this.setKind('solid');
 	}
 
 	static setupWebComponent() {
@@ -26,10 +32,6 @@ class FloatingPlatform extends Collidable {
 				}
 				let width = 16 * tag.size;
 				let height = 16;
-				// 'platform', not 'solid' - one-way collision (see
-				// Collidable.js's border.bottom/horizontal, both false for
-				// kind="platform"), so mario can jump up through it from
-				// below and only lands once he's coming from above
 				tag.classList += 'Collidable';
 				tag.style.position = 'absolute';
 				tag.style.width = width + 'px';
