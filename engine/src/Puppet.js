@@ -7,6 +7,9 @@ Number.prototype.inRange = function (a, b) {
 	return n >= a && n <= b;
 };
 
+// SMBDIS skid threshold: Player_XSpeedAbsolute >= $09 (1/16 px per frame)
+const SKID_MIN_SPEED = 9 / 16;
+
 class Puppet {
 	constructor(tag) {
 		this.tag = tag;
@@ -150,7 +153,16 @@ class Puppet {
 		this.ax = this.x;
 		this.ay = this.y;
 
-		if (Inject.control.shift) {
+		// SMBDIS RunningTimer: holding B in the direction he's already moving
+		// on the ground keeps the run speed/accel for 10 more frames once B
+		// is released, so letting go for a moment doesn't drop him back to a
+		// walk mid-stride
+		if (Inject.control.shift && this.speedY == 0 && this.speedX * (Inject.control.right ? 1 : Inject.control.left ? -1 : 0) > 0) {
+			this._runTimer = 10;
+		} else if (this._runTimer > 0) {
+			this._runTimer--;
+		}
+		if (Inject.control.shift || this._runTimer > 0) {
 			this.accelX = this.runAccel;
 			this.maxSpeedX = 2.5;
 			this.velocity_y = this.velocity_y_run;
@@ -179,7 +191,10 @@ class Puppet {
 			// on a pose already locked in, which is why pressing down
 			// right before a jump keeps the player drawn crouched for that
 			// entire jump. canCrouch() is overridable, see below.
-			this.crouching = this.canCrouch() && Inject.control.down;
+			// stays crouched while something overhead keeps standing up from
+			// being possible (releasing Down in a 1-tile gap)
+			this.crouching = (this.canCrouch() && Inject.control.down) || (this.crouching && !this.canStandUp());
+			this.syncCrouch();
 		}
 
 		if (!Inject.control.right && !Inject.control.left) {
@@ -195,11 +210,11 @@ class Puppet {
 		if (this.crouching) {
 			this.animation('lower-' + this.facingDir);
 		}
-		if (grounded && !this.crouching) {
+		if (grounded && !this.crouching && this.canSteer(grounded)) {
 			// skidding: pressing a direction opposite to the speed the player
 			// is still carrying from before (braking hard enough to turn around)
 			const skidding =
-				(Inject.control.left && this.speedX > 0.5) || (Inject.control.right && this.speedX < -0.5);
+				(Inject.control.left && this.speedX >= SKID_MIN_SPEED) || (Inject.control.right && this.speedX <= -SKID_MIN_SPEED);
 			if (skidding) {
 				this.animation('skid-' + (this.speedX < 0 ? 'left' : 'right'));
 			} else if (Inject.control.left) {
@@ -216,18 +231,29 @@ class Puppet {
 		// ground) doubles accelX. Airborne with *nothing* held does not
 		// touch speedX at all - coasting mid-jump with no input held
 		// keeps speed perfectly constant, it doesn't decay.
-		const dir = Inject.control.left ? -1 : Inject.control.right ? 1 : 0;
+		const dir = this.canSteer(grounded) ? (Inject.control.left ? -1 : Inject.control.right ? 1 : 0) : 0;
 		if (dir !== 0) {
 			const opposing = dir * this.speedX < 0;
-			const accel = opposing ? this.accelX * 2 : this.accelX;
-			let next = this.speedX + dir * accel;
-			next = dir > 0 ? Math.min(next, this.maxSpeedX) : Math.max(next, -this.maxSpeedX);
-			this.speedX = next;
+			if (dir * this.speedX > this.maxSpeedX) {
+				// faster than the current top speed (B was released while
+				// running): the excess wears off through friction instead of
+				// being cut in one frame; in the air it's kept as is
+				if (grounded) {
+					const over = Math.abs(this.speedX) - this.maxSpeedX;
+					this.speedX -= dir * Math.min(over, this.overspeedFriction());
+				}
+			} else {
+				const accel = opposing ? this.accelX * 2 : this.accelX;
+				let next = this.speedX + dir * accel;
+				next = dir > 0 ? Math.min(next, this.maxSpeedX) : Math.max(next, -this.maxSpeedX);
+				this.speedX = next;
+			}
 		} else if (grounded && this.speedX !== 0) {
 			// letting go on the ground still coasts to a stop, at the base
 			// walking accel regardless of running
-			if (this.speedX > 0) this.speedX = Math.max(0, this.speedX - this.walkAccel);
-			else this.speedX = Math.min(0, this.speedX + this.walkAccel);
+			const friction = this.coastFriction();
+			if (this.speedX > 0) this.speedX = Math.max(0, this.speedX - friction);
+			else this.speedX = Math.min(0, this.speedX + friction);
 		}
 		// require the key to be released before a new jump can be consumed,
 		// so holding 'a' across a landing doesn't auto bunny-hop
@@ -288,6 +314,16 @@ class Puppet {
 		// level, not just what's actually on/near screen
 		const currentlyTouching = new Set();
 		Inject.scene.getCollisionMapVisible().forEach((object) => {
+			// broad phase: static scenery well away from the player can't touch
+			// him (anything that moves, or reacts to more than touching - enemies,
+			// items, triggers - still runs every tick)
+			if (
+				object.scenario &&
+				!object.updatable &&
+				(object.x > this.ax + this.width + 64 || object.x + object.width < this.ax - 64)
+			) {
+				return;
+			}
 			const collisions = object.collides(this);
 
 			if (collisions.top || collisions.bottom || collisions.left || collisions.right) {
@@ -415,6 +451,34 @@ class Puppet {
 	// a subclass can restrict it (e.g. to a big/fire-powered player only)
 	// without changing this default for every other game.
 	canCrouch() {
+		return true;
+	}
+
+	// how much speed a grounded player with no steering input loses per tick
+	coastFriction() {
+		return this.walkAccel;
+	}
+
+	// per tick, while holding a direction faster than the current top speed
+	overspeedFriction() {
+		return this.coastFriction();
+	}
+
+	// whether there's room above to stand back up - a subclass whose crouch
+	// shrinks the collision box overrides this (see MarioPuppet)
+	canStandUp() {
+		return true;
+	}
+
+	// called each time `crouching` is resampled, to let a subclass resize
+	// the player's box to match
+	syncCrouch() {}
+
+	// whether left/right currently steer the player - a subclass can take
+	// that away (e.g. while holding down on the ground, so momentum just
+	// carries and friction slows the player). Overridable for the same
+	// reason as canCrouch().
+	canSteer(grounded) {
 		return true;
 	}
 

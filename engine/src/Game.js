@@ -1,5 +1,5 @@
 import Inject from './Inject';
-import fixedStepRaf from './fixedStepRaf';
+import fixedStepRaf, { setLoopsPaused } from './fixedStepRaf';
 
 class Game {
 	constructor() {
@@ -16,14 +16,19 @@ class Game {
 		this.thisLoop;
 
 		this._cancelLoop = null;
+		this.worldFrozen = false;
 	}
 
 	gameLoop = () => {
 		Inject.puppet.update();
 
-		Inject.scene.updatableMap.forEach((object) => {
-			object.update();
-		});
+		// a game can stop everything but the player (SMB1's power-up
+		// transformation does) without stopping the loop itself
+		if (!this.worldFrozen) {
+			Inject.scene.updatableMap.forEach((object) => {
+				object.update();
+			});
+		}
 
 		this.ticks++;
 		let thisFrameTime = (this.thisLoop = new Date()) - this.lastLoop;
@@ -32,6 +37,8 @@ class Game {
 	};
 
 	newGame = () => {
+		this._paused = false;
+		setLoopsPaused(false);
 		if (this._cancelLoop) {
 			this._cancelLoop();
 			this._cancelLoop = null;
@@ -52,7 +59,32 @@ class Game {
 		this._cancelLoop = fixedStepRaf(this.gameLoop, this.tickInterval);
 	}
 
+	// stops/resumes the loop without rebuilding the scene (play() would
+	// re-run constructCollisionMap and reset the level's runtime state)
+	get paused() {
+		return this._paused === true;
+	}
+
+	// every fixedStepRaf loop stops, the main one included - see
+	// fixedStepRaf.js's setLoopsPaused. The main loop itself is left running
+	// (paused) so resuming is just flipping the switch back.
+	pause = () => {
+		if (!this._cancelLoop || this._paused) return false;
+		this._paused = true;
+		setLoopsPaused(true);
+		return true;
+	};
+
+	resume = () => {
+		if (!this._paused) return false;
+		this._paused = false;
+		setLoopsPaused(false);
+		return true;
+	};
+
 	restart = () => {
+		this._paused = false;
+		setLoopsPaused(false);
 		if (this._cancelLoop) {
 			this._cancelLoop();
 			this._cancelLoop = null;

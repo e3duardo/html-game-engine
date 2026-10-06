@@ -23,8 +23,13 @@ class Router {
 		this._resolveHash();
 	}
 
+	// route name from the hash, ignoring a query tucked after it (#1-1?debug=1)
+	_hashRoute() {
+		return window.location.hash.slice(1).split('?')[0];
+	}
+
 	_resolveHash() {
-		this.goTo(window.location.hash.slice(1) || this.defaultRoute);
+		this.goTo(this._hashRoute() || this.defaultRoute);
 	}
 
 	// idempotent on the current route - besides being a harmless no-op for a
@@ -37,7 +42,7 @@ class Router {
 		const html = await fetch(route.fragment).then((response) => response.text());
 		document.querySelector('.Scene').innerHTML = html;
 		this.current = name;
-		if (window.location.hash.slice(1) !== name) window.location.hash = name;
+		if (this._hashRoute() !== name) window.location.hash = name;
 		route.onLoad(name);
 	}
 }

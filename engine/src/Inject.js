@@ -2,6 +2,7 @@ import Stage from './Stage';
 import Audio from './Audio';
 import { EventBus } from './GameEvents';
 import Router from './Router';
+import DebugContext from './DebugContext';
 
 class Inject {
 	constructor() {
@@ -15,6 +16,7 @@ class Inject {
 		this.audio = new Audio();
 		this.events = new EventBus();
 		this.router = new Router();
+		this.debug = new DebugContext();
 	}
 }
 

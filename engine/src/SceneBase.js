@@ -26,7 +26,11 @@ class SceneBase extends Tag {
 		// game on this engine has to match exactly - see line_to_scroll's
 		// own usage below.
 		this.line_to_scroll = 80;
-		this._scroll_x = 0;
+		// through the setter, not just the field: a Router scene swap reuses the
+		// same .Scene element, which still has the previous level's scroll
+		// offset applied (left: -3136px after finishing 1-1) - the new scene
+		// starts at 0 and the DOM has to agree
+		this.scroll_x = 0;
 		this.scroll_x_start = 0;
 
 		this.collisionMap = [];
@@ -48,7 +52,7 @@ class SceneBase extends Tag {
 	// matching opensWithCutscene's own default.
 	openingCutscene() {}
 
-	// called once the level-clear screen is already showing - a no-op here
+	// called once the castle celebration is over - a no-op here
 	// since this engine has no built-in idea of a "next" stage. Deciding
 	// what comes after THIS stage is over is stage/level knowledge, not
 	// the player puppet's job - a game's own Stage subclass overrides this

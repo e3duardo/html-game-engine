@@ -85,6 +85,36 @@ class WalkingItem extends Collidable {
 		this.ay = this.y + this.speedY;
 
 		Inject.scene.sceneMap.forEach((object) => {
+			// broad phase: nothing within a tile or so horizontally, nothing to
+			// collide with (the level has hundreds of solids and every walker
+			// asks every one of them, every tick)
+			if (object.x > this.ax + this.width + 16 || object.x + object.width < this.ax - 16) return;
+
+			// a solid wall is anything it overlaps vertically (at its position
+			// before this tick's move) at all - Collidable.collides() only
+			// reports a side hit when the CENTER of this object is within the
+			// wall's span, which lets something taller than the gap (a 24px
+			// koopa at a 1-tile gap between a brick and the floor) walk
+			// straight through it, then get shoved down by the brick as a
+			// "ceiling". Floors it stands on are excluded by the strict
+			// compare (its feet end exactly at their top).
+			if (
+				object.border.horizontal == 'solid' &&
+				this.y + this.height > object.y + 1 &&
+				this.y < object.y + object.height - 1
+			) {
+				if (this.speedX > 0 && this.ax + this.width > object.x && this.ax < object.x) {
+					this.ax = object.x - this.width;
+					this.speedX *= -1;
+					return;
+				}
+				if (this.speedX < 0 && this.ax < object.x + object.width && this.ax + this.width > object.x + object.width) {
+					this.ax = object.x + object.width;
+					this.speedX *= -1;
+					return;
+				}
+			}
+
 			const collisions = object.collides(this);
 
 			if (collisions.bottom && (object.border.top == 'solid' || object.border.top == 'platform')) {

@@ -37,6 +37,54 @@ class Collidable extends Object {
 		this.collideWithTheScene = false;
 	}
 
+	// Static collidables (floors, bricks, pipes... - everything that isn't
+	// `updatable`) read their box from the DOM (offsetLeft/clientWidth...),
+	// and every such read after ANY style write elsewhere on the page (an
+	// enemy moving, say) forces a synchronous layout of the whole level -
+	// with hundreds of them checked every tick that was most of the frame. So
+	// the first read caches the box; moving one of them through the x/y
+	// setters (a bumped block) or changing its size by hand (invalidateBox(),
+	// e.g. a collapsing bridge) refreshes it. Anything `updatable` still reads
+	// live, since it can move on its own.
+	_box() {
+		if (this.updatable) return null;
+		return (this._cachedBox ??= {
+			x: this.tag.offsetLeft,
+			y: this.tag.offsetTop,
+			width: this.tag.clientWidth,
+			height: this.tag.clientHeight,
+		});
+	}
+
+	invalidateBox() {
+		this._cachedBox = null;
+	}
+
+	get x() {
+		const box = this._box();
+		return box ? box.x : super.x;
+	}
+	set x(x) {
+		super.x = x;
+		this._cachedBox = null;
+	}
+	get y() {
+		const box = this._box();
+		return box ? box.y : super.y;
+	}
+	set y(y) {
+		super.y = y;
+		this._cachedBox = null;
+	}
+	get width() {
+		const box = this._box();
+		return box ? box.width : super.width;
+	}
+	get height() {
+		const box = this._box();
+		return box ? box.height : super.height;
+	}
+
 	setKind(kind) {
 		this.solid = kind === 'solid';
 		this.platform = kind === 'platform';

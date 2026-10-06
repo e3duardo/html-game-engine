@@ -22,8 +22,12 @@ function scriptedWalk(puppet, targetX, { stepX = 0.6, onTick, onComplete } = {})
 		puppet.x += stepX * dir;
 		if ((dir > 0 && puppet.x >= targetX) || (dir < 0 && puppet.x <= targetX)) puppet.x = targetX;
 
+		// only what's at or under his feet (allowing a step up of one tile):
+		// without this a level with a ceiling over the path (a castle) made
+		// the highest solid above him "the floor", and he snapped up to it
+		const feet = puppet.y + puppet.height;
 		const solids = Inject.scene.sceneMap.filter(
-			(o) => o.solid && puppet.x + puppet.width > o.x && puppet.x < o.x + o.width
+			(o) => o.solid && puppet.x + puppet.width > o.x && puppet.x < o.x + o.width && o.y >= feet - 16
 		);
 		const floor = solids.length ? solids.reduce((h, o) => (o.y < h.y ? o : h)) : null;
 		const groundY = floor ? floor.y - puppet.height : null;

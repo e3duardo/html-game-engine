@@ -14,6 +14,15 @@
 // clearInterval). Safe to call from inside `tick` itself: the cancel
 // function is bound before the first tick can possibly run, since
 // requestAnimationFrame always defers to the next frame.
+// One switch for every loop built on this (the main game loop and each
+// scripted sequence - a walk into a pipe, a flagpole slide, a power-up
+// transformation): while set, none of them tick and none of them accumulate
+// time to catch up on afterwards. A game's pause is just this.
+let loopsPaused = false;
+export function setLoopsPaused(paused) {
+	loopsPaused = paused;
+}
+
 function fixedStepRaf(tick, tickInterval) {
 	let rafId = null;
 	let lastTime = null;
@@ -35,6 +44,13 @@ function fixedStepRaf(tick, tickInterval) {
 	const maxTicksPerFrame = 5;
 
 	const loop = (now) => {
+		if (loopsPaused) {
+			// stay alive, but keep the clock current so resuming doesn't
+			// look like a long frame
+			lastTime = now;
+			rafId = requestAnimationFrame(loop);
+			return;
+		}
 		if (lastTime === null) lastTime = now;
 		let delta = now - lastTime;
 		lastTime = now;
