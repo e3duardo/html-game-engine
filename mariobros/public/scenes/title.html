@@ -1,0 +1,55 @@
+<!-- title screen: a scene of its own on the "/" route (no hash). Start goes on
+     to 1-1 (see SuperMarioBros._bootTitle). Everything here is PLACEHOLDER
+     art/text until the real sprites are dropped in. -->
+<style>
+	.title-logo {
+		position: absolute;
+		left: 40px;
+		top: 48px;
+		width: 176px;
+		height: 88px;
+		box-sizing: border-box;
+		border: 4px solid #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		color: #fff;
+		background: rgba(0, 0, 0, 0.35);
+		z-index: 5;
+	}
+	.title-push {
+		position: absolute;
+		left: 0;
+		width: 256px;
+		top: 168px;
+		text-align: center;
+		color: #fff;
+		z-index: 5;
+		animation: title-blink 1s steps(1) infinite;
+	}
+	.title-copy {
+		position: absolute;
+		left: 0;
+		width: 256px;
+		top: 192px;
+		text-align: center;
+		color: #fff;
+		font-size: 8px;
+		z-index: 5;
+	}
+	@keyframes title-blink {
+		50% { visibility: hidden; }
+	}
+</style>
+
+<div class="title-logo">logo<br>placeholder</div>
+<div class="title-push">push start</div>
+<div class="title-copy">placeholder 2026</div>
+
+<air-cloud size="3" x="8" y="10"></air-cloud>
+<air-cloud size="3" x="19" y="12"></air-cloud>
+<vegetation-mountain size="3" x="0"></vegetation-mountain>
+<vegetation-stuff size="5" x="11"></vegetation-stuff>
+<vegetation-mountain size="2" x="16"></vegetation-mountain>
+<scene-floor x="0" width="16"></scene-floor>

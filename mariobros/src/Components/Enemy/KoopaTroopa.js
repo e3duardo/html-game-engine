@@ -40,6 +40,12 @@ class KoopaTroopa extends Enemy {
 		// kills made by this sliding shell since it was kicked - each one
 		// worth more than the last (ShellChainCounter)
 		this._chain = 0;
+		// frame counter and the last frame mario was touching us: a shell is
+		// only kicked by a FRESH touch (SMBDIS keeps a per-enemy collision bit
+		// set while the overlap lasts), so the stomp that made it a shell
+		// doesn't also kick it on the very next tick
+		this._tick = 0;
+		this._lastTouch = -10;
 
 		// where this koopa goes back to on reset() (see SceneBase.resetLevel,
 		// called from Puppet.respawnPlayer)
@@ -73,6 +79,10 @@ class KoopaTroopa extends Enemy {
 		// gravity/ground/wall-turn from WalkingItem.walk() already fits every
 		// state as-is: speedX 0 while sitting as a shell, a full turn-around
 		// off walls while sliding fast - no per-state branching needed here.
+		// a red koopa never walks off a ledge: it turns around at the edge
+		// (the green ones and the goombas just fall)
+		if (this.tag.red && this.state == 'walking') this.turnAtLedge();
+		this._tick++;
 		this.walk();
 
 		// the base art (enemies.png, bgx=6) faces left - mirror it when
@@ -104,6 +114,22 @@ class KoopaTroopa extends Enemy {
 		}
 	};
 
+	// grounded and nothing solid under the foot a step ahead: turn back
+	turnAtLedge = () => {
+		if (this.speedY !== 0 || !this.speedX) return;
+		const dir = this.speedX > 0 ? 1 : -1;
+		const probeX = this.x + this.width / 2 + dir * 6;
+		const feet = this.y + this.height;
+		const supported = Inject.scene.sceneMap.some(
+			(o) =>
+				(o.border.top == 'solid' || o.border.top == 'platform') &&
+				o.x <= probeX &&
+				o.x + o.width > probeX &&
+				Math.abs(o.y - feet) <= 2
+		);
+		if (!supported) this.speedX *= -1;
+	};
+
 	animateWalk = () => {
 		if (this.state == 'walking' || this.state == 'shell-sliding') {
 			this._walkTick++;
@@ -120,6 +146,10 @@ class KoopaTroopa extends Enemy {
 
 		if (this.dead) return;
 		if (!this.isActive()) return;
+
+		const touching = collisions.top || collisions.bottom || collisions.left || collisions.right;
+		const freshTouch = touching && this._tick - this._lastTouch > 1;
+		if (touching) this._lastTouch = this._tick;
 
 		if (from.starPower && (collisions.top || collisions.bottom || collisions.left || collisions.right)) {
 			this.defeatByFire();
@@ -141,15 +171,17 @@ class KoopaTroopa extends Enemy {
 				else from.die();
 			}
 		} else if (this.state == 'shell') {
-			if (landed) {
-				Inject.audio.play(stompSound);
-				from.speedY = -4; // bounce off the stationary shell, same as any stomp (halved, tied to Game.fps)
-			} else if (collisions.left || collisions.right) {
+			// SMBDIS: ANY fresh touch of a stationary shell - from above too -
+			// kicks it away from mario (no bounce)
+			if (freshTouch && (landed || collisions.left || collisions.right || collisions.top)) {
 				Inject.audio.play(kickkillSound);
 				this.awardKick(from);
 				this.kick(from.x < this.x ? 1 : -1);
 			}
 		} else if (this.state == 'shell-sliding') {
+			// same fresh-touch rule: the overlap left over from the kick itself
+			// must not read as a stomp / a hit
+			if (!freshTouch) return;
 			if (landed) {
 				Inject.audio.play(stompSound);
 				this.stop();
@@ -235,6 +267,7 @@ class KoopaTroopa extends Enemy {
 	};
 
 	becomeShell = (from) => {
+		this._lastTouch = this._tick;
 		this.state = 'shell';
 		this._shellTicks = 0;
 		this.speedX = 0;

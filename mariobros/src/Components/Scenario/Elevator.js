@@ -90,9 +90,17 @@ class Elevator extends Collidable {
 			this._swaySpeed = 0;
 		} else if (this.motion === 'slide') {
 			this._originLeft = this.tag.offsetLeft;
+			// `wake` (tiles): wake up when the screen nears THIS column instead of
+			// our own, so a pair of platforms starts in lockstep
+			this._wakeLeft = tag.wake >= 0 ? tag.wake * 16 : this._originLeft;
 			this._left = this._originLeft;
 			this._frame = 0;
-			this._primary = 0;
+			// the primary counter is NOT cleared on spawn (InitHoriPlatform only
+			// zeroes the secondary one): it keeps what the object slot held, so
+			// phase 0 starts going right and 2 going left. 1-3's two neighbouring
+			// platforms end up in opposite phases.
+			this._phase = Number(tag.phase) || 0;
+			this._primary = this._phase;
 			this._secondary = 0;
 			// how far the platform moved this tick - carries mario along,
 			// see collide()
@@ -113,7 +121,7 @@ class Elevator extends Collidable {
 		// right, instead of at a phase that depends on how long the level has
 		// been running
 		if (!this._awake) {
-			if (Inject.scene.scroll_x + Inject.stage.width + LIFT_WAKE_AHEAD < this._originLeft) return;
+			if (Inject.scene.scroll_x + Inject.stage.width + LIFT_WAKE_AHEAD < this._wakeLeft) return;
 			this._awake = true;
 		}
 		this._frame++;
@@ -182,7 +190,7 @@ class Elevator extends Collidable {
 		if (this.motion === 'slide') {
 			this._left = this._originLeft;
 			this._frame = 0;
-			this._primary = 0;
+			this._primary = this._phase;
 			this._secondary = 0;
 			this._dx = 0;
 			this.tag.style.left = this._left + 'px';
@@ -208,6 +216,8 @@ class Elevator extends Collidable {
 			speed: 0.9375,
 			direction: 1,
 			motion: 'lift',
+			phase: 0,
+			wake: -1,
 			render: (tag) => {
 				tag.classList += 'Collidable';
 				tag.style.position = 'absolute';

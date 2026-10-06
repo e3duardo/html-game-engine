@@ -28,6 +28,7 @@ import DebugTeleport from './Components/UI/DebugTeleport';
 import TouchControls from './Components/UI/TouchControls';
 import GameOverScreen from './Components/Screen/GameOver';
 import WorldIntro from './Components/Screen/WorldIntro';
+import Title from './Stage/Title';
 
 import Goomba from './Components/Enemy/Goomba';
 import KoopaTroopa from './Components/Enemy/KoopaTroopa';
@@ -77,6 +78,12 @@ import Pole from './Components/Scenario/Pole';
 import Bridge from './Components/Scenario/Bridge';
 import Portal from '~/engine/src/Portal';
 import pauseSound from '../sounds/pause.wav';
+
+// SMBDIS GameTimerCtrlTimer: the HUD clock drops one unit every 24 frames (NES
+// ~60.0988 fps), not every second; the world card lasts 161 frames
+const NES_FPS = 60.0988;
+const GAME_CLOCK_MS = (24 * 1000) / NES_FPS;
+const WORLD_INTRO_MS = (161 * 1000) / NES_FPS;
 
 class SuperMarioBros extends Game {
 	constructor() {
@@ -162,10 +169,9 @@ class SuperMarioBros extends Game {
 		Inject.audio.mute = false;
 
 		Inject.hud = new Hud();
-		// Start toggles pause once the first Start (which leaves the title
-		// screen) has already happened
+		// Start toggles pause (a no-op on the title screen: no puppet there)
 		Inject.events.subscribe((event) => {
-			if (event.type === 'key' && event.data.key === 'start' && event.data.pressed && this._pressedStartOnce) {
+			if (event.type === 'key' && event.data.key === 'start' && event.data.pressed) {
 				this.togglePause();
 			}
 		});
@@ -209,15 +215,10 @@ class SuperMarioBros extends Game {
 			if (Inject.hud.time <= 0 && !Inject.puppet.dying) {
 				Inject.puppet.die();
 			}
-		}, 1000);
+		}, GAME_CLOCK_MS);
 
 		console.log('super mario bros');
 
-		// gates only the very first play() call behind a Start press, same
-		// as the original's title screen - see play() below. Every respawn
-		// after that auto-continues with no Start needed, same as the
-		// original (Start only gates the title screen, not a mid-game death).
-		this._pressedStartOnce = false;
 		// set true by _bootScene, right before a stage that opens on a
 		// scripted cutscene (see Inject.scene.opensWithCutscene) - consumed
 		// once by _startGameAfterIntro and cleared, so a mid-level respawn
@@ -231,6 +232,7 @@ class SuperMarioBros extends Game {
 		// route is already in location.hash (or '1-1' by default) and drives
 		// the very first _bootScene()/play() call itself - see index.js,
 		// which no longer calls play() directly.
+		Inject.router.register('title', `${import.meta.env.BASE_URL}scenes/title.html`, () => this._bootTitle());
 		Inject.router.register('1-1', `${import.meta.env.BASE_URL}scenes/1-1.html`, (name) =>
 			this._bootScene(World1, name)
 		);
@@ -323,26 +325,34 @@ class SuperMarioBros extends Game {
 
 	play() {
 		Inject.hud.showIntro(Inject.puppet.lives);
+		this._startGameAfterIntro();
+	}
 
-		if (this._pressedStartOnce) {
-			this._startGameAfterIntro();
-			return;
-		}
-
-		// first boot only: the original sits on its title screen until
-		// Start is pressed - stay stuck on this same black screen until
-		// Enter is pressed once.
+	// the "/" route (no hash): the title screen, a static scene with no
+	// puppet and no game loop. Start moves on to 1-1; opening a level's own
+	// route directly skips it.
+	_bootTitle() {
+		this.newGame();
+		if (Inject.puppet) Inject.puppet.destroy();
+		Inject.puppet = null;
+		ToadMessage.hide();
+		WorldIntro.hide();
+		Inject.audio.stopBackground();
+		Inject.hud.introShowing = true;
+		Inject.hud.stage = 11;
+		Inject.hud.time = 0;
+		Inject.scene = new Title();
 		const unsubscribe = Inject.events.subscribe((event) => {
 			if (event.type === 'key' && event.data.key === 'start' && event.data.pressed) {
 				unsubscribe();
-				this._pressedStartOnce = true;
-				this._startGameAfterIntro();
+				Inject.router.goTo('1-1');
 			}
 		});
 	}
 
-	// same ~2000ms gap the original has between Start being accepted and Mario
-	// actually gaining control, whether that's the title screen (first
+	// the original's gap between Start being accepted and Mario actually gaining
+	// control: measured on the real ROM, 161 frames (Start at frame 116, Mario
+	// back on screen at 279), whether that's the title screen (first
 	// boot) or a mid-game respawn - see play() above.
 	_startGameAfterIntro() {
 		setTimeout(() => {
@@ -359,7 +369,7 @@ class SuperMarioBros extends Game {
 				this._openingCutscenePending = false;
 				Inject.scene.openingCutscene();
 			}
-		}, 2000);
+		}, WORLD_INTRO_MS);
 	}
 
 	// only the final death (lives hits 0, Game Over screen shown) gets the
