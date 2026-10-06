@@ -42,7 +42,9 @@ class Router {
 		const html = await fetch(route.fragment).then((response) => response.text());
 		document.querySelector('.Scene').innerHTML = html;
 		this.current = name;
-		if (this._hashRoute() !== name) window.location.hash = name;
+		// the default route lives at the bare "/" (no hash) instead of #name
+		const wanted = name === this.defaultRoute ? '' : name;
+		if (this._hashRoute() !== wanted) window.location.hash = wanted;
 		route.onLoad(name);
 	}
 }
