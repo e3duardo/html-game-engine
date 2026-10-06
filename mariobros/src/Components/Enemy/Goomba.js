@@ -1,6 +1,7 @@
 import Collidable from '~/engine/src/Collidable';
 import Enemy from '~/engine/src/Enemy';
 import Inject from '~/engine/src/Inject';
+import { knockOff, stepKnockedOff, resetKnockOff } from '../../knockOff';
 import Assets from '../Assets';
 import kickkillSound from '../../../sounds/kickkill.wav';
 import stompSound from '../../../sounds/stompswim.wav';
@@ -28,6 +29,7 @@ class Goomba extends Enemy {
 	}
 
 	update = () => {
+		if (this.knocked) return stepKnockedOff(this);
 		if (this.dead) return;
 		if (!this.isActive()) return;
 
@@ -66,6 +68,7 @@ class Goomba extends Enemy {
 	};
 
 	reset = () => {
+		resetKnockOff(this);
 		this.dead = false;
 		this.activated = false;
 		this.speedX = -this.walkSpeed;
@@ -93,12 +96,17 @@ class Goomba extends Enemy {
 
 	// killed by a fireball instead of a stomp - same death, just no bounce
 	// to give mario (see Fireball.js, which calls this on any enemy it touches)
-	defeatByFire = () => {
-		this.die();
+	defeatByFire = (points = 100) => {
+		if (this.dead) return;
+		knockOff(this);
 		Inject.audio.play(kickkillSound);
-		Inject.hud.addScore(100);
-		Inject.hud.showScorePopup(this.tag, '100');
+		Inject.hud.addScore(points);
+		Inject.hud.showScorePopup(this.tag, String(points));
 	};
+
+	// a block hit from underneath while this stood on top of it
+	// (SMBDIS: "award 100 points for hitting block beneath enemy")
+	bumpedFromBelow = () => this.defeatByFire(100);
 
 	die = () => {
 		if (this.dead) return;
@@ -154,6 +162,10 @@ class Goomba extends Enemy {
 						}
 						enemy-goomba.frame-1 .m{
 							background-position: -${(bgx + 1) * 16}px -${bgy * 16}px;
+						}
+						/* killed by fire/star/block: flipped over while it falls */
+						enemy-goomba.knocked .m{
+							transform: scaleY(-1);
 						}
 						enemy-goomba.squished .m{
 							background-position: -${(bgx + 2) * 16}px -${bgy * 16}px;

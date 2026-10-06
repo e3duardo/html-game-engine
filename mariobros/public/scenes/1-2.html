@@ -1,10 +1,9 @@
-<!-- <div
-style="position: absolute; left: 256px; bottom: -240px; width: 3072px; height: 720px; opacity: 0.5; background-image: url('SMB_World_1-2_NES_level_map.webp'); background-repeat: no-repeat; pointer-events: none; z-index: 1000"
-></div> -->
+<debug-background src="SMB_World_1-2_NES_level_map.webp" x="256" width="3072" height="720" bottom="-240"></debug-background>
+<debug-grid></debug-grid>
 
 <!-- Pipe and castle - INIT -->
 
-<player-mario x="2" y="12"></player-mario>
+<player-mario x="2.5" y="12"></player-mario>
 
 
 <air-cloud size="4" x="3" y="10"></air-cloud>
@@ -63,7 +62,7 @@ style="position: absolute; left: 256px; bottom: -240px; width: 3072px; height: 7
 
      <game-portal x="19" y="16" warp-id="exit-b" lock-scroll-x="240"></game-portal>
 
-     <item-question x="26" y="5" mushroom="true"></item-question>
+     <item-question x="26" y="5" powerup="true"></item-question>
      <item-question x="27" y="5"></item-question>
      <item-question x="28" y="5"></item-question>
      <item-question x="29" y="5"></item-question>
@@ -209,7 +208,7 @@ style="position: absolute; left: 256px; bottom: -240px; width: 3072px; height: 7
      <item-brick x="84" y="11" line="false"></item-brick>
 
      <item-brick x="85" y="5" line="false"></item-brick>
-     <item-brick x="85" y="6" line="false" mushroom="true"></item-brick>
+     <item-brick x="85" y="6" line="false" powerup="true"></item-brick>
      <item-brick x="85" y="10" line="false"></item-brick>
      <item-brick x="85" y="11" line="false"></item-brick>
 
@@ -565,7 +564,7 @@ style="position: absolute; left: 256px; bottom: -240px; width: 3072px; height: 7
      <item-brick x="102" y="12" line="false"></item-brick>
      <item-brick x="103" y="12" line="false"></item-brick>
      <item-brick x="104" y="12" line="false"></item-brick>
-     <item-brick x="105" y="12" line="false" mushroom="true"></item-brick>
+     <item-brick x="105" y="12" line="false" life="true"></item-brick>
      <item-brick x="106" y="12" line="false"></item-brick>
      <item-brick x="107" y="12" line="false"></item-brick>
      <item-brick x="108" y="12" line="false"></item-brick>
@@ -622,24 +621,16 @@ style="position: absolute; left: 256px; bottom: -240px; width: 3072px; height: 7
      <scene-floor x="161" width="8" tileset="underground"></scene-floor>
      <scene-floor x="176" width="32" tileset="underground"></scene-floor>
 
-     <!-- 2 vertical lifts (não é ponte horizontal - sobe/desce no lugar),
-          um em cada buraco de 7 tiles. y=3 é a ponta baixa do trajeto
-          (descolado do chão - topo em y=4, 2 tiles acima do chão dos dois
-          lados); travel=5 -> a ponta alta fica em y=8. Largura 4 tiles
-          (ver Elevator.js) - ajustar quando trocar sprite.
-          Como nos lifts verticais reais do SMB1, cada um viaja
-          continuamente numa única direção
-          fixa e recicla pra outra ponta do trajeto ao chegar no fim -
-          nunca quica entre as duas pontas. direction="1" = sobe sem
-          parar; direction="-1" = desce sem parar. Opostos entre os dois
-          lifts (em vez dos dois com o mesmo default) para que, em
-          qualquer instante, pelo menos um dos dois esteja disponível
-          perto do meio do buraco para o jogador atravessar. -->
-     <scenario-elevator x="155.7" width="3" y="7" travel="5" direction="1"></scenario-elevator>
-     <scenario-elevator x="155.7" width="3" y="1" travel="5" direction="1"></scenario-elevator>
+     <!-- the 4 lifts over the pit, from SMBDIS's 1-2 enemy data: ids $27 (down)
+          at rows 7 and 13, then $26 (up) at rows 1 and 9 - each pair 128 or 96px
+          apart so one is always passing. y = the lift's starting bottom in
+          tiles (240 - row*16 - 16); they only start moving once the screen
+          gets near, and wrap off screen at the bottom (see Elevator.js) -->
+     <scenario-elevator x="155.7" width="3" y="7" direction="-1"></scenario-elevator>
+     <scenario-elevator x="155.7" width="3" y="1" direction="-1"></scenario-elevator>
 
-     <scenario-elevator x="170.7" width="3" y="4.5" travel="5" direction="-1"></scenario-elevator>
-     <scenario-elevator x="170.7" width="3" y="-3.5" travel="5" direction="-1"></scenario-elevator>
+     <scenario-elevator x="170.7" width="3" y="13" direction="1"></scenario-elevator>
+     <scenario-elevator x="170.7" width="3" y="5" direction="1"></scenario-elevator>
 
      <!-- end playable scene 1-2 -->
 </div>

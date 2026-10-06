@@ -1,5 +1,7 @@
 import Collidable from '~/engine/src/Collidable';
 import Assets from '../Assets';
+import brickSound from '../../../sounds/brick.wav';
+import Inject from '~/engine/src/Inject';
 
 class  Bridge extends Collidable {
 	static tagName = 'scene-bridge';
@@ -8,6 +10,24 @@ class  Bridge extends Collidable {
 		super(tag);
 		this.setKind('solid');
 	}
+
+	// SMBDIS RemoveBridge: the axe takes the bridge out one tile at a time
+	// from the far (axe) end, one every 4 frames, each with a crack
+	collapse = (onDone) => {
+		const tiles = Array.from(this.tag.querySelectorAll('.m'));
+		const interval = setInterval(() => {
+			const tile = tiles.pop();
+			if (!tile) {
+				clearInterval(interval);
+				onDone();
+				return;
+			}
+			tile.style.visibility = 'hidden';
+			this.tag.style.width = tiles.length * 16 + 'px';
+			this.invalidateBox();
+			Inject.audio.play(brickSound);
+		}, 4 * Inject.game.tickInterval);
+	};
 
 	static setupWebComponent() {
 		const { tagName } = this;

@@ -54,6 +54,15 @@ class Mario extends Object {
 							left: 0;
 						}
 
+						/* grow/shrink animation (see Puppet._freezeForSizeChange): the
+						   drawn pose changes size inside a fixed-size box, so anchor it
+						   to the feet. TODO: pose 1 (the in-between size) is just the big
+						   sprite for now - swap in its own frame when it's on the sheet. */
+						player-mario.sizing .m{ top: auto; bottom: 0; }
+						/* big mario crouching has a 16px box (see Puppet.syncCrouch): his
+						   32px crouch sprite hangs from the feet, not the head */
+						player-mario.crouch-box .m{ top: auto; bottom: 0; }
+
 						player-mario.right .m,
 						player-mario.lookup-right .m,
 						player-mario.lower-right .m{ background-position: -83px -34px; }
@@ -64,8 +73,22 @@ class Mario extends Object {
 						player-mario.jumping-right .m,
 						player-mario.falling-right .m{ background-position: -169px -34px; }
 
-						player-mario.skid-right .m,
-						player-mario.skid-left .m{ background-position: -183px -34px; width: 14px; }
+						player-mario.skid-right .m{ background-position: -149px -34px; width: 14px; transform: scaleX(-1); }
+						player-mario.skid-left .m{ background-position: -149px -34px; width: 14px; }
+
+						/* flagpole slide (see Puppet.winLevel): climb frames, hands on the pole */
+						player-mario.climb-right-0 .m{ background-position: -201px -34px; width: 14px; height: 16px; }
+						player-mario.climb-left-0 .m{ background-position: -201px -34px; width: 14px; height: 16px; transform: scaleX(-1); }
+						player-mario.climb-right-1 .m{ background-position: -218px -34px; width: 14px; height: 16px; }
+						player-mario.climb-left-1 .m{ background-position: -218px -34px; width: 14px; height: 16px; transform: scaleX(-1); }
+						player-mario.big-climb-right-0 .m{ background-position: -201px -1px; width: 14px; height: 32px; }
+						player-mario.big-climb-left-0 .m{ background-position: -201px -1px; width: 14px; height: 32px; transform: scaleX(-1); }
+						player-mario.big-climb-right-1 .m{ background-position: -148px -1px; width: 16px; height: 32px; }
+						player-mario.big-climb-left-1 .m{ background-position: -148px -1px; width: 16px; height: 32px; transform: scaleX(-1); }
+						player-mario.fire-climb-right-0 .m{ background-position: -201px -129px; width: 14px; height: 32px; }
+						player-mario.fire-climb-left-0 .m{ background-position: -201px -129px; width: 14px; height: 32px; transform: scaleX(-1); }
+						player-mario.fire-climb-right-1 .m{ background-position: -148px -129px; width: 16px; height: 32px; }
+						player-mario.fire-climb-left-1 .m{ background-position: -148px -129px; width: 16px; height: 32px; transform: scaleX(-1); }
 
 						player-mario.left .m,
 						player-mario.lookup-left .m,
@@ -95,8 +118,8 @@ class Mario extends Object {
 						player-mario.big-jumping-right .m,
 						player-mario.big-falling-right .m{ background-position: -165px -1px; width: 16px; height: 32px; }
 
-						player-mario.big-skid-right .m,
-						player-mario.big-skid-left .m{ background-position: -218px -1px; width: 14px; height: 32px; }
+						player-mario.big-skid-right .m{ background-position: -148px -1px; width: 16px; height: 32px; }
+						player-mario.big-skid-left .m{ background-position: -148px -1px; width: 16px; height: 32px;  transform: scaleX(-1);}
 
 						player-mario.big-left .m,
 						player-mario.big-lookup-left .m{ background-position: -80px -1px; width: 16px; height: 32px; transform: scaleX(-1); }
@@ -124,8 +147,8 @@ class Mario extends Object {
 						player-mario.fire-jumping-right .m,
 						player-mario.fire-falling-right .m{ background-position: -165px -129px; width: 16px; height: 32px; }
 
-						player-mario.fire-skid-right .m,
-						player-mario.fire-skid-left .m{ background-position: -218px -129px; width: 14px; height: 32px; }
+						player-mario.fire-skid-right .m{ background-position: -148px -129px; width: 16px; height: 32px; }
+						player-mario.fire-skid-left .m{ background-position: -148px -129px; width: 16px; height: 32px;  transform: scaleX(-1);}
 
 						player-mario.fire-left .m,
 						player-mario.fire-lookup-left .m{ background-position: -80px -129px; width: 16px; height: 32px; transform: scaleX(-1); }
@@ -152,6 +175,20 @@ class Mario extends Object {
 							25% { filter: hue-rotate(90deg) saturate(3); }
 							50% { filter: hue-rotate(180deg) saturate(3); }
 							75% { filter: hue-rotate(270deg) saturate(3); }
+						}
+
+						/* fire flower: SMBDIS cycles mario's palette through its 4
+						   variants while the transformation freeze runs (see
+						   Puppet._freezeForSizeChange) - a quicker hue cycle gets the
+						   same flash without new sprites */
+						player-mario.power-flash .m{
+							animation: power-flash-cycle .133s steps(1) infinite;
+						}
+						@keyframes power-flash-cycle{
+							0% { filter: none; }
+							25% { filter: hue-rotate(60deg) saturate(2); }
+							50% { filter: hue-rotate(180deg) saturate(2); }
+							75% { filter: brightness(0.35); }
 						}
 
 						/* brief grace period after getting hit while big/fire and

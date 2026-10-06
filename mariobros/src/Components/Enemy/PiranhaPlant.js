@@ -80,7 +80,7 @@ class PiranhaPlant extends Enemy {
 				// fully retracted - only start rising once mario is far
 				// enough away not to get a cheap sneak hit
 				const distance = Math.abs(Inject.puppet.x - this.x);
-				if (distance > SAFE_DISTANCE) this._direction = 1;
+				if (distance >= SAFE_DISTANCE) this._direction = 1;
 				else return;
 			} else {
 				// fully risen - always retracts next, no distance check
@@ -107,8 +107,7 @@ class PiranhaPlant extends Enemy {
 		super.collide(from, collisions);
 
 		if (this.dead || !this.emerged) return;
-		const touching = collisions.top || collisions.bottom || collisions.left || collisions.right;
-		if (!touching) return;
+		if (!this.touches(from)) return;
 
 		if (from.starPower) {
 			this.defeatByFire();
@@ -122,14 +121,51 @@ class PiranhaPlant extends Enemy {
 		else from.die();
 	};
 
+	// SMBDIS BoundBoxCtrlData: the plant's own box (ctrl $09) is only 10px
+	// wide (3px in from each side) and a 6px band (rows 14..20) of the
+	// sprite, measured from its current top - not the whole 16x32 tag. And
+	// mario's isn't his whole sprite either: small = 10px wide and the
+	// lower 12px (ctrl $01: x 3..13, y 4..16 of the sprite), big = x 2..14,
+	// y 8..32 (ctrl $00), a crouching big mario only y 20..32 (ctrl $02).
+	// Touching edges count as a hit, like the original's >= compares.
+	touches = (from) => {
+		let left = 3;
+		let right = 13;
+		let top = 4;
+		let bottom = 16;
+		if (from.height > 16) {
+			left = 2;
+			right = 14;
+			top = from.crouching ? 20 : 8;
+			bottom = 32;
+		}
+		return this.touchesBox(from.ax + left, from.ay + top, from.ax + right, from.ay + bottom);
+	};
+
+	// the plant's box against any other box, absolute px
+	touchesBox = (left, top, right, bottom) => {
+		const spriteTop = this.y + (RISE_DISTANCE - this._offset);
+		return (
+			left <= this.x + 13 &&
+			right >= this.x + 3 &&
+			top <= spriteTop + 20 &&
+			bottom >= spriteTop + 14
+		);
+	};
+
+	// Fireball.js asks enemies that have their own box (instead of the whole
+	// tag) through this - BoundBoxCtrlData ctrl $07, the fireball's own 8x8
+	hitByFireball = (fireball) =>
+		this.touchesBox(fireball.x, fireball.y, fireball.x + 8, fireball.y + 8);
+
 	// killed by a fireball or star touch, same as any other basic enemy -
 	// see Fireball.js, which calls this on any enemy it touches
 	defeatByFire = () => {
 		if (this.dead) return;
 		this.dead = true;
 		Inject.audio.play(kickkillSound);
-		Inject.hud.addScore(100);
-		Inject.hud.showScorePopup(this.tag, '100');
+		Inject.hud.addScore(200);
+		Inject.hud.showScorePopup(this.tag, '200');
 		this.tag.remove();
 	};
 

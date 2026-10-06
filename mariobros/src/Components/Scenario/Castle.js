@@ -11,6 +11,15 @@ const m22 = `background-position: ${-12 * 16}px ${-1 * 16}px`;
 const m23 = `background-position: ${-13 * 16}px ${-1 * 16}px`;
 const m24 = `background-position: ${-14 * 16}px ${-1 * 16}px`;
 
+// SMBDIS StarFlagObject: its top Y goes from $90 (144) up to $72 (114), and a
+// one-tile castle's roof is at 128 - so it starts 16px below the roof and ends
+// 14px above it (bumped to 17 to match the reference: css bottom 81). Kept relative to the castle's own top so a tall castle
+// (size 2) gets the same motion. The sprite cell is FLAG_HEIGHT tall with the
+// flag art at its top (16 for a one-tile flag, 32 for a two-tile one).
+const FLAG_START_BELOW_ROOF = 16;
+const FLAG_END_ABOVE_ROOF = 17;
+const FLAG_HEIGHT = 16;
+
 export const Castle = {
 	size: 1,
 	x: 0,
@@ -26,6 +35,9 @@ export const Castle = {
 		tag.style.bottom = tag.y * 16 + 'px';
 
 		let center = tag.size >= 2 ? 2 : 0;
+		// css `bottom` (from the castle's own bottom edge) of the flag when its
+		// top is `below` px under the roof (negative: above it)
+		const flagBottom = (below) => height - below - FLAG_HEIGHT;
 
 		return Object.html`
   		<style>
@@ -39,6 +51,27 @@ export const Castle = {
 				position: absolute;
 				width: 16px;
 				height: 16px;
+			}
+			/* the flag the castle raises once a level is cleared (SMBDIS's star
+			   flag): starts tucked behind the battlements (.g stacks above it)
+			   and rises up past the roof - see castleCelebration.js. TODO: swap
+			   the placeholder pennant for the real tile. */
+			/* position comes from per-castle custom properties set inline on
+			   the element (this <style> block is global - one castle's own
+			   values here would win for every castle on the page) */
+			building-castle .star-flag{
+				position: absolute;
+				z-index: 0;
+				bottom: var(--flag-start);
+				width: 16px;
+				height: ${FLAG_HEIGHT}px;
+				background-image: url('${Assets.items}');
+				background-position: -${8 * 16}px -${0 * 16}px;
+				background-repeat: no-repeat;
+				transition: bottom 0.5s linear;
+			}
+			building-castle .star-flag.raised{
+				bottom: var(--flag-end);
 			}
 		</style>
 		<div class="g">
@@ -130,6 +163,7 @@ export const Castle = {
 				<div class="m" style="top: ${16 * 10}px; left: ${16 * 8}px; ${m13};"></div>
 			` : ''}
 		</div>
+		<div class="star-flag" style="left: ${16 * (center + 2)}px; --flag-start: ${flagBottom(FLAG_START_BELOW_ROOF)}px; --flag-end: ${flagBottom(-FLAG_END_ABOVE_ROOF)}px"></div>
   `;
 	},
 };

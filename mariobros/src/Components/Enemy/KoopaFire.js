@@ -15,10 +15,9 @@ const FLIP_TICKS = 2;
 // top-left corner
 const HIT = { left: 6, top: 4, right: 10, bottom: 8 };
 
-// Bowser's flame, as a plain enemy for now - flies left from wherever it's
-// placed, hurts on touch, and goes away once it leaves the screen. Bowser
-// itself (spawn from his mouth, the Y-target wobble towards FlameYPosData)
-// isn't modelled yet.
+// Bowser's flame - flies left from wherever it's placed, hurts on touch, and
+// goes away once it leaves the screen. See KoopaFireSpawner.js for what
+// stands in for Bowser's mouth until Bowser exists.
 class KoopaFire extends Enemy {
 	static tagName = 'enemy-koopa-fire';
 
@@ -26,6 +25,11 @@ class KoopaFire extends Enemy {
 		super(tag);
 
 		this.speedX = 0;
+		// optional (px, top-left origin): when set, the flame drifts 1px per
+		// tick towards this height while it flies left, stopping once it's
+		// exactly there - what a flame spawned from Bowser's mouth does
+		// (ProcBowserFlame / FlameYPosData). Left null, it flies level.
+		this.targetY = null;
 		this._tick = 0;
 		this.defaultX = this.x;
 		this.defaultY = this.y;
@@ -41,6 +45,9 @@ class KoopaFire extends Enemy {
 		}
 
 		this.x = this.x - SPEED;
+		if (this.targetY !== null && this.y !== this.targetY) {
+			this.y = this.y + Math.sign(this.targetY - this.y);
+		}
 
 		this._tick++;
 		if (this._tick >= FLIP_TICKS) {
@@ -99,7 +106,7 @@ class KoopaFire extends Enemy {
 			render: (tag) => {
 				tag.classList += 'Collidable';
 				tag.style.position = 'absolute';
-				tag.style.width = '16px';
+				tag.style.width = '32px';
 				tag.style.height = '8px';
 				tag.style.left = tag.x * 16 + 'px';
 				tag.style.bottom = tag.y * 16 + 'px';
@@ -112,10 +119,11 @@ class KoopaFire extends Enemy {
 							position: absolute;
 							left: 0;
 							top: 0;
-							width: 16px;
+							width: 32px;
 							height: 8px;
-							border-radius: 60% 20% 20% 60% / 50%;
-							background: linear-gradient(90deg, #fc7460, #fcbcb0 60%, #fff);
+							background-image: url('${Assets.items}');
+							background-position: -${6 * 16}px -${8 * 16}px;
+							background-repeat: no-repeat;
 						}
 						${tagName}.flip .m {
 							transform: scaleY(-1);

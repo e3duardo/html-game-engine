@@ -1,4 +1,5 @@
 import Collidable from '~/engine/src/Collidable';
+import Inject from '~/engine/src/Inject';
 import Assets from '../Assets';
 
 // a platform that rises/falls on a fixed vertical track. Unlike the
@@ -8,6 +9,24 @@ import Assets from '../Assets';
 // CURRENT y every tick (this.ay = object.y - this.height), so he follows
 // it up/down for free as long as `platform` (one-way solid, not `solid`)
 // lets him land on top in the first place.
+const SWAY_HALF_TRAVEL = 64;
+const SWAY_ACCEL = 5 / 256;
+const SWAY_MAX_SPEED = 3;
+const SLIDE_MAX_COUNTER = 14;
+
+// SMBDIS PlatLiftUp / PlatLiftDown (ids $26 / $27, the lifts across 1-2's
+// pit): speed $ff (-1) or $00 with a 16/256 or 240/256 move force per frame,
+// i.e. 0.9375 px/frame either way. The Y position is one byte, so a lift that
+// leaves the top of the 256px-tall coordinate space comes back in at the
+// bottom - the "teleport" happens while it's off screen (below the 240px
+// stage), never in view. Objects in the original only exist once the screen
+// gets near them, which is why they all start from their data position when
+// you arrive - LIFT_WAKE_AHEAD mirrors the 48px spawn margin.
+const LIFT_SPEED = 0.9375;
+const LIFT_WRAP = 256;
+const LIFT_TOP = 224; // platform bottom (css) when its top touches y=0
+const LIFT_WAKE_AHEAD = 48;
+
 class Elevator extends Collidable {
 
 	static tagName = 'scenario-elevator';
@@ -49,18 +68,129 @@ class Elevator extends Collidable {
 		// A descending lift starts at the high end so it falls right away
 		// instead of visibly teleporting there on its first tick.
 		this.bottomPos = this.direction === 1 ? this.trackLow : this.trackHigh;
+		this._liftStart = this.trackLow;
+		this._awake = false;
 		this.tag.style.bottom = this.bottomPos + 'px';
+
+		// 'lift' (default): the continuous one-way lift above. The other two
+		// are the 1-3 platforms (SMBDIS ids $25 / $28):
+		// 'sway' - YMovingPlatform: starts at its top, speeds up and slows
+		//   down around a centre 64px below (swinging 128px in total, 5/256
+		//   px/frame^2, max 3px/frame), forever - a slow bob.
+		// 'slide' - XMovingPlatform: starts at its origin and slides 52px
+		//   to the right and back, speeding up and down in steps (see slide()).
+		this.motion = tag.motion;
+		if (this.motion === 'lift') {
+			// starts exactly where its `y` puts it, whichever way it goes
+			this.bottomPos = this.trackLow;
+			this.tag.style.bottom = this.bottomPos + 'px';
+		}
+		if (this.motion === 'sway') {
+			this._swayCenter = this.bottomPos - SWAY_HALF_TRAVEL;
+			this._swaySpeed = 0;
+		} else if (this.motion === 'slide') {
+			this._originLeft = this.tag.offsetLeft;
+			this._left = this._originLeft;
+			this._frame = 0;
+			this._primary = 0;
+			this._secondary = 0;
+			// how far the platform moved this tick - carries mario along,
+			// see collide()
+			this._dx = 0;
+		}
 	}
 
-	update = () => {
-		if (this.direction === 1) {
-			this.bottomPos += this.speed;
-			if (this.bottomPos > this.trackHigh) this.bottomPos = this.trackLow;
-		} else {
-			this.bottomPos -= this.speed;
-			if (this.bottomPos < this.trackLow) this.bottomPos = this.trackHigh;
+	// MoveWithXMCntrs / XMoveCntr_Platform: every 4th frame the secondary
+	// counter steps 0 -> 14 and back (the primary counter counts those
+	// phases: even = rising, odd = falling), and every frame the platform
+	// moves counter/16 px - RIGHT while the primary's bit 1 is clear (Y=1 /
+	// moving dir 1 in MoveWithXMCntrs), left once it's set (counter negated,
+	// dir 2). It starts at primary 0, so it goes right first: out 52px to the
+	// right of its origin, then back to it.
+	slide = () => {
+		// counters are zeroed when the object spawns (InitVStf), i.e. when the
+		// screen gets close - so every arrival finds it at its origin, going
+		// right, instead of at a phase that depends on how long the level has
+		// been running
+		if (!this._awake) {
+			if (Inject.scene.scroll_x + Inject.stage.width + LIFT_WAKE_AHEAD < this._originLeft) return;
+			this._awake = true;
 		}
+		this._frame++;
+		if (this._frame % 4 === 0) {
+			if (this._primary & 1) {
+				if (this._secondary === 0) this._primary++;
+				else this._secondary--;
+			} else if (this._secondary === SLIDE_MAX_COUNTER) {
+				this._primary++;
+			} else {
+				this._secondary++;
+			}
+		}
+		const sign = this._primary & 2 ? -1 : 1;
+		this._dx = (sign * this._secondary) / 16;
+		this._left += this._dx;
+		this.tag.style.left = this._left + 'px';
+	};
+
+	sway = () => {
+		// speed/force are zeroed at spawn (InitVStf) - same wake-up as slide
+		if (!this._awake) {
+			if (Inject.scene.scroll_x + Inject.stage.width + LIFT_WAKE_AHEAD < this.tag.offsetLeft) return;
+			this._awake = true;
+		}
+		this._swaySpeed += this.bottomPos > this._swayCenter ? -SWAY_ACCEL : SWAY_ACCEL;
+		this._swaySpeed = Math.max(-SWAY_MAX_SPEED, Math.min(SWAY_MAX_SPEED, this._swaySpeed));
+		this.bottomPos += this._swaySpeed;
 		this.tag.style.bottom = this.bottomPos + 'px';
+	};
+
+	// anything standing on the platform rides along with a slide
+	collide = (from, collisions) => {
+		if (this.motion === 'slide' && collisions.bottom && this._dx) from.ax += this._dx;
+	};
+
+	update = () => {
+		if (this.motion === 'sway') return this.sway();
+		if (this.motion === 'slide') return this.slide();
+		this.lift();
+	};
+
+	// the lifts only start moving once the screen is close enough to spawn
+	// them (see LIFT_WAKE_AHEAD), so each arrival finds them at their data
+	// positions instead of at a phase that depends on how long the level has
+	// been running
+	lift = () => {
+		if (!this._awake) {
+			if (Inject.scene.scroll_x + Inject.stage.width + LIFT_WAKE_AHEAD < this.tag.offsetLeft) return;
+			this._awake = true;
+		}
+		this.bottomPos += this.direction * LIFT_SPEED;
+		// one-byte Y wrap, off screen at the bottom
+		if (this.bottomPos > LIFT_TOP) this.bottomPos -= LIFT_WRAP;
+		else if (this.bottomPos < LIFT_TOP - LIFT_WRAP) this.bottomPos += LIFT_WRAP;
+		this.tag.style.bottom = this.bottomPos + 'px';
+	};
+
+	reset = () => {
+		this._awake = false;
+		if (this.motion === 'sway') {
+			this.bottomPos = this._swayCenter + SWAY_HALF_TRAVEL;
+			this._swaySpeed = 0;
+			this.tag.style.bottom = this.bottomPos + 'px';
+		}
+		if (this.motion === 'slide') {
+			this._left = this._originLeft;
+			this._frame = 0;
+			this._primary = 0;
+			this._secondary = 0;
+			this._dx = 0;
+			this.tag.style.left = this._left + 'px';
+		}
+		if (this.motion === 'lift') {
+			this.bottomPos = this._liftStart;
+			this.tag.style.bottom = this.bottomPos + 'px';
+		}
 	};
 
 	static setupWebComponent() {
@@ -75,8 +205,9 @@ class Elevator extends Collidable {
 			// screen width; easy to tweak here once real sprites are in
 			width: 4,
 			travel: 5,
-			speed: 0.5,
+			speed: 0.9375,
 			direction: 1,
+			motion: 'lift',
 			render: (tag) => {
 				tag.classList += 'Collidable';
 				tag.style.position = 'absolute';

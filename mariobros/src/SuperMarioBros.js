@@ -1,4 +1,5 @@
 import Inject from '~/engine/src/Inject';
+import { pauseTimeouts, resumeTimeouts } from './pausableTimeout';
 
 import gameOverTheme from '../sounds/gameovertheme.mp3';
 
@@ -21,9 +22,11 @@ import GameOver from './Stage/GameOver';
 import Mario from './Components/Actor/Mario';
 
 import DebugBar from './Components/UI/DebugBar';
+import DebugBackground from './Components/UI/DebugBackground';
+import DebugGrid from './Components/UI/DebugGrid';
+import DebugTeleport from './Components/UI/DebugTeleport';
 import TouchControls from './Components/UI/TouchControls';
 import GameOverScreen from './Components/Screen/GameOver';
-import LevelClear from './Components/Screen/LevelClear';
 import WorldIntro from './Components/Screen/WorldIntro';
 
 import Goomba from './Components/Enemy/Goomba';
@@ -31,7 +34,13 @@ import KoopaTroopa from './Components/Enemy/KoopaTroopa';
 import ParaTroopa from './Components/Enemy/ParaTroopa';
 import PiranhaPlant from './Components/Enemy/PiranhaPlant';
 import FireBar from './Components/Enemy/FireBar';
+import Axe from './Components/Item/Axe';
+import Chain from './Components/Item/Chain';
+import Toad from './Components/Item/Toad';
+import ToadMessage from './Components/Screen/ToadMessage';
 import KoopaFire from './Components/Enemy/KoopaFire';
+import Bowser from './Components/Enemy/Bowser';
+import KoopaFireSpawner from './Components/Enemy/KoopaFireSpawner';
 
 import Brick from './Components/Item/Brick';
 import Coin from './Components/Item/Coin';
@@ -67,6 +76,7 @@ import Elevator from './Components/Scenario/Elevator';
 import Pole from './Components/Scenario/Pole';
 import Bridge from './Components/Scenario/Bridge';
 import Portal from '~/engine/src/Portal';
+import pauseSound from '../sounds/pause.wav';
 
 class SuperMarioBros extends Game {
 	constructor() {
@@ -75,10 +85,13 @@ class SuperMarioBros extends Game {
 		Mario.setupWebComponent();
 
 		DebugBar.setupWebComponent();
+		DebugBackground.setupWebComponent();
+		DebugGrid.setupWebComponent();
+		DebugTeleport.setupWebComponent();
 		TouchControls.setupWebComponent();
 		Hud.setupWebComponent();
 		GameOverScreen.setupWebComponent();
-		LevelClear.setupWebComponent();
+		ToadMessage.setupWebComponent();
 		WorldIntro.setupWebComponent();
 
 		Goomba.setupWebComponent();
@@ -87,6 +100,11 @@ class SuperMarioBros extends Game {
 		PiranhaPlant.setupWebComponent();
 		FireBar.setupWebComponent();
 		KoopaFire.setupWebComponent();
+		Bowser.setupWebComponent();
+		Axe.setupWebComponent();
+		Chain.setupWebComponent();
+		Toad.setupWebComponent();
+		KoopaFireSpawner.setupWebComponent();
 
 		Brick.setupWebComponent();
 		Coin.setupWebComponent();
@@ -112,8 +130,27 @@ class SuperMarioBros extends Game {
 		// window.__inject for external tooling to poke at
 		// Inject.puppet/scene directly, without leaving that exposed by
 		// default for every normal visit to the page
-		if (new URLSearchParams(window.location.search).get('debug') === '1') {
-			window.__inject = Inject;
+		if (Inject.debug.enabled) window.__inject = Inject;
+
+		// ?automated=1: for Playwright & co - only the .Stage stays on the
+		// page, so no buttons/panels end up in screenshots or videos
+		if (new URLSearchParams(window.location.search).get('automated') === '1') {
+			const style = document.createElement('style');
+			style.textContent = `
+				debug-bar, event-panel, .InfoBox, touch-controls { display: none !important; }
+			`;
+			document.head.appendChild(style);
+		}
+
+		// ?debug=overflow: show what's outside the 256x240 screen (the
+		// level keeps running past both edges) and hide the side panel
+		if (Inject.debug.has('overflow')) {
+			const style = document.createElement('style');
+			style.textContent = `
+				.Stage { overflow: visible; }
+				.InfoBox { display: none; }
+			`;
+			document.head.appendChild(style);
 		}
 		console.log(Inject);
 
@@ -125,6 +162,13 @@ class SuperMarioBros extends Game {
 		Inject.audio.mute = false;
 
 		Inject.hud = new Hud();
+		// Start toggles pause once the first Start (which leaves the title
+		// screen) has already happened
+		Inject.events.subscribe((event) => {
+			if (event.type === 'key' && event.data.key === 'start' && event.data.pressed && this._pressedStartOnce) {
+				this.togglePause();
+			}
+		});
 		Inject.hud.actor = 'mario';
 		// score/coin only ever get set here, once for the whole game session
 		// - neither losing a life nor finishing a level touches them, only
@@ -148,6 +192,8 @@ class SuperMarioBros extends Game {
 				Inject.hud.time <= 0 ||
 				Inject.hud.introShowing ||
 				Inject.hud.clockStopped ||
+				this.worldFrozen ||
+				this.paused ||
 				Inject.puppet.winning
 			)
 				return;
@@ -217,7 +263,7 @@ class SuperMarioBros extends Game {
 	// outside .Scene, so score/coin already carry over for free.
 	_bootScene(SceneClass, routeName) {
 		const carry = Inject.puppet ? Inject.puppet.captureState() : null;
-		Inject.hud.hideLevelClear();
+		ToadMessage.hide();
 		if (Inject.puppet) Inject.puppet.destroy();
 		Inject.scene = new SceneClass();
 		Inject.puppet = new Puppet(document.querySelector('player-mario'));
@@ -248,6 +294,33 @@ class SuperMarioBros extends Game {
 	// respawn after death (Puppet.die()'s timeout calls Inject.game.play()
 	// the same way, once lives remain). Nothing moves and no input has any
 	// effect while it's up, since gameInterval simply isn't running yet.
+	// Start pauses/resumes while the game engine is running - which in
+	// SMBDIS (PauseRoutine: game mode, OperMode_Task 3) includes the scripted
+	// parts that run inside it: the walk out of the castle into 1-2's pipe, a
+	// power-up transformation, the flagpole slide and the walk to the castle,
+	// but not the axe/bridge ending, the end-of-level tally, a death, or the
+	// intro card (puppet.noPause covers the first two; the flagpole slide and
+	// walk are blocked too, see Puppet.winLevel - their setTimeout chain
+	// doesn't survive a pause). The pause blip plays
+	// and the music stops until it's resumed
+	togglePause() {
+		const puppet = Inject.puppet;
+		if (this.paused) {
+			this.resume();
+			resumeTimeouts();
+			Inject.audio.play(pauseSound);
+			if (this._pausedTrack) Inject.audio.playBackground(this._pausedTrack);
+			this._pausedTrack = null;
+			return;
+		}
+		if (!puppet || puppet.dying || puppet.noPause || Inject.hud.introShowing || Inject.hud.time <= 0) return;
+		if (!this.pause()) return;
+		pauseTimeouts();
+		Inject.audio.play(pauseSound);
+		this._pausedTrack = Inject.audio._backgroundSrc;
+		Inject.audio.stopBackground();
+	}
+
 	play() {
 		Inject.hud.showIntro(Inject.puppet.lives);
 

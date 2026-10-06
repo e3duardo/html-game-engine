@@ -40,12 +40,11 @@ class Stage extends SceneBase {
 		if (this._openingCutscene) this._openingCutscene();
 	}
 
-	// advances to the next stage once the COURSE CLEAR card has had a moment
-	// on screen - derives "next" from the current route name ('1-2' -> '1-3')
+	// advances to the next stage a moment after the castle celebration - derives "next" from the current route name ('1-2' -> '1-3')
 	// unless this stage's own config named an explicit one (see
 	// `nextStage` above). Router.goTo() itself no-ops if that next route
 	// doesn't exist yet (see Router.js), so finishing the last real stage
-	// just stays on the COURSE CLEAR card. The 3s pause isn't a precise
+	// just stays on the castle. The 3s pause isn't a precise
 	// measured value, just a reasonable beat.
 	onLevelComplete() {
 		setTimeout(() => {

@@ -1,5 +1,6 @@
 import Collidable from '~/engine/src/Collidable';
 import Inject from '~/engine/src/Inject';
+import bumpEnemiesAbove from '../../bumpEnemiesAbove';
 import Assets from '../Assets';
 import coinSound from '../../../sounds/coin.wav';
 import itemSound from '../../../sounds/item.wav';
@@ -97,6 +98,7 @@ class Question extends Collidable {
 
 		if (!this.disabled && !this.bumping && collisions.top && this.border.bottom == 'solid') {
 			this.bumping = true;
+			bumpEnemiesAbove(this);
 			const startY = this.y;
 			let i = 0;
 			let interval;

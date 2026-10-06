@@ -1,6 +1,7 @@
 import Collidable from '~/engine/src/Collidable';
 import Enemy from '~/engine/src/Enemy';
 import Inject from '~/engine/src/Inject';
+import { knockOff, stepKnockedOff, resetKnockOff } from '../../knockOff';
 import Assets from '../Assets';
 import kickkillSound from '../../../sounds/kickkill.wav';
 import stompSound from '../../../sounds/stompswim.wav';
@@ -9,6 +10,16 @@ import stompSound from '../../../sounds/stompswim.wav';
 // 'walking' (default) -> stomped from above -> 'shell' (stationary) ->
 // kicked from the side -> 'shell-sliding' (fast, defeats anything it hits)
 // -> stomped again -> back to 'shell'.
+// SMBDIS RevivalRateData ($10 interval-timer units, one unit = 21 frames):
+// a stunned shell wakes up on its own after that long
+const UNIT_TICKS = 21;
+const REVIVE_UNITS = 0x10;
+const REVIVE_TICKS = REVIVE_UNITS * UNIT_TICKS;
+// SetupFloateyNumber's score table, by index
+const FLOATEY = [0, 100, 200, 400, 500, 800, 1000, 2000, 4000, 5000, 8000];
+// KickedShellPtsData: kicking a shell that's about to wake up is worth more
+const KICK_NEAR_WAKE = [8000, 1000, 500];
+
 class KoopaTroopa extends Enemy {
 
 	static tagName = 'enemy-koopa-troopa';
@@ -25,6 +36,10 @@ class KoopaTroopa extends Enemy {
 		this.walkFrameTicks = 16;
 		this._walkFrame = 0;
 		this._walkTick = 0;
+		this._shellTicks = 0;
+		// kills made by this sliding shell since it was kicked - each one
+		// worth more than the last (ShellChainCounter)
+		this._chain = 0;
 
 		// where this koopa goes back to on reset() (see SceneBase.resetLevel,
 		// called from Puppet.respawnPlayer)
@@ -33,19 +48,25 @@ class KoopaTroopa extends Enemy {
 	}
 
 	reset = () => {
+		resetKnockOff(this);
 		this.dead = false;
 		this.activated = false;
 		this.state = 'walking';
 		this.speedX = -this.walkSpeed;
 		this._walkFrame = 0;
 		this._walkTick = 0;
+		this._shellTicks = 0;
+		this._chain = 0;
 		this.tag.classList.remove('frame-1', 'shell');
+		this._shellBox = false;
+		this.tag.style.height = '24px';
 		this.x = this.defaultX;
 		this.y = this.defaultY;
 		this.originalParent.appendChild(this.tag);
 	};
 
 	update = () => {
+		if (this.knocked) return stepKnockedOff(this);
 		if (this.dead) return;
 		if (!this.isActive()) return;
 
@@ -67,14 +88,9 @@ class KoopaTroopa extends Enemy {
 		// a kicked shell reuses the same toggle to spin between its 2 shell
 		// frames instead - a stationary shell (plain 'shell') always shows
 		// just frame 0, no toggling
-		if (this.state == 'walking' || this.state == 'shell-sliding') {
-			this._walkTick++;
-			if (this._walkTick >= this.walkFrameTicks) {
-				this._walkTick = 0;
-				this._walkFrame = this._walkFrame === 0 ? 1 : 0;
-				this.tag.classList.toggle('frame-1', this._walkFrame === 1);
-			}
-		}
+		this.animateWalk();
+
+		if (this.state == 'shell' && ++this._shellTicks >= REVIVE_TICKS) this.revive();
 
 		if (this.state == 'shell-sliding') {
 			// a moving shell is itself a weapon - defeats any other enemy it touches
@@ -82,9 +98,20 @@ class KoopaTroopa extends Enemy {
 				if (this.dead || object === this || !object.enemy || object.dead) return;
 				const collisions = object.collides(this);
 				if (collisions.top || collisions.bottom || collisions.left || collisions.right) {
-					if (object.defeatByFire) object.defeatByFire();
+					if (object.defeatByFire) object.defeatByFire(this.chainScore());
 				}
 			});
+		}
+	};
+
+	animateWalk = () => {
+		if (this.state == 'walking' || this.state == 'shell-sliding') {
+			this._walkTick++;
+			if (this._walkTick >= this.walkFrameTicks) {
+				this._walkTick = 0;
+				this._walkFrame = this._walkFrame === 0 ? 1 : 0;
+				this.tag.classList.toggle('frame-1', this._walkFrame === 1);
+			}
 		}
 	};
 
@@ -119,6 +146,7 @@ class KoopaTroopa extends Enemy {
 				from.speedY = -4; // bounce off the stationary shell, same as any stomp (halved, tied to Game.fps)
 			} else if (collisions.left || collisions.right) {
 				Inject.audio.play(kickkillSound);
+				this.awardKick(from);
 				this.kick(from.x < this.x ? 1 : -1);
 			}
 		} else if (this.state == 'shell-sliding') {
@@ -133,11 +161,86 @@ class KoopaTroopa extends Enemy {
 		}
 	};
 
+	// 400 normally (+ the stomp chain), but much more if it was about to wake
+	awardKick = (from) => {
+		const unitsLeft = Math.floor((REVIVE_TICKS - this._shellTicks) / UNIT_TICKS);
+		const points =
+			unitsLeft < 3
+				? KICK_NEAR_WAKE[Math.max(0, unitsLeft)]
+				: FLOATEY[Math.min(3 + (from.comboKills || 0), FLOATEY.length - 1)];
+		Inject.hud.addScore(points);
+		Inject.hud.showScorePopup(this.tag, String(points));
+	};
+
+	// the next kill's score: 500, 800, 1000, 2000, 4000, 5000, 8000, then
+	// a 1-up for every one after (the original runs out of table there)
+	chainScore = () => {
+		const index = 4 + this._chain++;
+		if (index >= FLOATEY.length) {
+			Inject.puppet.addLife();
+			return 0;
+		}
+		return FLOATEY[index];
+	};
+
+	// a shell is a 16px-tall object, not the 24px koopa it came from (SMBDIS
+	// swaps the bounding box when the koopa is stunned) - which is what lets
+	// a kicked shell slide through a 1-tile gap the walking koopa can't enter.
+	// Feet stay planted: the box shrinks from the top.
+	setShellBox = (on) => {
+		if (on === !!this._shellBox) return;
+		this._shellBox = on;
+		this.tag.style.height = on ? '16px' : '24px';
+		this.y = this.y + (on ? 8 : -8);
+	};
+
+	// room above for the taller walking koopa to stand back up
+	canStandUp = () =>
+		!Inject.scene.sceneMap.some(
+			(o) =>
+				o.border.bottom == 'solid' &&
+				o.x < this.x + this.width &&
+				o.x + o.width > this.x &&
+				o.y < this.y &&
+				o.y + o.height > this.y - 8
+		);
+
+	// the stunned shell shakes itself back into a walking koopa
+	revive = () => {
+		// stays a shell until there's room to stand
+		if (!this.canStandUp()) {
+			this._shellTicks = REVIVE_TICKS - 1;
+			return;
+		}
+		this.setShellBox(false);
+		this.state = 'walking';
+		this._shellTicks = 0;
+		this.speedX = (Math.random() < 0.5 ? -1 : 1) * this.walkSpeed;
+		this.tag.classList.remove('shell');
+	};
+
+	// a block was hit from underneath while this koopa stood on top of it:
+	// it's knocked into a shell, hopping a little (SetStun) - 100 points
+	bumpedFromBelow = () => {
+		if (this.dead) return;
+		this.state = 'shell';
+		this._shellTicks = 0;
+		this.speedX = 0;
+		this.speedY = -3;
+		this.tag.classList.remove('frame-1');
+		this.tag.classList.add('shell');
+		this.setShellBox(true);
+		Inject.hud.addScore(100);
+		Inject.hud.showScorePopup(this.tag, '100');
+	};
+
 	becomeShell = (from) => {
 		this.state = 'shell';
+		this._shellTicks = 0;
 		this.speedX = 0;
 		this.tag.classList.remove('frame-1');
 		this.tag.classList.add('shell');
+		this.setShellBox(true);
 		Inject.audio.play(stompSound);
 		from.speedY = -4; // halved, tied to Game.fps
 		// a direct stomp feeds mario's chained-kill combo, same as a goomba
@@ -146,11 +249,13 @@ class KoopaTroopa extends Enemy {
 	};
 
 	kick = (direction) => {
+		this._chain = 0;
 		this.state = 'shell-sliding';
 		this.speedX = this.walkSpeed * 6 * direction;
 	};
 
 	stop = () => {
+		this._shellTicks = 0;
 		this.state = 'shell';
 		this.speedX = 0;
 		this.tag.classList.remove('frame-1');
@@ -159,17 +264,19 @@ class KoopaTroopa extends Enemy {
 	};
 
 	// killed outright by a fireball, in any state - see Fireball.js
-	defeatByFire = () => {
+	defeatByFire = (points = 200) => {
+		if (this.dead) return;
 		Inject.audio.play(kickkillSound);
-		this.die();
+		this.die(points);
 	};
 
-	die = () => {
+	die = (points = 200) => {
 		if (this.dead) return;
-		this.dead = true;
-		Inject.hud.addScore(100);
-		Inject.hud.showScorePopup(this.tag, '100');
-		this.tag.remove();
+		if (points) {
+			Inject.hud.addScore(points);
+			Inject.hud.showScorePopup(this.tag, String(points));
+		}
+		knockOff(this);
 	};
 
 	static setupWebComponent() {
@@ -252,8 +359,37 @@ class KoopaTroopa extends Enemy {
 							transform: scaleX(-1);
 						}
 
+						/* a demoted paratroopa (see ParaTroopa.js) reuses this tag
+						   but switches back to the plain koopa's walk art */
+						${tagName}.demoted:not(.shell) .m{
+							background-position: -${KoopaTroopa.bgx * 16}px -8px;
+						}
+						${tagName}.demoted:not(.shell).frame-1 .m{
+							background-position: -${(KoopaTroopa.bgx + 1) * 16}px -8px;
+						}
+						${tagName}[underground="true"].demoted:not(.shell) .m{
+							background-position: -${KoopaTroopa.bgx * 16}px -${8 + 32}px;
+						}
+						${tagName}[underground="true"].demoted:not(.shell).frame-1 .m{
+							background-position: -${(KoopaTroopa.bgx + 1) * 16}px -${8 + 32}px;
+						}
+						${tagName}[red="true"].demoted:not(.shell) .m{
+							background-position: -${KoopaTroopa.bgx * 16}px -${8 + 64}px;
+						}
+						${tagName}[red="true"].demoted:not(.shell).frame-1 .m{
+							background-position: -${(KoopaTroopa.bgx + 1) * 16}px -${8 + 64}px;
+						}
+
+						/* killed by fire/star/shell/block: flipped over while it falls */
+						${tagName}.knocked .m{
+							transform: scaleY(-1);
+						}
+						${tagName}.right.knocked .m{
+							transform: scale(-1, -1);
+						}
+
 						${tagName}.shell .m{
-							top: 8px;
+							top: 0;
 							height: 16px;
 							background-position: -${shellBgx * 16}px -16px;
 							transform: none;

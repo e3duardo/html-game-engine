@@ -3,7 +3,6 @@ import HudBase from '~/engine/src/HudBase';
 import Inject from '~/engine/src/Inject';
 import Assets from '../Assets';
 import WorldIntro from '../Screen/WorldIntro';
-import LevelClear from '../Screen/LevelClear';
 
 import beepSound from '../../../sounds/beep.wav';
 import oneUpSound from '../../../sounds/1up.wav';
@@ -115,14 +114,6 @@ class Hud extends HudBase {
 		WorldIntro.hide();
 	};
 
-	// showLevelClear() below never dismisses itself - undoing it is only
-	// ever needed once a next scene actually exists to show instead (see
-	// SuperMarioBros._bootScene, called right as a Router-driven level
-	// transition starts)
-	hideLevelClear = () => {
-		LevelClear.hide();
-	};
-
 	// the floating "100"/"200" text that pops up and fades wherever a score
 	// gain happened (an enemy stomp, a coin) - purely visual, doesn't touch
 	// the actual score (see addScore/addCoin above, both already called by
@@ -139,18 +130,11 @@ class Hud extends HudBase {
 		setTimeout(() => popup.remove(), 700);
 	};
 
-	// the "COURSE CLEAR!" screen shown once Mario reaches the castle (see
-	// Puppet.winLevel) - stays up (it's never dismissed here) until the next
-	// scene actually boots and explicitly hides it, see hideLevelClear above
-	showLevelClear = () => {
-		LevelClear.show(this.tag.querySelector('.hud-score').textContent);
-	};
-	// the original converts whatever time is left into score right before
-	// the level-clear screen, visibly counting the clock down to 0 (beeping
-	// on every tick) rather than just silently adding a lump sum - 50 points
-	// per unit of time. Called from Puppet.walkToCastle() once mario's walked in the door; `onComplete`
-	// is showLevelClear() itself, so the screen only appears once the
-	// countdown finishes, same as the original never showing it mid-count.
+	// the original converts whatever time is left into score once mario is in
+	// the castle, visibly counting the clock down to 0 (beeping on every tick)
+	// rather than just silently adding a lump sum - 50 points per unit of
+	// time. Called from Puppet.walkToCastle() once mario's walked in the door;
+	// `onComplete` runs once the countdown finishes.
 	playTimeBonus = (onComplete) => {
 		const step = () => {
 			if (this.time <= 0) {

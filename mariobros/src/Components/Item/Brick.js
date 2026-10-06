@@ -1,5 +1,6 @@
 import Collidable from '~/engine/src/Collidable';
 import Inject from '~/engine/src/Inject';
+import bumpEnemiesAbove from '../../bumpEnemiesAbove';
 import Assets from '../Assets';
 import brickSound from '../../../sounds/brick.wav';
 import bumpSound from '../../../sounds/bump.wav';
@@ -77,6 +78,7 @@ class Brick extends Collidable {
 	// brick bumped by small mario, or either disguised variant above)
 	bounce = () => {
 		this.bumping = true;
+		bumpEnemiesAbove(this);
 		const startY = this.y;
 		let i = 0;
 		let interval;
@@ -137,6 +139,7 @@ class Brick extends Collidable {
 
 	break = () => {
 		this.dead = true;
+		bumpEnemiesAbove(this);
 		Inject.audio.play(brickSound);
 		this.tag.classList.add('breaking');
 		setTimeout(() => {

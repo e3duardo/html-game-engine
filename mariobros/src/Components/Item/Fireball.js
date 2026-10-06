@@ -68,7 +68,10 @@ class Fireball extends WalkingItem {
 		Inject.scene.getCollisionMapVisible().forEach((object) => {
 			if (this.dead || !object.enemy || object.dead) return;
 			const collisions = object.collides(this);
-			if (collisions.top || collisions.bottom || collisions.left || collisions.right) {
+			const hit = object.hitByFireball
+				? object.hitByFireball(this)
+				: collisions.top || collisions.bottom || collisions.left || collisions.right;
+			if (hit) {
 				if (object.defeatByFire) object.defeatByFire();
 				this.remove();
 			}

@@ -1,7 +1,10 @@
 import Inject from '~/engine/src/Inject';
+import { pausableTimeout, clearPausableTimeout } from './pausableTimeout';
 import Puppet from '~/engine/src/Puppet';
 import { scriptedWalk } from '~/engine/src/Sequences';
 import fixedStepRaf from '~/engine/src/fixedStepRaf';
+import castleCelebration from './castleCelebration';
+import ToadMessage from './Components/Screen/ToadMessage';
 
 import deathSound from '../sounds/death.wav';
 import fireballSound from '../sounds/fireball.wav';
@@ -134,8 +137,9 @@ class MarioPuppet extends Puppet {
 		this.hurryActive = false;
 		this.powerUp = null;
 		this.tag.style.height = '16px';
+		this._crouchShrunk = false;
 		this.invincible = false;
-		clearTimeout(this._starPowerTimeout);
+		clearPausableTimeout(this._starPowerTimeout);
 		this.starPower = false;
 		this.tag.classList.remove('star-power');
 		super.respawnPlayer();
@@ -197,6 +201,66 @@ class MarioPuppet extends Puppet {
 		return this.big;
 	}
 
+	// SMBDIS BoundBoxCtrlData: a crouching big mario's box is only the lower
+	// 12px of his 32px sprite (ctrl $02), which is what lets him slide under
+	// a 1-tile gap. Here that means the real box shrinks to 16px - tag height
+	// and y, feet planted - while Down is held, and grows back after.
+	syncCrouch() {
+		if (this.crouching && this.big && !this._crouchShrunk) {
+			this._crouchShrunk = true;
+			this.tag.style.height = '16px';
+			this._shiftY(16);
+		} else if (!this.crouching && this._crouchShrunk) {
+			this._endCrouchShrink();
+		}
+	}
+
+	_endCrouchShrink() {
+		if (!this._crouchShrunk) return;
+		this._crouchShrunk = false;
+		this.tag.style.height = '32px';
+		this._shiftY(-16);
+	}
+
+	// SMBDIS ImposeFriction / FrictionData: while he can't steer (Down held on
+	// the ground) friction is the original's - $d0/256 of a 1/16px unit per
+	// frame above $21 units/frame (~2.06px/frame), $98 below - so a run into
+	// a slide carries on for ~75px. The ordinary coast after letting go keeps
+	// the snappier feel the controls were tuned to (see walkAccel above).
+	coastFriction() {
+		if (this.canSteer(true)) return super.coastFriction();
+		return Math.abs(this.speedX) >= 2.0625 ? 0.0508 : 0.0371;
+	}
+
+	// letting go of B while running: the excess over the walking top speed
+	// goes away at the original's friction rate (see above)
+	overspeedFriction() {
+		return Math.abs(this.speedX) >= 2.0625 ? 0.0508 : 0.0371;
+	}
+
+	// standing needs the 16px above his crouched head to be free
+	canStandUp() {
+		if (!this._crouchShrunk) return true;
+		return !Inject.scene.collisionMap.some(
+			(o) =>
+				o.scenario &&
+				!o.dead &&
+				o.border.bottom == 'solid' &&
+				this.x + this.width > o.x + 1 &&
+				this.x < o.x + o.width - 1 &&
+				o.y < this.y &&
+				o.y + o.height > this.y - 16
+		);
+	}
+
+	// SMBDIS PlayerCtrlRoutine: holding Down on the ground while Left/Right
+	// are held wipes the directional bits for that frame - at any size, not
+	// just while crouching - so mario can't steer or accelerate, he just
+	// coasts on whatever speed he had (the slide under low gaps in 1-2)
+	canSteer(grounded) {
+		return !(grounded && Inject.control.down);
+	}
+
 	// no onGround-based clearing here on purpose: onGround isn't updated to
 	// its real value until *later* in the same tick's collision pass (see
 	// engine Puppet.js's update()), so checking it right here - straight
@@ -232,8 +296,18 @@ class MarioPuppet extends Puppet {
 		// same deal for 'hurt-flicker' below (see shrink()) - it needs to
 		// survive every walk/jump/idle animation() call during its ~2.8s
 		// window, same as star-power needs to survive its own 11s.
+		// during a grow/shrink animation the drawn size is whatever the
+		// current step says (see _sizeChange), not what powerUp says
+		let sizing = this._crouchShrunk ? 'crouch-box ' : '';
+		if (this._sizePose !== null && this._sizePose !== undefined) {
+			prefix = this._sizePose === 0 ? '' : 'big-';
+			sizing = 'sizing sizing-pose-' + this._sizePose + ' ';
+		}
+		this._lastClasse = classe;
 		super.animation(
-			(this.starPower ? 'star-power ' : '') +
+			sizing +
+				(this._flashing ? 'power-flash ' : '') +
+				(this.starPower ? 'star-power ' : '') +
 				(this.invincible ? 'hurt-flicker ' : '') +
 				prefix +
 				classe
@@ -261,19 +335,54 @@ class MarioPuppet extends Puppet {
 		if (this.ay !== undefined) this.ay += dy;
 	}
 
-	_freezeForSizeChange() {
+	// SMBDIS HandleChangeSize / ChangeSizeOffsetAdder: for the first 40
+	// frames a step advances every 4 frames. Growing cycles the drawn size
+	// through [small, middle, big] as 0 1 0 1 0 1 2 0 1 2; shrinking
+	// alternates big/small five times (it reuses the swimming poses).
+	// Everything but mario - enemies, items, the clock - stands still the
+	// whole time (TimerControl), then he's back after the full freeze.
+	static GROW_POSES = [0, 1, 0, 1, 0, 1, 2, 0, 1, 2];
+	static SHRINK_POSES = [2, 0, 2, 0, 2, 0, 2, 0, 2, 0];
+	static SIZE_STEP_TICKS = 4;
+
+	// `poses`: null for a plain freeze (the fire flower has no size
+	// animation), otherwise one of the sequences above
+	_freezeForSizeChange(poses = null) {
 		this.scripted = true;
-		setTimeout(() => {
-			this.scripted = false;
-		}, MarioPuppet.SIZE_CHANGE_FREEZE_MS);
+		Inject.game.worldFrozen = true;
+		// no size animation (the fire flower): mario's palette cycles instead
+		this._flashing = !poses;
+		if (this._flashing) this.animation(this._lastClasse || this.facingDir);
+		const totalTicks = Math.round(MarioPuppet.SIZE_CHANGE_FREEZE_MS / Inject.game.tickInterval);
+		let tick = 0;
+		const cancel = fixedStepRaf(() => {
+			if (poses) {
+				const step = Math.floor(tick / MarioPuppet.SIZE_STEP_TICKS);
+				const pose = step < poses.length ? poses[step] : null;
+				if (pose !== this._sizePose && step < poses.length) {
+					this._sizePose = pose;
+					this.animation(this._lastClasse || this.facingDir);
+				}
+			}
+			if (++tick >= totalTicks) {
+				cancel();
+				this._sizePose = null;
+				this._flashing = false;
+				this.scripted = false;
+				Inject.game.worldFrozen = false;
+				this.animation(this._lastClasse || this.facingDir);
+			}
+		}, Inject.game.tickInterval);
 	}
 
-	grow() {
+	// `animate` false: restoreState() carrying the power-up over to the next
+	// scene - the size just applies, no transformation plays
+	grow(animate = true) {
 		if (this.big) return;
 		this.powerUp = 'super';
 		this._shiftY(-16);
 		this.tag.style.height = '32px';
-		this._freezeForSizeChange();
+		if (animate) this._freezeForSizeChange(MarioPuppet.GROW_POSES);
 	}
 
 	// the fire flower only ever spawns when mario is already big (the
@@ -281,18 +390,19 @@ class MarioPuppet extends Puppet {
 	// see Question.js), so normally there's no size change here, just the
 	// power-up switching from 'super' to 'fire' - the height adjustment
 	// below only matters if this is ever reached while still small.
-	becomeFire() {
+	becomeFire(animate = true) {
 		if (this.powerUp === 'fire') return;
 		if (!this.big) {
 			this._shiftY(-16);
 			this.tag.style.height = '32px';
 		}
 		this.powerUp = 'fire';
-		this._freezeForSizeChange();
+		if (animate) this._freezeForSizeChange();
 	}
 
 	shrink() {
 		if (!this.big) return;
+		this._endCrouchShrink();
 		this.powerUp = null;
 		this._shiftY(16);
 		this.tag.style.height = '16px';
@@ -305,11 +415,12 @@ class MarioPuppet extends Puppet {
 		// animation() re-adds the 'hurt-flicker' CSS class every tick this
 		// is true, same pattern as starPower/'star-power'.
 		this.invincible = true;
-		setTimeout(() => {
+		clearPausableTimeout(this._invincibleTimeout);
+		this._invincibleTimeout = pausableTimeout(() => {
 			this.invincible = false;
 		}, 2800);
 		Inject.audio.play(pipePowerDownSound);
-		this._freezeForSizeChange();
+		this._freezeForSizeChange(MarioPuppet.SHRINK_POSES);
 	}
 
 	// what a Router-driven scene swap (see engine Router.js) carries forward
@@ -327,10 +438,10 @@ class MarioPuppet extends Puppet {
 		// reuses grow()/becomeFire() rather than setting `powerUp`/tag height
 		// by hand, so this stays correct if either ever grows other side
 		// effects later
-		if (state.powerUp === 'super') this.grow();
+		if (state.powerUp === 'super') this.grow(false);
 		else if (state.powerUp === 'fire') {
-			this.grow();
-			this.becomeFire();
+			this.grow(false);
+			this.becomeFire(false);
 		}
 	}
 
@@ -354,7 +465,12 @@ class MarioPuppet extends Puppet {
 	// x/y attributes only place things on the 16px tile grid, too coarse
 	// for a projectile that should leave from mario's own hands).
 	throwFireball() {
-		if (this.powerUp != 'fire' || this.dying) return;
+		// the original doesn't let a crouching player throw (PlayerCtrlRoutine / CrouchingFlag)
+		if (this.powerUp != 'fire' || this.dying || this.crouching) return;
+		// no commands during a scripted sequence (walking into a pipe, the
+		// flagpole, a power-up transformation...), over a title card, or
+		// while paused - the same keypress that throws mid-level is ignored
+		if (this.scripted || this.winning || Inject.hud.introShowing || Inject.game.paused) return;
 		if (document.querySelectorAll('item-fireball').length >= 2) return;
 		// facingDir (not the current sprite class) - matches the original
 		// throwing in whichever direction PlayerFacingDir last held, not
@@ -376,8 +492,8 @@ class MarioPuppet extends Puppet {
 	activateStarPower() {
 		this.starPower = true;
 		this.tag.classList.add('star-power');
-		clearTimeout(this._starPowerTimeout);
-		this._starPowerTimeout = setTimeout(() => this.endStarPower(), 11000);
+		clearPausableTimeout(this._starPowerTimeout);
+		this._starPowerTimeout = pausableTimeout(() => this.endStarPower(), 11000);
 		Inject.audio.playBackground(invincibilityTheme);
 	}
 
@@ -413,7 +529,7 @@ class MarioPuppet extends Puppet {
 	// same way die() does (stops the main loop entirely, nothing else moves)
 	// and instead plays out its own short scripted sequence on its own
 	// timers: slide down to the pole's base, award a score band, walk into
-	// the castle, then show the level-clear title card - this engine only
+	// the castle, then move on to the next level - this engine only
 	// has the one continuous scrolling stage per route, no multi-room
 	// chaining exists (see the "no multi-room" note on SceneBase.warp), so
 	// there's nowhere else to send the player within THIS stage afterwards
@@ -422,6 +538,10 @@ class MarioPuppet extends Puppet {
 	winLevel(pole) {
 		if (this.winning || this.dying) return;
 		this.winning = true;
+		// the original lets you pause the slide and the walk, but here the
+		// steps are chained with setTimeouts that keep running while the
+		// frame loops freeze, so pausing mid-sequence desyncs everything
+		this.noPause = true;
 		Inject.game.newGame();
 
 		// winning is only ever flipped true above, so nothing here can
@@ -443,27 +563,32 @@ class MarioPuppet extends Puppet {
 		// pole mario is when he first touches it decides the score (measured
 		// now, before the slide-to-ground animation below moves `this.y`):
 		// touching near the very top scores highest, the bottom scores
-		// lowest. This is a proportional 5-band approximation of a
-		// per-tile-row score table, not a pixel-for-pixel port of one.
-		const poleTop = pole.tag.offsetTop;
-		const poleHeight = pole.tag.offsetHeight;
-		let relative = poleHeight > 0 ? (this.y - poleTop) / poleHeight : 1;
-		relative = Math.max(0, Math.min(1, relative));
-		const POLE_SCORE_BANDS = [5000, 2000, 800, 400, 100];
-		const band = Math.min(
-			POLE_SCORE_BANDS.length - 1,
-			Math.floor(relative * POLE_SCORE_BANDS.length)
-		);
-		const poleScore = POLE_SCORE_BANDS[band];
+		// lowest.
+		// SMBDIS FlagpoleCollision / FlagpoleYPosData: the player's own top Y
+		// (same coordinate system as here) against $90 / $68 / $50 / $22
+		const POLE_SCORES = [
+			[0x90, 100],
+			[0x68, 400],
+			[0x50, 800],
+			[0x22, 2000],
+		];
+		const hit = POLE_SCORES.find(([minY]) => this.y >= minY);
+		const poleScore = hit ? hit[1] : 5000;
 		Inject.hud.addScore(poleScore);
 		Inject.hud.showScorePopup(this.tag, String(poleScore));
 
 		this.speedX = 0;
 		this.speedY = 0;
-		this.x = pole.x + (pole.width - this.width) / 2;
-		// the NES original reuses the skid pose for pole-sliding too - no
-		// dedicated "climbing" sprite exists, and it already looks the part
-		this.animation('skid-right');
+		// three beats, like the original: slide down the pole's left side
+		// (climb frames, hands on the pole), flip to its right side facing
+		// left, then hop off to the right onto the ground. `poleX` is the
+		// pole's centre line: the grabbing hand sits on it
+		// the lowered flag stops a few px above the base block, not touching it
+		const FLAG_REST_GAP = 5;
+		const poleX = pole.x + pole.width / 2;
+		const hangLeftX = poleX - this.width + 1 ;
+		const hangRightX = poleX - 1;
+		this.animation('climb-right-0');
 
 		// the flag itself slides down the pole too, independently of mario's
 		// own descent below (see Flag.js - it's purely decorative art today,
@@ -474,7 +599,7 @@ class MarioPuppet extends Puppet {
 		// bottom-anchored .Scene parent) needs no unit conversion.
 		const flagTag = document.querySelector('item-flag');
 		if (flagTag) {
-			const flagBottomTarget = parseFloat(pole.tag.style.bottom) || 0;
+			const flagBottomTarget = (parseFloat(pole.tag.style.bottom) || 0) + FLAG_REST_GAP;
 			const cancelFlag = fixedStepRaf(() => {
 				const current = parseFloat(flagTag.style.bottom) || 0;
 				const next = current - 4;
@@ -501,30 +626,69 @@ class MarioPuppet extends Puppet {
 		// same as any other landing, not sink through it to whatever's
 		// further down. The pole-based calc is only a fallback if none is
 		// found.
-		const groundCandidates = Inject.scene.sceneMap.filter(
-			(object) => object.solid && this.x + this.width > object.x && this.x < object.x + object.width
-		);
-		const floor = groundCandidates.length
-			? groundCandidates.reduce((highest, o) => (o.y < highest.y ? o : highest))
-			: null;
-		const groundY = floor ? floor.y - this.height : pole.y + pole.height - this.height;
+		const findFloor = (x) => {
+			const candidates = Inject.scene.sceneMap.filter(
+				(object) =>
+					object.solid &&
+					x + this.width > object.x &&
+					x < object.x + object.width &&
+					object.y >= this.y + this.height - 16 // not a ceiling above him
+			);
+			return candidates.length ? candidates.reduce((highest, o) => (o.y < highest.y ? o : highest)) : null;
+		};
+		const floor = findFloor(poleX - this.width / 2);
+		// he stops with his feet right on top of the lowered flag (about a
+		// tile above the base block, tile y=4 on the grid), not on the block
+		const groundY = (floor ? floor.y : pole.y + pole.height) - FLAG_REST_GAP - 16 - this.height;
+		const walkAfterHop = () => {
+			this.animation('right');
+			setTimeout(() => this.walkToCastle(), 200);
+		};
 		// halved from 4 (slide speed) - see the note on die()'s cancelDeath
 		// (engine Puppet.js) for why this runs on fixedStepRaf instead of
 		// setInterval
+		let slideTicks = 0;
 		const cancelSlide = fixedStepRaf(() => {
 			this.y += 2;
+			// re-asserted every tick: this runs inside the collision pass
+			// that triggered winLevel(), which writes mario's own x back
+			// after us on that first tick
+			this.x = hangLeftX;
+			// the two climb frames alternate while he moves (hands swap)
+			this.animation('climb-right-' + (Math.floor(slideTicks++ / 4) % 2));
 			if (this.y >= groundY) {
 				this.y = groundY;
 				cancelSlide();
-				// mario holds still at the base of the pole for ~48 frames
-				// (~800ms) before walking - during which he briefly faces left (the original's
-				// own scripted "turn around" beat, reusing the plain turn
-				// sprite) before turning back right to walk to the castle
-				this.animation('left');
+				// holds still at the base for a beat, then turns to the other
+				// side of the pole (facing left)...
 				setTimeout(() => {
-					this.animation('right');
-					this.walkToCastle();
-				}, 800);
+					this.x = hangRightX;
+					this.animation('climb-left-0');
+					// ...and after another beat hops off to the right
+					setTimeout(() => this._hopOffPole(findFloor, walkAfterHop), 500);
+				}, 500);
+			}
+		}, Inject.game.tickInterval);
+	}
+
+	// last beat of winLevel(): a small jump to the right, falling until he
+	// lands on whatever solid is under him (the ground, one tile below the
+	// pole's hard block)
+	_hopOffPole(findFloor, onLand) {
+		this.animation('jumping-right');
+		const HOP_SPEED_X = 1;
+		const GRAVITY = 0.4;
+		let speedY = -2;
+		const cancelHop = fixedStepRaf(() => {
+			this.x += HOP_SPEED_X;
+			speedY += GRAVITY;
+			this.y += speedY;
+			const floor = findFloor(this.x);
+			const groundY = floor ? floor.y - this.height : this.y;
+			if (speedY > 0 && this.y >= groundY) {
+				this.y = groundY;
+				cancelHop();
+				onLand();
 			}
 		}, Inject.game.tickInterval);
 	}
@@ -552,6 +716,73 @@ class MarioPuppet extends Puppet {
 		// stopping at the castle's outer left wall
 		const doorX = castle ? castle.offsetLeft + 32 + (16 - this.width) / 2 : null;
 		const targetX = doorX !== null ? doorX : this.x + 96;
+		// no camera follow here: SMBDIS FlagpoleCollision does `inc ScrollLock`
+		// the moment the pole is touched, so the screen stays where it was
+		// (the level is built so the castle is already in view). Following him
+		// to the door scrolled the camera past the end of the level's own art,
+		// into whatever sits beyond it (1-2's bonus room).
+		scriptedWalk(this, targetX, {
+			onComplete: () => {
+				// mario disappears through the door
+				this.noPause = true;
+				this.tag.style.visibility = 'hidden';
+				// the clock's last digit now decides the fireworks
+				const digit = Inject.hud.time % 10;
+				// converts the leftover clock into score first (see
+				// Hud.playTimeBonus) - then the castle's flag goes up (and
+				// fireworks, see castleCelebration.js); the next level only
+				// loads after all of that, same as the original (there's no
+				// "course clear" card in SMB1)
+				setTimeout(
+					() =>
+						Inject.hud.playTimeBonus(() => {
+							castleCelebration(castle, digit, () => {
+								// what happens next is stage knowledge, not the
+								// puppet's own - see SceneBase.js's own
+								// onLevelComplete
+								Inject.scene.onLevelComplete();
+							});
+						}),
+					400
+				);
+			},
+		});
+	}
+
+	// SMBDIS HandleAxeMetatile / BridgeCollapse: touching the axe ends the
+	// fight. If Bowser's still standing, the bridge goes tile by tile and he
+	// falls with it; if he was already beaten with fireballs there's no
+	// collapse. Either way mario then walks to Toad.
+	reachAxe(axe) {
+		if (this.winning || this.dying) return;
+		this.winning = true;
+		this.noPause = true;
+		this.speedX = 0;
+		this.speedY = 0;
+		Inject.audio.stopBackground();
+		axe.consume();
+		Inject.scene.collisionMap.forEach((o) => o.tag.tagName === 'ITEM-CHAIN' && o.cut());
+
+		const bowser = Inject.scene.collisionMap.find((o) => o.tag.tagName === 'ENEMY-BOWSER');
+		const bridge = Inject.scene.collisionMap.find((o) => o.tag.tagName === 'SCENE-BRIDGE');
+		if (bowser && !bowser.defeated && !bowser.dead && bridge) {
+			bowser.freezeForEnding();
+			// the flames still in the air go with the music
+			Inject.scene.collisionMap.forEach((o) => {
+				if (o.tag.tagName === 'ENEMY-KOOPA-FIRE' && !o.dead) o.remove_();
+			});
+			bridge.collapse(() => bowser.dropWithBridge(() => this.walkToToad()));
+		} else {
+			this.walkToToad();
+		}
+	}
+
+	// the camera follows him the same way walkToCastle() does; the message
+	// shows once he's next to Toad
+	walkToToad() {
+		const toad = document.querySelector('npc-toad');
+		const targetX = toad ? toad.offsetLeft - this.width - 4 : this.x + 64;
+		Inject.audio.play(levelCompleteTheme);
 		scriptedWalk(this, targetX, {
 			onTick: () => {
 				let scroll = this.x - Inject.stage.width / 2;
@@ -561,20 +792,10 @@ class MarioPuppet extends Puppet {
 				Inject.scene.scroll_x = scroll;
 			},
 			onComplete: () => {
-				// converts the leftover clock into score first (see
-				// Hud.playTimeBonus) - the level-clear screen only appears
-				// once that countdown finishes, same as the original
-				setTimeout(
-					() =>
-						Inject.hud.playTimeBonus(() => {
-							Inject.hud.showLevelClear();
-							// what happens next is stage knowledge, not the
-							// puppet's own - see SceneBase.js's own
-							// onLevelComplete
-							Inject.scene.onLevelComplete();
-						}),
-					400
-				);
+				setTimeout(() => {
+					ToadMessage.show();
+					Inject.scene.onLevelComplete();
+				}, 600);
 			},
 		});
 	}

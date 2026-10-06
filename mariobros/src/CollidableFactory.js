@@ -4,7 +4,11 @@ import Goomba from './Components/Enemy/Goomba';
 import KoopaTroopa from './Components/Enemy/KoopaTroopa';
 import ParaTroopa from './Components/Enemy/ParaTroopa';
 import FireBar from './Components/Enemy/FireBar';
+import Axe from './Components/Item/Axe';
+import Chain from './Components/Item/Chain';
 import KoopaFire from './Components/Enemy/KoopaFire';
+import Bowser from './Components/Enemy/Bowser';
+import KoopaFireSpawner from './Components/Enemy/KoopaFireSpawner';
 import Brick from './Components/Item/Brick';
 import Coin from './Components/Item/Coin';
 import Elevator from './Components/Scenario/Elevator';
@@ -27,7 +31,7 @@ import CollidableFactoryBase from '~/engine/src/CollidableFactoryBase';
 // every class that needs its own behaviour on top of a plain Collidable,
 // keyed by its own static tagName - add a new one here and nothing else
 const collidables = new Map(
-	[Question, Brick, Goomba, KoopaTroopa, ParaTroopa, PiranhaPlant, FireBar, KoopaFire, Mushroom, Coin, Flower, Fireball, Pipe, Pole, Elevator, Star, Lava, Block, Bridge, Floor, FloatingPlatform].map((Component) => [Component.tagName, Component])
+	[Question, Brick, Goomba, KoopaTroopa, ParaTroopa, PiranhaPlant, FireBar, Bowser, Axe, Chain, KoopaFire, KoopaFireSpawner, Mushroom, Coin, Flower, Fireball, Pipe, Pole, Elevator, Star, Lava, Block, Bridge, Floor, FloatingPlatform].map((Component) => [Component.tagName, Component])
 );
 
 class CollidableFactory extends CollidableFactoryBase {

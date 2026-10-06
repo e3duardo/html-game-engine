@@ -142,8 +142,8 @@ class FireBar extends Enemy {
 				tag.style.position = 'absolute';
 				tag.style.width = '0px';
 				tag.style.height = '0px';
-				tag.style.left = (tag.x * 16) + 8 + 'px';
-				tag.style.bottom = (tag.y * 16) + 8 + 'px';
+				tag.style.left = (tag.x * 16) + 'px';
+				tag.style.bottom = (tag.y * 16) + 'px';
 				tag.style.zIndex = 3;
 
  8				// TODO: swap the placeholder ball for the firebar tile in tileset.png
