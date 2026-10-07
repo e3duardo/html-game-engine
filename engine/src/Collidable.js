@@ -56,6 +56,25 @@ class Collidable extends Object {
 		});
 	}
 
+	// the part of the tag that counts for collisions, as {l, t, w, h} insets
+	// from the tag's top-left: a `.c` child (a div the markup positions and sizes
+	// like any other, next to the `.g` group and its `.m` sprite) if there is
+	// one, else `hitInset` if a class sets it, else the whole tag
+	hitBox() {
+		if (this._hit) return this._hit;
+		const c = this.tag.querySelector && this.tag.querySelector('.c');
+		if (c) this._hit = { l: c.offsetLeft, t: c.offsetTop, w: c.offsetWidth, h: c.offsetHeight };
+		else if (this.hitInset) this._hit = this.hitInset;
+		else return { l: 0, t: 0, w: this.width, h: this.height };
+		return this._hit;
+	}
+
+	// this object's collision box in level coordinates
+	_ownBox() {
+		const hb = this.hitBox();
+		return { x: this.x + hb.l, y: this.y + hb.t, w: hb.w, h: hb.h };
+	}
+
 	invalidateBox() {
 		this._cachedBox = null;
 	}
@@ -104,19 +123,64 @@ class Collidable extends Object {
 	// touched it (see e.g. Pipe.js/Question.js)
 	collide(from, collisions) {}
 
+	// Collision against a player whose box is not its whole tag (see
+	// Puppet.hitBox): `from` is a plain {ax, ay, width, height, prevAx, prevAy,
+	// center} snapshot of that box. Each axis is decided separately - the
+	// feet stand on whatever the box overlaps at all, the head bumps whatever is
+	// above its centre, the sides push back - and which one it is comes from
+	// where the box was the frame before, not from how deep it ended up.
+	collidesBox = (from) => {
+		const collisions = { top: false, bottom: false, left: false, right: false };
+		const fl = from.ax;
+		const fr = fl + from.width;
+		const ft = from.ay;
+		const fb = ft + from.height;
+		const prevFb = from.prevAy + from.height;
+		const prevFt = from.prevAy;
+		const box = this._ownBox();
+		const ol = box.x;
+		const or = ol + box.w;
+		const ot = box.y;
+		const ob = ot + box.h;
+		const TOL = 4;
+
+		// a platform that moves (a lift going down) leaves the standing player a
+		// pixel or so above it each frame; he gets re-seated on it, so
+		// allow that gap
+		const gap = this.updatable ? 4 : 0;
+		if (fr > ol && fl < or && fb >= ot - gap && fb <= ot + box.h - 1 && prevFb <= ot + TOL) {
+			collisions.bottom = true;
+			return collisions;
+		}
+		const cx = fl + from.width / 2;
+		if (cx >= ol - 0.25 && cx <= or + 1.25 && ft >= ot && ft <= ob && prevFt >= ob - TOL) {
+			collisions.top = true;
+			return collisions;
+		}
+		const cy = ft + from.height / 2;
+		if (cy >= ot - 0.25 && cy <= ob + 1.25) {
+			if (fr > ol && fl < ol) collisions.right = true;
+			if (fl < or && fr > or) collisions.left = true;
+		}
+		return collisions;
+	};
+
 	collides = (from) => {
+		if (from.boxed) return this.collidesBox(from);
 		let collisions = { top: false, bottom: false, left: false, right: false };
+		const box = this._ownBox();
+		const bx = box.x, by = box.y, bw = box.w, bh = box.h;
 		// above or below this object (checked against the middle of `from`,
 		// with a small tolerance)
-		if ((from.ax + from.width / 2).inRange(this.x - 0.25, this.x + this.width + 1.25)) {
-			if ((from.ay + from.height).inRange(this.y, this.y + this.height - 1)) {
+		if ((from.ax + from.width / 2).inRange(bx - 0.25, bx + bw + 1.25)) {
+			if ((from.ay + from.height).inRange(by, by + bh - 1)) {
 				collisions.bottom = true;
-			} else if (from.ay.inRange(this.y, this.y + this.height)) {
+			} else if (from.ay.inRange(by, by + bh)) {
 				collisions.top = true;
 			}
 		}
 		// right or left of this object
-		if ((from.ay + from.height / 2).inRange(this.y - 0.25, this.y + this.height + 1.25)) {
+		if ((from.ay + from.height / 2).inRange(by - 0.25, by + bh + 1.25)) {
 			// from is straddling this object's LEFT
 			// edge (approaching from the left) - its right edge has passed
 			// that edge but its left edge hasn't reached it yet. This is an
@@ -129,11 +193,11 @@ class Collidable extends Object {
 			// the edge - at real movement speeds (several px/tick) that
 			// band gets stepped over entirely most ticks, missing genuine
 			// wall hits (e.g. running straight through a pipe).
-			if (from.ax + from.width > this.x && from.ax < this.x) {
+			if (from.ax + from.width > bx && from.ax < bx) {
 				collisions.right = true;
 			}
 			// from is straddling this object's RIGHT edge
-			if (from.ax < this.x + this.width && from.ax + from.width > this.x + this.width) {
+			if (from.ax < bx + bw && from.ax + from.width > bx + bw) {
 				collisions.left = true;
 			}
 		}

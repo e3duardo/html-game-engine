@@ -19,6 +19,13 @@ class Game {
 		this.worldFrozen = false;
 	}
 
+	// counts every frame of the game, and a few rules only run on even frames
+	// (the player-vs-enemy collision check is one). It starts at 161 on the first
+	// frame a level runs after the title card, so parity follows that.
+	get frameCounter() {
+		return (160 + this.ticks) & 255;
+	}
+
 	gameLoop = () => {
 		Inject.puppet.update();
 

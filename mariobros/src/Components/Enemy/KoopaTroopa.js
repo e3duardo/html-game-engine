@@ -219,6 +219,11 @@ class KoopaTroopa extends Enemy {
 	// swaps the bounding box when the koopa is stunned) - which is what lets
 	// a kicked shell slide through a 1-tile gap the walking koopa can't enter.
 	// Feet stay planted: the box shrinks from the top.
+	// walking: 12x12 from 9px below Y; shell: same small box as a goomba
+	hitBox() {
+		return this._shellBox ? { l: 3, t: 6, w: 10, h: 6 } : { l: 2, t: 9, w: 12, h: 12 };
+	}
+
 	setShellBox = (on) => {
 		if (on === !!this._shellBox) return;
 		this._shellBox = on;
@@ -275,7 +280,7 @@ class KoopaTroopa extends Enemy {
 		this.tag.classList.add('shell');
 		this.setShellBox(true);
 		Inject.audio.play(stompSound);
-		from.speedY = -4; // halved, tied to Game.fps
+		from.speedY = -4; // stomping a shell bounces the same, see stop()
 		// a direct stomp feeds mario's chained-kill combo, same as a goomba
 		// (100/200/400/..., see Puppet.awardStompScore)
 		from.awardStompScore(this.tag);

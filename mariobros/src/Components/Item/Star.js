@@ -7,6 +7,9 @@ class Star extends WalkingItem {
 
 	constructor(tag) {
 		super(tag);
+		// 12x12, 9px below the object's own Y, which sits 8px
+		// above this tag's top (see Collidable.hitBox)
+		this.hitInset = { l: 2, t: 1, w: 12, h: 12 };
 		// the real star never settles - it keeps hopping for as long as it
 		// exists (see WalkingItem's bounceOnLand)
 		this.bounceOnLand = true;
@@ -15,7 +18,7 @@ class Star extends WalkingItem {
 	collide = (from, collisions) => {
 		super.collide(from, collisions);
 
-		if (this.dead) return;
+		if (this.dead || this.untouchable) return;
 		if (collisions.top || collisions.bottom || collisions.left || collisions.right) {
 			from.activateStarPower();
 			this.remove();

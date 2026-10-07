@@ -93,49 +93,59 @@ class Question extends Collidable {
 		}
 	};
 
+	// head hits from below bump it (the player's speed goes to 0, not 1 as against plain ground)
+	get bumpable() {
+		return !this.disabled;
+	}
+
 	collide = (from, collisions) => {
 		super.collide(from, collisions);
 
 		if (!this.disabled && !this.bumping && collisions.top && this.border.bottom == 'solid') {
 			this.bumping = true;
 			bumpEnemiesAbove(this);
-			const startY = this.y;
+			// the contents come out the instant the
+			// block is hit (the item starts rising at once, the coin pops and
+			// counts), while the block's own little hop plays out for a few frames
+			if (this.hasMushroom) {
+				this.hasMushroom = false;
+				Inject.audio.play(itemSound);
+				Inject.scene.spawn('item-mushroom', { x: this.tag.x, y: this.tag.y + 1 }).startRise();
+			} else if (this.hasPowerUp) {
+				this.hasPowerUp = false;
+				Inject.audio.play(itemSound);
+				if (from.big) {
+					Inject.scene.spawn('item-flower', { x: this.tag.x, y: this.tag.y + 1 }).startRise();
+				} else {
+					Inject.scene.spawn('item-mushroom', { x: this.tag.x, y: this.tag.y + 1 }).startRise();
+				}
+			} else if (this.hasLife) {
+				this.hasLife = false;
+				Inject.audio.play(itemSound);
+				Inject.scene.spawn('item-mushroom', { x: this.tag.x, y: this.tag.y + 1, life: true }).startRise();
+			} else {
+				// every other '?' block just holds a coin - awarded
+				// straight away, no walk-into step
+				Inject.hud.addCoin();
+				Inject.hud.showScorePopup(this.tag, '200');
+				Inject.audio.play(coinSound);
+				this.popCoin();
+			}
+			this.disable();
 			let i = 0;
 			let interval;
 			interval = setInterval(() => {
 				i++;
 				// triangle wave: 10 steps up, 10 steps back down - always lands
 				// back on startY exactly, instead of drifting from rounding
-				this.y = i <= 10 ? startY - i : startY - (20 - i);
+				// visual only: the collision box stays put (a bumping block must not
+				// shove a goomba walking next to it sideways - the bump
+				// is a separate object that never touches the metatile)
+				this.tag.style.transform = `translateY(${i <= 10 ? -i : -(20 - i)}px)`;
 				if (i >= 20) {
 					clearInterval(interval);
-					this.y = startY;
+					this.tag.style.transform = '';
 					this.bumping = false;
-					if (this.hasMushroom) {
-						this.hasMushroom = false;
-						Inject.audio.play(itemSound);
-						Inject.scene.spawn('item-mushroom', { x: this.tag.x, y: this.tag.y + 1 });
-					} else if (this.hasPowerUp) {
-						this.hasPowerUp = false;
-						Inject.audio.play(itemSound);
-						if (from.big) {
-							Inject.scene.spawn('item-flower', { x: this.tag.x, y: this.tag.y + 1 });
-						} else {
-							Inject.scene.spawn('item-mushroom', { x: this.tag.x, y: this.tag.y + 1 });
-						}
-					} else if (this.hasLife) {
-						this.hasLife = false;
-						Inject.audio.play(itemSound);
-						Inject.scene.spawn('item-mushroom', { x: this.tag.x, y: this.tag.y + 1, life: true });
-					} else {
-						// every other '?' block just holds a coin - awarded
-						// straight away, same as the original (no walk-into step)
-						Inject.hud.addCoin();
-						Inject.hud.showScorePopup(this.tag, '200');
-						Inject.audio.play(coinSound);
-						this.popCoin();
-					}
-					this.disable();
 				}
 			}, 5);
 		}

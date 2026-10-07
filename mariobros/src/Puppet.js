@@ -62,8 +62,15 @@ class MarioPuppet extends Puppet {
 		// explicit request to trade some of that momentum for a snappier,
 		// more modern response; top speed itself (maxSpeedX, and the
 		// speed-banded jump arcs keyed off it) is untouched.
-		this.walkAccel = 0.111;
-		this.runAccel = 0.167;
+		// fidelity pass: integer ramp (152 / 228 over 256,
+		// in 1/16 px per frame^2) so recorded inputs replay the same - the 3x
+		// snappier values were 0.111 / 0.167
+		this.intPhysics = true;
+		this.walkAccel = 0.0371;
+		this.runAccel = 0.0557;
+		// gravity caps the fall at 4 px/frame (+ a force byte that resets at
+		// 128), so it oscillates between 4 and 4.5 - 4.25 on average
+		this.speed_limit_y = 4.25;
 
 		// the power-up mario is currently holding: null (small), 'super'
 		// (big), or 'fire'. What a power-up actually grants is read from
@@ -185,8 +192,27 @@ class MarioPuppet extends Puppet {
 		{ maxSpeed: Infinity, impulse: 5, riseGravity: 0x28 / 256, fallGravity: 0x90 / 256 },
 	];
 
+	// jump impulse and rise/fall force bytes, indexed by the
+	// walking speed at takeoff (in 1/16 px: <9, <16, <25, <28, faster)
+	static INT_JUMP = [
+		{ impulse: 4, rise: 0x20, fall: 0x70 },
+		{ impulse: 4, rise: 0x20, fall: 0x70 },
+		{ impulse: 4, rise: 0x1e, fall: 0x60 },
+		{ impulse: 5, rise: 0x28, fall: 0x90 },
+		{ impulse: 5, rise: 0x28, fall: 0x90 },
+	];
+
 	jump() {
 		this._jumpPhysics = MarioPuppet.JUMP_PHYSICS.find((p) => Math.abs(this.speedX) < p.maxSpeed);
+		if (this.intPhysics) {
+			const a = this._xAbs | 0;
+			const band = a < 0x09 ? 0 : a < 0x10 ? 1 : a < 0x19 ? 2 : a < 0x1c ? 3 : 4;
+			const j = MarioPuppet.INT_JUMP[band];
+			this._jumpConsumed = true;
+			this._intJump(j.impulse, j.rise, j.fall);
+			Inject.audio.play(this.big ? jumpBigSound : jumpSmallSound);
+			return;
+		}
 		super.jump();
 		Inject.audio.play(this.big ? jumpBigSound : jumpSmallSound);
 	}
@@ -239,6 +265,26 @@ class MarioPuppet extends Puppet {
 	}
 
 	// standing needs the 16px above his crouched head to be free
+	// Collision box (x0, y0, x1, y1 inside the 16px-wide cell): small 3,20,13,32 -
+	// 10x12 planted at the bottom of the cell; big 2,8,14,32 - 12x24;
+	// big crouching 2,20,14,32 - 12x12. Here the tag is 16 tall when
+	// small or crouching (feet at the bottom) and 32 when big.
+	hitBox() {
+		if (!this.big) return { l: 3, t: 4, w: 10, h: 12 };
+		if (this._crouchShrunk) return { l: 2, t: 4, w: 12, h: 12 };
+		return { l: 2, t: 8, w: 12, h: 24 };
+	}
+
+	// BlockBuffer_X_Adder / Y_Adder rows for the player (see engine _intBG).
+	// small and crouching share one set, big another; the tag of a small or
+	// crouched mario is 16px tall at the bottom of the 32px cell
+	bgProbes() {
+		if (!this.big || this._crouchShrunk) {
+			return { offY: 16, headX: 8, headY: 0x12, upperExt: 0x10, feetX: [3, 12], feetY: 32, sideX: [2, 13], sideY: [24, 24, 24, 24] };
+		}
+		return { offY: 0, headX: 8, headY: 4, upperExt: 0x20, feetX: [3, 12], feetY: 32, sideX: [2, 13], sideY: [8, 24, 8, 24] };
+	}
+
 	canStandUp() {
 		if (!this._crouchShrunk) return true;
 		return !Inject.scene.collisionMap.some(
@@ -347,15 +393,19 @@ class MarioPuppet extends Puppet {
 
 	// `poses`: null for a plain freeze (the fire flower has no size
 	// animation), otherwise one of the sequences above
-	_freezeForSizeChange(poses = null) {
+	_freezeForSizeChange(poses = null, frames = 59, controlFrames = frames) {
+		// the freeze starts on the pickup frame (mario has already moved
+		// that frame) and the world stands still until the task ends:
+		// 59 frames for growing, 63 for the fire flower, 55 for the
+		// injury blink - which only freezes mario himself for the first 16,
+		// after that he is back in control while everything else waits
 		this.scripted = true;
 		Inject.game.worldFrozen = true;
-		// no size animation (the fire flower): mario's palette cycles instead
-		this._flashing = !poses;
-		if (this._flashing) this.animation(this._lastClasse || this.facingDir);
-		const totalTicks = Math.round(MarioPuppet.SIZE_CHANGE_FREEZE_MS / Inject.game.tickInterval);
+		let controlBack = frames - controlFrames;
+		const totalTicks = Math.round(((frames * 1000) / 60.0988) / Inject.game.tickInterval);
 		let tick = 0;
 		const cancel = fixedStepRaf(() => {
+			if (controlBack > 0 && tick + 1 === controlFrames) this.scripted = false;
 			if (poses) {
 				const step = Math.floor(tick / MarioPuppet.SIZE_STEP_TICKS);
 				const pose = step < poses.length ? poses[step] : null;
@@ -397,7 +447,7 @@ class MarioPuppet extends Puppet {
 			this.tag.style.height = '32px';
 		}
 		this.powerUp = 'fire';
-		if (animate) this._freezeForSizeChange();
+		if (animate) this._freezeForSizeChange(null, 63);
 	}
 
 	shrink() {
@@ -420,7 +470,7 @@ class MarioPuppet extends Puppet {
 			this.invincible = false;
 		}, 2800);
 		Inject.audio.play(pipePowerDownSound);
-		this._freezeForSizeChange(MarioPuppet.SHRINK_POSES);
+		this._freezeForSizeChange(MarioPuppet.SHRINK_POSES, 55, 16);
 	}
 
 	// what a Router-driven scene swap (see engine Router.js) carries forward

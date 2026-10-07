@@ -31,23 +31,15 @@ Referência: disassembly em `~/vendor/smbdis/SMBDIS.ASM`. Coordenadas do jogo = 
 - [x] Abertura da 1-2 vindo da 1-1: `.Scene` ficava com o scroll da fase anterior (`left: -3136px`); agora zera ao criar a cena
 
 - [x] Modo debug via URL (`Inject.debug`, `engine/src/DebugContext.js`): `?debug` liga `<debug-background>` (mapa de referência) e `<debug-grid>` (grade 16px numerada, x esquerda→direita, y de baixo p/ cima); `?debug=overflow` também mostra o que está fora da tela e esconde o InfoBox. Flags separadas por vírgula.
-
-## Falta — com você (sprites / conferir no original)
-- [x] Sprite dos fogos de artifício (hoje: círculo CSS) — `src/castleCelebration.js`
-- [x] Posição inicial do Mario: SMBDIS `PlayerStarting_X_Pos` = $28 (x=40, tile 2,5) para entrada normal; 1-1, 1-3 e 1-4 agora em `x="2.5"` (1-2 já estava)
-- [x] Skid (virar correndo): só durava ~1 frame (limiar de velocidade 0.5); agora dura até parar e virar. Lado esquerdo espelhado. Dura pouco (~5 frames) porque a aceleração é 3x a original
-- [x] "Rampa" do fim da ponte da 1-4: era a corrente (`Chain.js`) que prende a ponte ao machado
-- [x] Sons por palpite: `fire.wav` (chama do Bowser), `billfirework.wav` (fogos)
-- [x] Estrela no Bowser: conferido no SMBDIS (EColl → ShellOrBlockDefeat antes de qualquer checagem de ID; Bowser cai, 200 pts). Bola de fogo é outro caminho (5 acertos, 5000 pts)
-- [x] Posição do machado (141,6) e do Toad (153,2) — conferir contra o original
-
-## Falta — não testado
-- [x] Timers da estrela (11s) e do piscar após dano (2,8s) agora congelam na pausa (`src/pausableTimeout.js`). Ainda não pausam: setTimeouts cosméticos (moeda, popup de pontos, remoção de inimigo) e a sequência da bandeira (já bloqueia pausa)
-- [x] Congelamento do mundo ao pegar a flor de fogo (visual)
-- [x] Soltar Baixo sob teto de 1 tile (deve continuar agachado)
-- [x] Bowser morto por bolas de fogo (Goomba revelado): testado em 1-4 (5 acertos → +5000, pula e cai como Goomba de cabeça para baixo; `BowserIdentities[mundo 1] = Goomba`). Falta só você ver em vídeo se o sprite é o que queria
-- [x] Mario pequeno apertando Baixo + direção correndo (desliza sem agachar)
-
-## Ideias / não prioritário
-- [ ] Fricção ao soltar o botão usa o `walkAccel` ajustado (mais seco que o original)
-- [x] Soltar B com velocidade acima de 1,5: o excesso agora some pela fricção original (0,0508 / 0,0371) em vez de cortar de uma vez; no ar a velocidade é mantida
+- Replay de um playthrough gravado chega na bandeira da 1-1 no nosso jogo, com o estado interno batendo byte a byte com o log de referência até o frame 4349 (relógio virtual, 1 tick do engine por frame gravado, ~10s por rodada). Para isso o Mario passou a usar física inteira (`intPhysics` em `engine/src/Puppet.js`, opt-in; o marioworld não muda):
+  - horizontal: atrito e movimento com dois bytes de força separados, direção de movimento começando em 0, checagem de derrapada depois do cálculo do atrito, bits de colisão mascarando o atrito, timer de corrida;
+  - vertical: gravidade com bytes de velocidade/força/dummy, escolha da gravidade do pulo/queda (state 0/1/2), pulo por faixa de velocidade, bounce do stomp = -4 (goomba/koopa);
+  - colisão por tiles: cabeça em Y+4 (grande) ou +18 (pequeno), pés em X+3/X+12 (4px de tolerância para pousar), laterais em X+2/X+13 empurrando 1px por frame, pés fundos pulam a checagem lateral;
+  - caixas de colisão: Mario 10x12 / 12x24, goomba 10x6, itens e koopa andando 12x12, casco 10x6;
+  - contato com inimigos só em frames pares do contador de frames, uma vez por contato (bit de colisão), inimigo anda antes de testar o contato; stomp = velocidade vertical > 0;
+  - câmera com o atraso entre x 80 e 112, grupos de goombas nascendo na borda direita (atributos `group`/`lead` no 1-1), cogumelo/flor subindo 1px a cada 4 frames e saindo na hora do hit, freeze do power-up de 59/63 frames começando no frame seguinte (dano: 55 frames, Mario livre depois dos 16 primeiros), aceleração 0.0371/0.0557, clock do HUD de 24 frames.
+- [ ] Depois da bandeira o replay diverge (o engine entra na sequência própria de fim de fase; a referência continua em estado diferente): conferir a sequência do mastro/castelo contra o log de referência.
+- [ ] Outras fases com a física nova: elevadores/plataformas da 1-2/1-3/1-4 foram só testados na mão (ficam presos ao Mario, sem tremer). Vale gravar um playthrough de cada fase para repetir a comparação (precisa de um `inputs.csv` por fase).
+- [ ] Grupos de inimigos das outras fases: só a 1-1 tem os atributos `group`/`lead` (nascimento na borda direita da tela).
+- [ ] Enemies ainda usam a física antiga (float) - só o Mario é exato; koopas/paratroopas/Bowser/plantas fora da 1-1 não foram comparados com o log de referência.
+- [ ] `hitBox()` hoje vem de insets no código (Mario, goomba, itens, koopa); a ideia da `div .c` (offset/tamanho no markup, ao lado de `.g`/`.m`) já é lida por `Collidable.hitBox()` quando existir, falta migrar os componentes.

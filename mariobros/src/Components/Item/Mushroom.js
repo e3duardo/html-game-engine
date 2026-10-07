@@ -10,16 +10,22 @@ class Mushroom extends WalkingItem {
 
 	constructor(tag) {
 		super(tag);
+		// 12x12, 9px below the object's own Y, which sits 8px
+		// above this tag's top (see Collidable.hitBox)
+		this.hitInset = { l: 2, t: 1, w: 12, h: 12 };
 		// same shape and movement as the regular mushroom, just a green
 		// recolor and a different effect - picked by the `life` attribute
 		// in the level markup (see Question.js's `hasLife` block)
 		this.isLife = tag.hasAttribute('life');
+		// 1px/frame (goombas are 0.5)
+		this.walkSpeed = 1;
+		this.speedX = 1;
 	}
 
 	collide = (from, collisions) => {
 		super.collide(from, collisions);
 
-		if (this.dead) return;
+		if (this.dead || this.untouchable) return;
 		if (collisions.top || collisions.bottom || collisions.left || collisions.right) {
 			if (this.isLife) {
 				from.addLife();

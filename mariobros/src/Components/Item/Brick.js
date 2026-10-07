@@ -47,6 +47,11 @@ class Brick extends Collidable {
 		this.originalParent.appendChild(this.tag);
 	};
 
+	// head hits from below bump it (the player's speed goes to 0, not 1 as against plain ground)
+	get bumpable() {
+		return true;
+	}
+
 	collide = (from, collisions) => {
 		super.collide(from, collisions);
 
@@ -86,10 +91,13 @@ class Brick extends Collidable {
 			i++;
 			// triangle wave: 10 steps up, 10 steps back down - always lands
 			// back on startY exactly, instead of drifting from rounding
-			this.y = i <= 10 ? startY - i : startY - (20 - i);
+			// visual only: the collision box stays put (a bumping block must not
+				// shove a goomba walking next to it sideways - the bump
+				// is a separate object that never touches the metatile)
+				this.tag.style.transform = `translateY(${i <= 10 ? -i : -(20 - i)}px)`;
 			if (i >= 20) {
 				clearInterval(interval);
-				this.y = startY;
+				this.tag.style.transform = '';
 				this.bumping = false;
 			}
 		}, 5);
@@ -134,7 +142,7 @@ class Brick extends Collidable {
 		this.spent = true;
 		this.tag.classList.add('spent');
 		Inject.audio.play(itemSound);
-		Inject.scene.spawn('item-star', { x: this.tag.x, y: this.tag.y + 1 });
+		Inject.scene.spawn('item-star', { x: this.tag.x, y: this.tag.y + 1 }).startRise();
 	};
 
 	break = () => {

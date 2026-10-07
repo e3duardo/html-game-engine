@@ -66,7 +66,35 @@ class WalkingItem extends Collidable {
 		}
 	}
 
+	// A power-up comes out of its block one pixel every
+	// 4th frame for 16 pixels (and a 17th step that hands it its speed), drawn
+	// behind the block, and can't be picked up before its state reaches 6
+	// (24 frames in). Callers that spawn one from a block call startRise().
+	startRise = () => {
+		this._riseTicks = 0;
+		this._riseTargetY = this.y;
+		this.y = this.y + 16;
+		this.rising = true;
+		this.tag.style.zIndex = 1;
+	};
+
+	// true while it's still too deep in the block to be touched
+	get untouchable() {
+		return !!this.rising && this._riseTicks < 24;
+	}
+
+	_stepRise = () => {
+		this._riseTicks++;
+		if (this._riseTicks % 4 === 0 && this.y > this._riseTargetY) this.y = this.y - 1;
+		if (this._riseTicks >= 68) {
+			this.rising = false;
+			this.y = this._riseTargetY;
+			this.tag.style.zIndex = 2;
+		}
+	};
+
 	update = () => {
+		if (this.rising) return this._stepRise();
 		this.walk();
 	};
 

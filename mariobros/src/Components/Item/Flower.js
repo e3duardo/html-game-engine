@@ -12,14 +12,39 @@ class Flower extends Collidable {
 
 	constructor(tag) {
 		super(tag);
+		// 12x12, 9px below the object's own Y, which sits 8px
+		// above this tag's top (see Collidable.hitBox)
+		this.hitInset = { l: 2, t: 1, w: 12, h: 12 };
 		this.type = 'item';
 		this.collected = false;
+		this.updatable = true;
 	}
+
+	// same emergence as the mushroom (see WalkingItem.startRise), it just never
+	// moves afterwards
+	startRise = () => {
+		this._riseTicks = 0;
+		this._riseTargetY = this.y;
+		this.y = this.y + 16;
+		this.rising = true;
+		this.tag.style.zIndex = 1;
+	};
+
+	update = () => {
+		if (!this.rising) return;
+		this._riseTicks++;
+		if (this._riseTicks % 4 === 0 && this.y > this._riseTargetY) this.y = this.y - 1;
+		if (this._riseTicks >= 68) {
+			this.rising = false;
+			this.y = this._riseTargetY;
+			this.tag.style.zIndex = 2;
+		}
+	};
 
 	collide = (from, collisions) => {
 		super.collide(from, collisions);
 
-		if (this.collected) return;
+		if (this.collected || (this.rising && this._riseTicks < 24)) return;
 		if (collisions.top || collisions.bottom || collisions.left || collisions.right) {
 			this.collected = true;
 			from.becomeFire();

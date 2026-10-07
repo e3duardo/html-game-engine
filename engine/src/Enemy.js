@@ -15,6 +15,15 @@ class Enemy extends WalkingItem {
 		this.type = 'enemy';
 		this.activated = false;
 		this.activationLookahead = 48;
+		// The members of an enemy group (goomba pairs...)
+		// are not placed from their data column - the whole group appears at the
+		// right edge of the screen (x = ScreenRight, +24 per member) in the frame
+		// the screen reaches the group's trigger, so there is no 48px lookahead.
+		// `group` marks a member; `lead` (tiles) names the first member's column,
+		// the one whose arrival triggers everybody
+		if (tag.hasAttribute && tag.hasAttribute('group')) this.activationLookahead = -1;
+		const lead = tag.getAttribute && tag.getAttribute('lead');
+		this.groupLead = lead !== null && lead !== undefined && lead !== '' ? Number(lead) * 16 : null;
 	}
 
 	// true while the enemy is in its "alive" window: past activation, not
@@ -25,7 +34,8 @@ class Enemy extends WalkingItem {
 			return false; // scrolled off the left edge for good
 		}
 		if (this.activated) return true;
-		if (this.x > Inject.scene.scroll_x + Inject.stage.width + this.activationLookahead) {
+		const trigger = this.groupLead ?? this.x;
+		if (trigger > Inject.scene.scroll_x + Inject.stage.width + this.activationLookahead) {
 			return false; // still too far ahead of the camera
 		}
 		this.activated = true;
@@ -50,11 +60,18 @@ class Enemy extends WalkingItem {
 	// narrow gaps between adjacent blocks (the player's own width bridging
 	// two neighbors' spans at once) and floor/pipe edges.
 	landedOn = (from) => {
+		// the player's contact rules (even frames, once per contact) already live
+		// in the collision flags the caller has
+		if (from.intPhysics) return false;
+		const hb = from.hitBox ? from.hitBox() : { l: 0, t: 0, w: from.width, h: from.height };
+		const mine = this._ownBox();
+		const falling = from.intPhysics ? from._nSy > 0 : from.speedY > 0;
 		return (
-			from.speedY > 0 &&
-			from.ax + from.width > this.x &&
-			from.ax < this.x + this.width &&
-			(from.ay + from.height).inRange(this.y, this.y + this.height - 1)
+			falling &&
+			from.ax + hb.l + hb.w > mine.x &&
+			from.ax + hb.l < mine.x + mine.w &&
+			from.ay + hb.t + hb.h > mine.y &&
+			from.ay + hb.t < mine.y + mine.h
 		);
 	};
 }

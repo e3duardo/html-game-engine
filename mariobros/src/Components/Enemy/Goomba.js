@@ -11,6 +11,9 @@ class Goomba extends Enemy {
 
 	constructor(tag) {
 		super(tag);
+		// small box: 10 wide and only 6 tall, 14px below
+		// the enemy's own Y - which sits 8px above this tag's top (see Collidable.hitBox)
+		this.hitInset = { l: 3, t: 6, w: 10, h: 6 };
 
 		// goombas always start out walking left, regardless of where mario
 		// is - the moving direction is hardcoded, not read from mario's
@@ -87,7 +90,7 @@ class Goomba extends Enemy {
 	squish = (from) => {
 		this.die();
 		Inject.audio.play(stompSound);
-		// halved from -8 (bounce impulse), tied to Game.fps (now 60)
+		// stomp bounce: vertical speed -4
 		from.speedY = -4;
 		// a direct stomp feeds mario's chained-kill combo (100/200/400/...,
 		// see Puppet.awardStompScore) - a fireball kill below doesn't
