@@ -34,7 +34,7 @@
 	"homepage": "https://e3duardo.github.io/html-game-engine/",
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
-		"eslint": "^10.11.0",
+		"eslint": "^10.15.0",
 		"eslint-config-prettier": "^10.1.8",
 		"globals": "^17.12.0",
 		"less": "^4.9.1",
